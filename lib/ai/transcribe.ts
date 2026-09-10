@@ -7,7 +7,12 @@ const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5";
 let client: Anthropic | null = null;
 function anthropic() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not set");
+  // Surfaced straight to the cook in the capture list, so say something useful.
+  if (!apiKey) {
+    throw new Error(
+      "Reading photos is not switched on yet. Your photo is saved and can be read later.",
+    );
+  }
   client ??= new Anthropic({ apiKey });
   return client;
 }
