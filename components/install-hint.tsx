@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Button, Card } from "@/components/ui";
 
 type InstallPromptEvent = Event & {
@@ -8,19 +8,38 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+const STANDALONE = "(display-mode: standalone)";
+
+function subscribeToDisplayMode(onChange: () => void) {
+  const query = window.matchMedia(STANDALONE);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+const noSubscription = () => () => {};
+
 export function InstallHint() {
-  const [installed, setInstalled] = useState(true);
+  // Assume installed on the server so the prompt never flashes before
+  // hydration decides it is not needed.
+  const installed = useSyncExternalStore(
+    subscribeToDisplayMode,
+    () => window.matchMedia(STANDALONE).matches,
+    () => true,
+  );
+
+  const isIos = useSyncExternalStore(
+    noSubscription,
+    () => /iphone|ipad|ipod/i.test(navigator.userAgent),
+    () => false,
+  );
+
   const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
-  const [isIos, setIsIos] = useState(false);
 
   useEffect(() => {
-    setInstalled(window.matchMedia("(display-mode: standalone)").matches);
-    setIsIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
-
     // Chrome and Edge let us trigger the real install prompt.
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setPrompt(e as InstallPromptEvent);
+    const onPrompt = (event: Event) => {
+      event.preventDefault();
+      setPrompt(event as InstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
     return () => window.removeEventListener("beforeinstallprompt", onPrompt);

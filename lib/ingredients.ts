@@ -37,8 +37,17 @@ export function formatQuantity(n: number): string {
   return String(Math.round(n * 100) / 100);
 }
 
+/** Abbreviations never take an "s": 200 g, not 200 gs. */
+const ABBREVIATIONS = new Set([
+  "g", "kg", "mg", "ml", "l", "oz", "lb", "tsp", "tbsp", "qt", "pt", "fl oz",
+]);
+
+/** Metric mass and volume read better closed up: 200g, 350ml. */
+const ATTACHED = new Set(["g", "kg", "mg", "ml", "l"]);
+
 function pluralizeUnit(unit: string, qty: number | null) {
-  if (!unit || qty === null || qty <= 1) return unit;
+  if (!unit || ABBREVIATIONS.has(unit)) return unit;
+  if (qty === null || qty <= 1) return unit;
   if (/(s|sh|ch|x)$/i.test(unit)) return unit + "es";
   return unit + "s";
 }
@@ -49,11 +58,15 @@ export function formatIngredient(ing: Ingredient): string {
 
   if (ing.quantity !== null && ing.quantity !== undefined) {
     const q = formatQuantity(ing.quantity);
+    const amount =
+      ing.quantityMax != null ? `${q}-${formatQuantity(ing.quantityMax)}` : q;
     parts.push(
-      ing.quantityMax != null ? `${q}-${formatQuantity(ing.quantityMax)}` : q,
+      ing.unit && ATTACHED.has(ing.unit) ? `${amount}${ing.unit}` : amount,
     );
   }
-  if (ing.unit) parts.push(pluralizeUnit(ing.unit, ing.quantity ?? null));
+  if (ing.unit && !(ing.quantity != null && ATTACHED.has(ing.unit))) {
+    parts.push(pluralizeUnit(ing.unit, ing.quantity ?? null));
+  }
   if (ing.item) parts.push(ing.item);
 
   const line = parts.join(" ").trim();
@@ -90,7 +103,9 @@ function parseNumber(token: string): number | null {
  * is always shown to the cook verbatim.
  */
 export function parseIngredient(line: string, group?: string | null): Ingredient {
-  const trimmed = line.trim();
+  // Metric recipes write "200g caster sugar" with no space, which would
+  // otherwise be read as an unquantified item and refuse to scale.
+  const trimmed = line.trim().replace(/^(\d+(?:[.,]\d+)?)([a-zA-Z]+)\b/, "$1 $2");
   if (!trimmed) return { quantity: null, unit: null, item: "", group };
 
   // A trailing clause after a comma is preparation, not part of the item.
