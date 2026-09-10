@@ -1,0 +1,123 @@
+import Link from "next/link";
+import type { ComponentProps, ReactNode } from "react";
+
+type Variant = "primary" | "secondary" | "ghost" | "danger";
+
+const base =
+  "tap inline-flex items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-bold " +
+  "transition-[filter,background-color] active:brightness-95 disabled:opacity-50 " +
+  "disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 " +
+  "focus-visible:outline-pink";
+
+const variants: Record<Variant, string> = {
+  primary: "bg-pink text-page shadow-sm",
+  secondary: "bg-card text-ink border border-line",
+  ghost: "text-browned",
+  danger: "bg-jam text-page",
+};
+
+export function Button({
+  variant = "primary",
+  className = "",
+  ...props
+}: ComponentProps<"button"> & { variant?: Variant }) {
+  return (
+    <button {...props} className={`${base} ${variants[variant]} ${className}`} />
+  );
+}
+
+export function ButtonLink({
+  variant = "primary",
+  className = "",
+  ...props
+}: ComponentProps<typeof Link> & { variant?: Variant }) {
+  return (
+    <Link {...props} className={`${base} ${variants[variant]} ${className}`} />
+  );
+}
+
+export function Card({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={`rounded-card border border-line bg-card shadow-[0_1px_3px_#382a2214] ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-[0.8rem] font-bold tracking-wide text-browned uppercase">
+        {label}
+      </span>
+      {children}
+      {hint ? <span className="mt-1 block text-sm text-muted">{hint}</span> : null}
+    </label>
+  );
+}
+
+export function Input({ className = "", ...props }: ComponentProps<"input">) {
+  return (
+    <input
+      {...props}
+      className={
+        "tap w-full rounded-xl border border-line bg-page px-4 text-[1.05rem] text-ink " +
+        "placeholder:text-muted/60 focus:border-pink focus:outline-none " +
+        className
+      }
+    />
+  );
+}
+
+export function Textarea({
+  className = "",
+  ...props
+}: ComponentProps<"textarea">) {
+  return (
+    <textarea
+      {...props}
+      className={
+        "w-full rounded-xl border border-line bg-page px-4 py-3 text-[1.05rem] text-ink " +
+        "placeholder:text-muted/60 focus:border-pink focus:outline-none " +
+        className
+      }
+    />
+  );
+}
+
+export function ErrorNote({ children }: { children: ReactNode }) {
+  if (!children) return null;
+  return (
+    <p
+      role="alert"
+      className="rounded-xl bg-jam/10 px-4 py-3 text-[0.95rem] text-jam"
+    >
+      {children}
+    </p>
+  );
+}
+
+/** Small uppercase label used above groups of things. */
+export function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <span className="text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
+      {children}
+    </span>
+  );
+}

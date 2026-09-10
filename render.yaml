@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: pink-recipe-box
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    # Migrations run at build rather than at boot: the free plan re-runs the
+    # start command every time the service wakes, and cold starts are already
+    # slow enough.
+    buildCommand: npm ci && npm run build && npm run db:migrate
+    startCommand: npm run start
+    healthCheckPath: /login
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Points at the `pinkbox` schema in the existing camino-db instance.
+      # Use the external URL with ?sslmode=require, or the internal URL as-is.
+      - key: DATABASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: INVITE_CODE
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true

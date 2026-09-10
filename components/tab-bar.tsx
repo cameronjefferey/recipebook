@@ -1,0 +1,46 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { BoxIcon, CameraIcon, GearIcon, SearchIcon } from "@/components/icons";
+
+const tabs = [
+  { href: "/box", label: "Box", Icon: BoxIcon },
+  { href: "/search", label: "Search", Icon: SearchIcon },
+  { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
+  { href: "/settings", label: "Settings", Icon: GearIcon },
+];
+
+export function TabBar() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="no-print pb-safe sticky bottom-0 z-30 border-t border-line bg-card/95 backdrop-blur">
+      <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1">
+        {tabs.map(({ href, label, Icon, primary }) => {
+          const active = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <li key={href} className="flex-1">
+              <Link
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={`tap flex w-full flex-col items-center justify-center gap-0.5 rounded-xl py-1 ${
+                  active ? "text-pink" : "text-muted"
+                }`}
+              >
+                {primary ? (
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-pink text-page shadow-sm">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                ) : (
+                  <Icon className="h-6 w-6" />
+                )}
+                <span className="text-[0.7rem] font-bold">{label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
