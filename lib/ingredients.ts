@@ -1,4 +1,4 @@
-import type { Ingredient } from "@/lib/db/schema";
+import type { Ingredient, Instruction } from "@/lib/db/schema";
 
 const VULGAR: Array<[number, string]> = [
   [1 / 8, "⅛"],
@@ -174,6 +174,16 @@ export function groupIngredients(list: Ingredient[]) {
     const key = ing.group?.trim() || "";
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)!.push(ing);
+  }
+  return Array.from(groups, ([name, items]) => ({ name, items }));
+}
+
+export function groupInstructions(list: Instruction[]) {
+  const groups = new Map<string, Instruction[]>();
+  for (const step of list) {
+    const key = step.group?.trim() || "";
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(step);
   }
   return Array.from(groups, ([name, items]) => ({ name, items }));
 }

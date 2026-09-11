@@ -6,6 +6,7 @@ import type { Ingredient, Instruction } from "@/lib/db/schema";
 import {
   formatIngredient,
   groupIngredients,
+  groupInstructions,
   scaleIngredient,
 } from "@/lib/ingredients";
 import { logCook, setStatus } from "@/lib/actions/recipes";
@@ -257,17 +258,13 @@ export function RecipeView({
         >
           I made this
         </Button>
+        <Link
+          href={`/book?at=${recipe.id}`}
+          className="tap inline-flex items-center justify-center rounded-full text-[0.9rem] font-bold text-browned"
+        >
+          Flip through from here
+        </Link>
       </div>
     </article>
   );
-}
-
-function groupInstructions(list: Instruction[]) {
-  const groups = new Map<string, Instruction[]>();
-  for (const step of list) {
-    const key = step.group?.trim() || "";
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(step);
-  }
-  return Array.from(groups, ([name, items]) => ({ name, items }));
 }

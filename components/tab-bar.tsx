@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BoxIcon, CameraIcon, GearIcon, SearchIcon } from "@/components/icons";
+import {
+  BookIcon,
+  BoxIcon,
+  CameraIcon,
+  GearIcon,
+  SearchIcon,
+} from "@/components/icons";
 
+// "Flip" rather than "Book", which reads too much like "Box" at a glance.
 const tabs = [
   { href: "/box", label: "Box", Icon: BoxIcon },
-  { href: "/search", label: "Search", Icon: SearchIcon },
+  { href: "/book", label: "Flip", Icon: BookIcon },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
+  { href: "/search", label: "Search", Icon: SearchIcon },
   { href: "/settings", label: "Settings", Icon: GearIcon },
 ];
 

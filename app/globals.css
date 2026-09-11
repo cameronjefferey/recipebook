@@ -138,6 +138,31 @@ body {
   color: var(--color-browned);
 }
 
+/* --- Flip view: a leaf of the book -------------------------------- *
+   Shading down the left edge reads as the gutter of a bound book, and
+   the offset shadows suggest the pages still to come underneath.      */
+@utility book-page {
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-browned) 14%, transparent) 0,
+    transparent 12px
+  );
+  box-shadow:
+    0 1px 3px #382a2214,
+    4px 0 0 -1px var(--color-sink),
+    7px 0 0 -2px color-mix(in srgb, var(--color-sink) 65%, var(--color-browned));
+}
+
+/* The pager is swiped, so its scrollbar is noise on every platform. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Cook mode: no accidental text selection while tapping through steps */
 @utility no-select {
   -webkit-user-select: none;

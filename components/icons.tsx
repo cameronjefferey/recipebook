@@ -67,6 +67,38 @@ export function ChevronLeft({ className }: P) {
   );
 }
 
+export function ChevronRight({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="m9.5 5 7 7-7 7" />
+    </svg>
+  );
+}
+
+export function BookIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        {...stroke}
+        d="M12 6.8C10.6 5.3 8.6 4.7 4 4.7v12.6c4.6 0 6.6.6 8 2 1.4-1.4 3.4-2 8-2V4.7c-4.6 0-6.6.6-8 2.1Z"
+      />
+      <path {...stroke} d="M12 6.8v12.5" />
+    </svg>
+  );
+}
+
+/** Rolled for inspiration, when nothing in particular is wanted. */
+export function DieIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect {...stroke} x="4" y="4" width="16" height="16" rx="3.5" />
+      <circle cx="9" cy="9" r="1.4" fill="currentColor" />
+      <circle cx="15" cy="15" r="1.4" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.4" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function CheckIcon({ className }: P) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>
