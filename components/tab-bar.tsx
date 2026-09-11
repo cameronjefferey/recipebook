@@ -6,6 +6,7 @@ import {
   BookIcon,
   BoxIcon,
   CameraIcon,
+  CartIcon,
   GearIcon,
   SearchIcon,
 } from "@/components/icons";
@@ -14,6 +15,7 @@ import {
 const tabs = [
   { href: "/box", label: "Box", Icon: BoxIcon },
   { href: "/book", label: "Shelf", Icon: BookIcon },
+  { href: "/plan", label: "Plan", Icon: CartIcon },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
   { href: "/search", label: "Search", Icon: SearchIcon },
   { href: "/settings", label: "Settings", Icon: GearIcon },

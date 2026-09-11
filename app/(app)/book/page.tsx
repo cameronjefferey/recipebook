@@ -2,17 +2,15 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { listShelf, type ShelfBook, type SharedShelfBook } from "@/lib/books";
 import { shareCounts } from "@/lib/sharing";
-import { planCount } from "@/lib/grocery";
 import { NewBookForm } from "@/components/new-book-form";
-import { ShareIcon, CartIcon, ChevronRight } from "@/components/icons";
+import { ShareIcon } from "@/components/icons";
 import { Eyebrow } from "@/components/ui";
 
 export default async function ShelfPage() {
   const user = await requireUser();
-  const [{ smart, mine, shared }, sharedOut, planned] = await Promise.all([
+  const [{ smart, mine, shared }, sharedOut] = await Promise.all([
     listShelf(user),
     shareCounts(user.householdId),
-    planCount(user.householdId),
   ]);
 
   return (
@@ -21,19 +19,6 @@ export default async function ShelfPage() {
         <h1 className="font-display text-2xl">The shelf</h1>
         <p className="hand mt-1">pick a book and start flipping</p>
       </div>
-
-      <Link
-        href="/plan"
-        className="flex items-center justify-between rounded-card border border-pink-mid bg-pink-soft px-4 py-3 text-pink active:brightness-95"
-      >
-        <span className="flex items-center gap-2 font-bold">
-          <CartIcon className="h-5 w-5" />
-          {planned > 0
-            ? `${planned} cooking this week`
-            : "Plan what you're cooking this week"}
-        </span>
-        <ChevronRight className="h-5 w-5" />
-      </Link>
 
       <section className="space-y-3">
         <Eyebrow>Your books</Eyebrow>

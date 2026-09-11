@@ -536,7 +536,18 @@ if (process.env.DATABASE_URL) {
   const sql = (await import("postgres")).default(process.env.DATABASE_URL);
   const CHILI = "Smoke Plan Chili";
   const TACOS = "Smoke Plan Tacos";
-  const forget = () => sql`DELETE FROM pinkbox.recipes WHERE title IN (${CHILI}, ${TACOS})`;
+  // The plan and the list are read back whole ("both meals are on this
+  // week's list," an exact garlic total), so this section needs to start
+  // from an empty plan rather than assume it is the only thing that has
+  // ever touched it — these three tables are its own, nobody else's data
+  // lives in them.
+  const forget = () =>
+    Promise.all([
+      sql`DELETE FROM pinkbox.recipes WHERE title IN (${CHILI}, ${TACOS})`,
+      sql`DELETE FROM pinkbox.meal_plan_items`,
+      sql`DELETE FROM pinkbox.grocery_extras`,
+      sql`DELETE FROM pinkbox.grocery_checked`,
+    ]);
   await forget();
 
   const { ctx, page, errors } = await openApp("iPhone 13");
@@ -619,19 +630,21 @@ if (process.env.DATABASE_URL) {
       /black beans/i.test(await planBody()) && /corn tortillas/i.test(await planBody()),
     );
 
-    // crossing an item off, and having it stick
-    const garlicLine = page.getByRole("button", { name: /garlic/i });
+    // crossing an item off, and having it stick — matched on the merged
+    // line's exact text, not just "garlic," so a line from some unrelated
+    // recipe can never be the one this clicks by accident.
+    const garlicLine = page.getByRole("button", { name: /^3 cloves garlic, minced/ });
     check("a grocery line starts unchecked", (await garlicLine.getAttribute("aria-pressed")) === "false");
     await garlicLine.click();
     await page.waitForFunction(() =>
       [...document.querySelectorAll('button[aria-pressed="true"]')].some((b) =>
-        b.textContent.includes("garlic"),
+        b.textContent.startsWith("3 cloves garlic, minced"),
       ),
     );
     await page.reload({ waitUntil: "networkidle" });
     check(
       "a checked line is still checked after a reload",
-      (await page.getByRole("button", { name: /garlic/i }).getAttribute("aria-pressed")) === "true",
+      (await garlicLine.getAttribute("aria-pressed")) === "true",
     );
 
     // something nobody wrote a recipe for
