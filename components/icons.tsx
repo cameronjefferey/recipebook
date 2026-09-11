@@ -138,6 +138,27 @@ export function LinkIcon({ className }: P) {
   );
 }
 
+export function CalendarIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <rect {...stroke} x="3.5" y="5" width="17" height="15" rx="2.5" />
+      <path {...stroke} d="M3.5 9.5h17" />
+      <path {...stroke} d="M8 3v4M16 3v4" />
+    </svg>
+  );
+}
+
+/** A grocery basket, for the list that comes out of the week's plan. */
+export function CartIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M4 8h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8L4 8Z" />
+      <path {...stroke} d="M8 8 9.5 4h5L16 8" />
+      <path {...stroke} d="M9.5 12v4M14.5 12v4" />
+    </svg>
+  );
+}
+
 export function PencilIcon({ className }: P) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>

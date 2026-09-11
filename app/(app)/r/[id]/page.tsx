@@ -11,6 +11,7 @@ import {
   loadComponents,
   withComponents,
 } from "@/lib/component-recipes";
+import { isPlanned } from "@/lib/grocery";
 import { RecipeView } from "@/components/recipe-view";
 
 export default async function RecipePage({
@@ -34,7 +35,7 @@ export default async function RecipePage({
   // Seeing somebody else's recipe is not the same as being able to touch it.
   const mine = recipe.householdId === user.householdId;
 
-  const [images, tags, books, componentsByUrl] = await Promise.all([
+  const [images, tags, books, componentsByUrl, planned] = await Promise.all([
     db
       .select({
         id: recipeImages.id,
@@ -50,6 +51,7 @@ export default async function RecipePage({
       .where(eq(recipeTags.recipeId, id)),
     mine ? booksForRecipe(user, id) : Promise.resolve([]),
     loadComponents(user, recipe.householdId, recipe.ingredients),
+    isPlanned(user, id),
   ]);
 
   // Some ingredients are recipes. Fold those in so the list is everything you
@@ -86,6 +88,7 @@ export default async function RecipePage({
       books={books}
       components={components}
       mine={mine}
+      planned={planned}
     />
   );
 }

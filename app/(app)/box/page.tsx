@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { listRecipes, listCategories } from "@/lib/recipes";
-import { RecipeCard } from "@/components/recipe-card";
+import { BoxGrid } from "@/components/box-grid";
 import { ButtonLink } from "@/components/ui";
 
 const STATUS_FILTERS = [
@@ -93,13 +93,7 @@ export default async function BoxPage({
           </ButtonLink>
         </div>
       ) : (
-        <ul className="grid grid-cols-2 gap-3">
-          {recipes.map((recipe) => (
-            <li key={recipe.id}>
-              <RecipeCard recipe={recipe} />
-            </li>
-          ))}
-        </ul>
+        <BoxGrid recipes={recipes} />
       )}
     </div>
   );

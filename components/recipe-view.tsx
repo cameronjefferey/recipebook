@@ -11,6 +11,7 @@ import {
 } from "@/lib/ingredients";
 import { logCook, setStatus } from "@/lib/actions/recipes";
 import { BookPicker } from "@/components/book-picker";
+import { MealPlanToggle } from "@/components/meal-plan-toggle";
 import { ChevronRight } from "@/components/icons";
 import { Button } from "@/components/ui";
 
@@ -55,6 +56,7 @@ export function RecipeView({
   books,
   components = [],
   mine = true,
+  planned,
 }: {
   recipe: Recipe;
   images: { id: string; kind: "original" | "photo"; rotation: number }[];
@@ -67,6 +69,8 @@ export function RecipeView({
    * that would write to it, because their box is not ours to annotate.
    */
   mine?: boolean;
+  /** on this household's "cooking this week" list */
+  planned: boolean;
 }) {
   const [factor, setFactor] = useState(1);
   const [checked, setChecked] = useState<Set<string>>(new Set());
@@ -130,6 +134,7 @@ export function RecipeView({
             {label}
           </button>
         ))}
+        <MealPlanToggle recipeId={recipe.id} planned={planned} />
       </div>
 
       {original ? (

@@ -303,6 +303,71 @@ export const bookShares = pinkbox.table(
   ],
 );
 
+/**
+ * A recipe marked "cooking this week." One running list per household,
+ * cleared by hand when a week is done rather than on a clock, because
+ * nobody's kitchen keeps to the calendar. A recipe here does not have to be
+ * this household's own — planning what to cook is a personal note on top of
+ * any recipe you can see, not a change to the recipe itself.
+ */
+export const mealPlanItems = pinkbox.table(
+  "meal_plan_items",
+  {
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    recipeId: uuid("recipe_id")
+      .notNull()
+      .references(() => recipes.id, { onDelete: "cascade" }),
+    addedBy: uuid("added_by").references(() => users.id, { onDelete: "set null" }),
+    addedAt: timestamp("added_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.householdId, t.recipeId] }),
+    index("meal_plan_items_recipe_idx").on(t.recipeId),
+  ],
+);
+
+/** Something to buy that nobody wrote a recipe for: paper towels, more coffee. */
+export const groceryExtras = pinkbox.table(
+  "grocery_extras",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    text: text("text").notNull(),
+    checked: boolean("checked").notNull().default(false),
+    addedBy: uuid("added_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("grocery_extras_household_idx").on(t.householdId, t.createdAt)],
+);
+
+/**
+ * Which combined grocery lines have been crossed off while shopping. Keyed by
+ * the same key the list is built with rather than a row id of its own,
+ * because the list is recomputed fresh from whatever is planned this week —
+ * there is nothing else for a checkmark to attach to.
+ */
+export const groceryChecked = pinkbox.table(
+  "grocery_checked",
+  {
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    checkedAt: timestamp("checked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.householdId, t.key] })],
+);
+
 export const cookLog = pinkbox.table(
   "cook_log",
   {

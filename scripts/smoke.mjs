@@ -524,6 +524,169 @@ if (process.env.DATABASE_URL) {
   }
 }
 
+/* ==================================== meal plan and grocery list ======== */
+// Needs the database only to tidy up after itself: recipes have no delete
+// button, and the plan is meant to survive until somebody clears it.
+if (!process.env.DATABASE_URL) {
+  console.log("\nMEAL PLAN AND GROCERY LIST");
+  note("this section", "needs DATABASE_URL to tidy up after itself");
+}
+if (process.env.DATABASE_URL) {
+  console.log("\nMEAL PLAN AND GROCERY LIST");
+  const sql = (await import("postgres")).default(process.env.DATABASE_URL);
+  const CHILI = "Smoke Plan Chili";
+  const TACOS = "Smoke Plan Tacos";
+  const forget = () => sql`DELETE FROM pinkbox.recipes WHERE title IN (${CHILI}, ${TACOS})`;
+  await forget();
+
+  const { ctx, page, errors } = await openApp("iPhone 13");
+  try {
+    const write = async (title, ingredients) => {
+      await page.goto(`${BASE}/add/write`, { waitUntil: "networkidle" });
+      await page.getByLabel("Name").fill(title);
+      await page.getByLabel("Ingredients").fill(ingredients.join("\n"));
+      await page.getByLabel("Steps").fill("Do it.");
+      await page.getByRole("button", { name: /Save|Add/ }).first().click();
+      await page.waitForURL(/\/r\//, { timeout: 20000 });
+      return page.url().split("/r/")[1];
+    };
+    const planBody = () => page.locator("main").innerText();
+
+    await write(CHILI, [
+      "2 cloves garlic, minced",
+      "1 cup flour",
+      "salt and pepper",
+      "1 can black beans",
+    ]);
+
+    // the toggle, on the recipe page it came from
+    const chip = page.getByRole("button", { name: "Cook this week" });
+    check("a fresh recipe starts off the list", (await chip.getAttribute("aria-pressed")) === "false");
+    await chip.click();
+    await page.waitForFunction(() => document.body.innerText.includes("Cooking this week"), null, {
+      timeout: 10000,
+    });
+    await page.reload({ waitUntil: "networkidle" });
+    check(
+      "cook this week survives a reload",
+      (await page.getByRole("button", { name: "Cooking this week" }).getAttribute("aria-pressed")) ===
+        "true",
+    );
+
+    await write(TACOS, [
+      "1 clove garlic, minced",
+      "2 tablespoons flour",
+      "salt and pepper",
+      "8 corn tortillas",
+    ]);
+
+    // the second one, added in a batch from the box grid
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Select", exact: true }).click();
+    await page.getByRole("button", { name: `Select ${TACOS}` }).click();
+    await page.getByRole("button", { name: /Add 1 to this week/ }).click();
+    await page.waitForFunction(
+      () => document.body.innerText.includes("Added 1 recipe to this week"),
+      null,
+      { timeout: 10000 },
+    );
+    check("the box confirms a batch addition", true);
+
+    await page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
+    check(
+      "both meals are on this week's list",
+      /Smoke Plan Chili/.test(await planBody()) && /Smoke Plan Tacos/.test(await planBody()),
+    );
+    check(
+      "matching cloves of garlic add together",
+      /3 cloves garlic, minced/i.test(await planBody()),
+      await planBody(),
+    );
+    check(
+      "a merged line says which meals it came from",
+      /for smoke plan chili, smoke plan tacos/i.test(await planBody()),
+    );
+    check(
+      "flour in different units stays on two lines rather than being guessed at",
+      /1 cup flour/i.test(await planBody()) && /2 tablespoons flour/i.test(await planBody()),
+    );
+    check(
+      "an identical unquantified line only appears once",
+      (await planBody()).match(/salt and pepper/gi)?.length === 1,
+    );
+    check(
+      "each meal's own ingredient still made the list",
+      /black beans/i.test(await planBody()) && /corn tortillas/i.test(await planBody()),
+    );
+
+    // crossing an item off, and having it stick
+    const garlicLine = page.getByRole("button", { name: /garlic/i });
+    check("a grocery line starts unchecked", (await garlicLine.getAttribute("aria-pressed")) === "false");
+    await garlicLine.click();
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll('button[aria-pressed="true"]')].some((b) =>
+        b.textContent.includes("garlic"),
+      ),
+    );
+    await page.reload({ waitUntil: "networkidle" });
+    check(
+      "a checked line is still checked after a reload",
+      (await page.getByRole("button", { name: /garlic/i }).getAttribute("aria-pressed")) === "true",
+    );
+
+    // something nobody wrote a recipe for
+    await page.getByLabel("Add an item to the grocery list").fill("paper towels");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await page.waitForFunction(() => document.body.innerText.includes("paper towels"));
+    check("a hand-added item joins the list", /paper towels/i.test(await planBody()));
+    await page.getByRole("button", { name: "paper towels", exact: true }).click();
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll('button[aria-pressed="true"]')].some(
+        (b) => b.textContent.trim() === "paper towels",
+      ),
+    );
+    await page.reload({ waitUntil: "networkidle" });
+    check(
+      "and it stays checked after a reload too",
+      (await page.getByRole("button", { name: "paper towels", exact: true }).getAttribute(
+        "aria-pressed",
+      )) === "true",
+    );
+    await page.getByRole("button", { name: "Remove paper towels" }).click();
+    await page.waitForFunction(() => !document.body.innerText.includes("paper towels"));
+    check("removing a hand-added item takes it off for good", !/paper towels/i.test(await planBody()));
+
+    // taking a meal off the plan recomputes the list, not just hides a row
+    await page.getByRole("button", { name: `Take ${CHILI} off this week` }).click();
+    await page.waitForFunction(() => !document.body.innerText.includes("Smoke Plan Chili"));
+    check("chili leaves the meal list", !/Smoke Plan Chili/.test(await planBody()));
+    check("black beans leave with it", !/black beans/i.test(await planBody()));
+    check(
+      "garlic drops back down rather than staying at the old total",
+      /1 clove garlic, minced/i.test(await planBody()) && !/3 cloves garlic/i.test(await planBody()),
+    );
+
+    // starting a new week clears the plan and the list, but not the recipes
+    page.once("dialog", (d) => d.accept());
+    await page.getByRole("button", { name: "Start a new week" }).click();
+    await page.waitForFunction(() => document.body.innerText.includes("Nothing yet"));
+    check("the plan is empty", !/Smoke Plan Tacos/.test(await planBody()));
+    check("so is the grocery list", !/tortillas/i.test(await planBody()));
+
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    check(
+      "starting a new week never touches the recipes themselves",
+      /Smoke Plan Tacos/.test(await page.locator("body").innerText()),
+    );
+
+    check("no page errors", errors.length === 0, errors.slice(0, 2).join(" | "));
+  } finally {
+    await forget();
+    await ctx.close();
+    await sql.end();
+  }
+}
+
 /* ============================ two boxes, one book passed between them */
 // Needs the sign-up code and a database to tidy up after itself, both of which
 // come from the environment: neither belongs in the repository.
@@ -602,6 +765,45 @@ if (process.env.DATABASE_URL && INVITE) {
     /Shared with you/i.test(await guest.page.locator("body").innerText()),
   );
 
+  // planning is a personal note on top of anything visible, not a change to
+  // the recipe, so a recipe let into a shared book can be planned by the
+  // guest same as any other — right up until access is taken back.
+  const SHARED_MEAL = `Smoke Shared Meal ${stamp}`;
+  await op.goto(`${BASE}/add/write`, { waitUntil: "networkidle" });
+  await op.getByLabel("Name").fill(SHARED_MEAL);
+  await op.getByLabel("Ingredients").fill("2 cups smoke shared broth");
+  await op.getByLabel("Steps").fill("Simmer it.");
+  await op.getByRole("button", { name: /Save|Add/ }).first().click();
+  await op.waitForURL(/\/r\//, { timeout: 20000 });
+  const sharedMealId = op.url().split("/r/")[1];
+  await op.getByRole("button", { name: new RegExp(BOOK) }).click();
+  await op.waitForFunction(
+    (n) =>
+      [...document.querySelectorAll("button")]
+        .find((x) => x.textContent.includes(n))
+        ?.getAttribute("aria-pressed") === "true",
+    BOOK,
+    { timeout: 10000 },
+  );
+
+  // The book itself is a flip-through pager, so go straight to the recipe by
+  // address rather than hunting for it a page at a time.
+  await guest.page.goto(`${BASE}/r/${sharedMealId}`, { waitUntil: "networkidle" });
+  await guest.page.getByRole("button", { name: "Cook this week" }).click();
+  await guest.page.waitForFunction(() => document.body.innerText.includes("Cooking this week"), null, {
+    timeout: 10000,
+  });
+
+  await guest.page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
+  check(
+    "a guest can plan a recipe shared into their shelf",
+    (await guest.page.locator("main").innerText()).includes(SHARED_MEAL),
+  );
+  check(
+    "and its ingredients reach their grocery list",
+    /smoke shared broth/i.test(await guest.page.locator("main").innerText()),
+  );
+
   await write(guest.page, `Smoke Guest Dish ${stamp}`);
   await guest.page.getByRole("button", { name: new RegExp(BOOK) }).click();
   await guest.page.waitForFunction(
@@ -651,6 +853,12 @@ if (process.env.DATABASE_URL && INVITE) {
     (await guest.page.locator("body").innerText()).includes("Smoke Guest Dish"),
   );
 
+  await guest.page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
+  check(
+    "losing access to a book takes its meal off the guest's plan too",
+    !(await guest.page.locator("main").innerText()).includes(SHARED_MEAL),
+  );
+
   check("no owner page errors", ownerErrors.length === 0, ownerErrors.slice(0, 1).join(""));
   check("no guest page errors", guest.errors.length === 0, guest.errors.slice(0, 1).join(""));
 
@@ -661,6 +869,7 @@ if (process.env.DATABASE_URL && INVITE) {
   await op.getByRole("button", { name: "Delete this book" }).click();
   await op.waitForURL(`${BASE}/book`, { timeout: 10000 });
 
+  await sql`DELETE FROM pinkbox.recipes WHERE title = ${SHARED_MEAL}`;
   await sql`DELETE FROM pinkbox.households WHERE name LIKE ${"Smokeguest%"}`;
   await sql.end();
   await guest.ctx.close();
@@ -698,7 +907,7 @@ if (process.env.DATABASE_URL && INVITE) {
 
   await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
   const first = await page.locator("ul.grid li a").first().getAttribute("href");
-  const paths = ["/box", "/search", "/settings", "/add", "/book", "/book/all"];
+  const paths = ["/box", "/search", "/settings", "/add", "/book", "/book/all", "/plan"];
   if (first) paths.push(first);
 
   for (const path of paths) {
