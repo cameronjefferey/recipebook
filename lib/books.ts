@@ -314,6 +314,46 @@ export async function listBookPages(
   return pages;
 }
 
+/**
+ * File a new recipe into the book named after its category, making the book if
+ * the shelf has not got one yet. Without this the shelf would slowly go stale:
+ * transcription suggests a category, and everything new would otherwise pile up
+ * in "Not in a book" however carefully it had been labelled.
+ */
+export async function fileUnderCategory(
+  householdId: string,
+  recipeId: string,
+  category: string | null | undefined,
+) {
+  const name = category?.trim().replace(/\s+/g, " ").slice(0, 60);
+  if (!name) return;
+
+  const [existing] = await db
+    .select({ id: books.id })
+    .from(books)
+    .where(
+      and(
+        eq(books.householdId, householdId),
+        sql`lower(${books.name}) = lower(${name})`,
+      ),
+    )
+    .limit(1);
+
+  const bookId =
+    existing?.id ??
+    (
+      await db
+        .insert(books)
+        .values({ householdId, name })
+        .returning({ id: books.id })
+    )[0].id;
+
+  await db
+    .insert(bookRecipes)
+    .values({ bookId, recipeId })
+    .onConflictDoNothing();
+}
+
 /** Books this recipe sits in, plus every book available to put it in. */
 export async function booksForRecipe(householdId: string, recipeId: string) {
   const [all, mine] = await Promise.all([

@@ -14,6 +14,7 @@ import {
   type Instruction,
 } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
+import { fileUnderCategory } from "@/lib/books";
 import { parseIngredient } from "@/lib/ingredients";
 
 /** A line beginning with # is a section heading, e.g. "# For the crust". */
@@ -157,6 +158,8 @@ export async function saveFromCapture(
 
     createdIds.push(row.id);
 
+    await fileUnderCategory(user.householdId, row.id, entry.category);
+
     // Each recipe keeps its own copy of the photo, so it stays self-contained
     // and deleting one recipe never orphans or strands another's original.
     await db.insert(recipeImages).values({
@@ -185,6 +188,7 @@ export async function saveFromCapture(
     .where(eq(captures.id, captureId));
 
   revalidatePath("/box");
+  revalidatePath("/book");
   redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/box");
 }
 
@@ -244,6 +248,8 @@ export async function createManualRecipe(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   if (!title) throw new Error("A recipe needs a name.");
 
+  const category = String(formData.get("category") ?? "").trim() || null;
+
   const [row] = await db
     .insert(recipes)
     .values({
@@ -251,7 +257,7 @@ export async function createManualRecipe(formData: FormData) {
       createdBy: user.id,
       title,
       description: String(formData.get("description") ?? "").trim() || null,
-      category: String(formData.get("category") ?? "").trim() || null,
+      category,
       servings: Number(formData.get("servings")) || null,
       ingredients: linesToIngredients(
         String(formData.get("ingredients") ?? "").split("\n"),
@@ -264,6 +270,9 @@ export async function createManualRecipe(formData: FormData) {
     })
     .returning({ id: recipes.id });
 
+  await fileUnderCategory(user.householdId, row.id, category);
+
   revalidatePath("/box");
+  revalidatePath("/book");
   redirect(`/r/${row.id}`);
 }
