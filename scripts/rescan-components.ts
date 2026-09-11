@@ -31,7 +31,10 @@ if (!url) {
   process.exit(2);
 }
 
-const client = postgres(url);
+// The app talks to Render over its internal address, which needs no TLS. Run
+// from a laptop it is the external one, which insists on it.
+const local = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(url);
+const client = postgres(url, local ? {} : { ssl: "require" });
 const db = drizzle(client);
 
 const same = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
