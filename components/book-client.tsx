@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import type { BookLeaf, BookRecipe } from "@/lib/recipes";
+import type { BookLeaf, BookRecipe } from "@/lib/books";
 import {
   formatIngredient,
   groupIngredients,
@@ -22,12 +21,13 @@ export function BookClient({
   pages,
   initialIndex,
   orders,
+  bookId,
 }: {
   pages: BookLeaf[];
   initialIndex: number;
   orders: { key: string; label: string; active: boolean }[];
+  bookId: string;
 }) {
-  const router = useRouter();
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [index, setIndex] = useState(initialIndex);
 
@@ -107,49 +107,37 @@ export function BookClient({
     goTo(next);
   }, [goTo, index, pages]);
 
-  // Which chapter we are inside is whatever divider we last passed.
-  const chapter = useMemo(() => {
+  // Which letter we are under is whatever divider we last passed.
+  const section = useMemo(() => {
     for (let i = Math.min(index, pages.length - 1); i >= 0; i--) {
       const page = pages[i];
-      if (page.kind === "chapter") return page.name;
+      if (page.kind === "divider") return page.name;
     }
     return null;
   }, [index, pages]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div className="flex items-center gap-2">
         <div className="no-scrollbar -mx-4 min-w-0 flex-1 overflow-x-auto px-4">
           <ul className="flex gap-2">
             {orders.map(({ key, label, active }) => (
               <li key={key}>
-                {key === "shuffle" ? (
-                  // Re-dealing needs a new URL, and the fresh token has to be
-                  // minted in the handler rather than during render.
-                  <button
-                    type="button"
-                    onClick={() =>
-                      router.push(
-                        `/book?by=shuffle&s=${Math.random().toString(36).slice(2, 8)}`,
-                      )
-                    }
-                    className={pill(active)}
-                  >
-                    {label}
-                  </button>
-                ) : (
-                  <Link href={`/book?by=${key}`} className={pill(active)}>
-                    {label}
-                  </Link>
-                )}
+                <Link
+                  href={`/book/${bookId}?by=${key}`}
+                  className={pill(active)}
+                >
+                  {label}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
+        {/* Bordered rather than filled, so it does not read as a fourth pill. */}
         <button
           onClick={surprise}
           aria-label="Turn to a recipe at random"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pink-soft text-pink active:brightness-95"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
         >
           <DieIcon className="h-5 w-5" />
         </button>
@@ -159,15 +147,15 @@ export function BookClient({
         ref={trackRef}
         role="region"
         aria-label="Recipe pages"
-        className="no-scrollbar -mx-4 flex h-[calc(100dvh-15rem)] min-h-[18rem] snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
+        className="no-scrollbar -mx-4 flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
       >
         {pages.map((page, i) => (
           <div
             key={page.key}
             className="w-full shrink-0 snap-center snap-always px-4"
           >
-            {page.kind === "chapter" ? (
-              <ChapterLeaf name={page.name} count={page.count} />
+            {page.kind === "divider" ? (
+              <DividerLeaf name={page.name} count={page.count} />
             ) : (
               <RecipeLeaf
                 recipe={page.recipe}
@@ -190,7 +178,7 @@ export function BookClient({
         </PageButton>
 
         <p className="min-w-0 truncate text-center text-[0.8rem] font-bold tracking-wide text-browned uppercase">
-          {chapter ?? "\u00a0"}
+          {section ?? "\u00a0"}
         </p>
 
         <PageButton
@@ -206,7 +194,7 @@ export function BookClient({
 }
 
 function pill(active: boolean) {
-  return `inline-flex h-9 items-center rounded-full px-4 text-[0.85rem] font-bold whitespace-nowrap ${
+  return `inline-flex h-9 items-center rounded-full px-3 text-[0.85rem] font-bold whitespace-nowrap ${
     active ? "bg-pink text-page" : "bg-pink-soft text-pink"
   }`;
 }
@@ -234,15 +222,10 @@ function PageButton({
   );
 }
 
-function ChapterLeaf({ name, count }: { name: string; count: number }) {
+function DividerLeaf({ name, count }: { name: string; count: number }) {
   return (
     <div className="book-page flex h-full flex-col items-center justify-center rounded-card border border-line px-8 text-center">
-      <span className="text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
-        Chapter
-      </span>
-      <h2 className="font-display mt-3 text-4xl leading-tight text-pink">
-        {name}
-      </h2>
+      <h2 className="font-display text-6xl leading-none text-pink">{name}</h2>
       <span className="mt-5 h-px w-14 bg-pink-mid" />
       <p className="hand mt-4">
         {count} {count === 1 ? "recipe" : "recipes"}
@@ -283,8 +266,10 @@ function RecipeLeaf({
     <article className="book-page no-scrollbar relative flex h-full flex-col overflow-y-auto rounded-card border border-line">
       {recipe.status === "keeper" ? <span className="ribbon" /> : null}
 
+      {/* Capped, not a fixed ratio: a page is short, and the recipe has to be
+          readable without scrolling past a full-bleed photograph first. */}
       {recipe.imageId ? (
-        <div className="aspect-4/3 shrink-0 overflow-hidden bg-sink">
+        <div className="h-40 max-h-[38%] shrink-0 overflow-hidden bg-sink">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`/api/images/${recipe.imageId}`}

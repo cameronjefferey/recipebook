@@ -10,10 +10,10 @@ import {
   SearchIcon,
 } from "@/components/icons";
 
-// "Flip" rather than "Book", which reads too much like "Box" at a glance.
+// "Shelf" rather than "Books", which reads too much like "Box" at a glance.
 const tabs = [
   { href: "/box", label: "Box", Icon: BoxIcon },
-  { href: "/book", label: "Flip", Icon: BookIcon },
+  { href: "/book", label: "Shelf", Icon: BookIcon },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
   { href: "/search", label: "Search", Icon: SearchIcon },
   { href: "/settings", label: "Settings", Icon: GearIcon },
@@ -23,7 +23,7 @@ export function TabBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="no-print pb-safe sticky bottom-0 z-30 border-t border-line bg-card/95 backdrop-blur">
+    <nav className="no-print pb-safe z-30 shrink-0 border-t border-line bg-card/95 backdrop-blur">
       <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1">
         {tabs.map(({ href, label, Icon, primary }) => {
           const active = pathname === href || pathname.startsWith(href + "/");

@@ -10,6 +10,7 @@ import {
   scaleIngredient,
 } from "@/lib/ingredients";
 import { logCook, setStatus } from "@/lib/actions/recipes";
+import { BookPicker } from "@/components/book-picker";
 import { Button } from "@/components/ui";
 
 type Recipe = {
@@ -40,10 +41,12 @@ export function RecipeView({
   recipe,
   images,
   tags,
+  books,
 }: {
   recipe: Recipe;
   images: { id: string; kind: "original" | "photo"; rotation: number }[];
   tags: string[];
+  books: { id: string; name: string; inBook: boolean }[];
 }) {
   const [factor, setFactor] = useState(1);
   const [checked, setChecked] = useState<Set<string>>(new Set());
@@ -212,6 +215,8 @@ export function RecipeView({
         </section>
       ) : null}
 
+      <BookPicker recipeId={recipe.id} books={books} />
+
       {tags.length ? (
         <ul className="no-print flex flex-wrap gap-2">
           {tags.map((tag) => (
@@ -259,7 +264,7 @@ export function RecipeView({
           I made this
         </Button>
         <Link
-          href={`/book?at=${recipe.id}`}
+          href={`/book/all?at=${recipe.id}`}
           className="tap inline-flex items-center justify-center rounded-full text-[0.9rem] font-bold text-browned"
         >
           Flip through from here

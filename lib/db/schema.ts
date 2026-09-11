@@ -8,6 +8,7 @@ import {
   jsonb,
   primaryKey,
   index,
+  uniqueIndex,
   customType,
 } from "drizzle-orm/pg-core";
 
@@ -196,6 +197,47 @@ export const recipeTags = pinkbox.table(
     tag: text("tag").notNull(),
   },
   (t) => [primaryKey({ columns: [t.recipeId, t.tag] }), index("recipe_tags_tag_idx").on(t.tag)],
+);
+
+/**
+ * A recipe book on the shelf: "Breakfast", "Sides", "What the kids will eat".
+ * Membership is many-to-many on purpose, because a recipe is routinely both a
+ * weeknight dinner and one the children will actually accept.
+ */
+export const books = pinkbox.table(
+  "books",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    /** lower sorts nearer the left of the shelf; ties break on name */
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [uniqueIndex("books_household_name_idx").on(t.householdId, t.name)],
+);
+
+export const bookRecipes = pinkbox.table(
+  "book_recipes",
+  {
+    bookId: uuid("book_id")
+      .notNull()
+      .references(() => books.id, { onDelete: "cascade" }),
+    recipeId: uuid("recipe_id")
+      .notNull()
+      .references(() => recipes.id, { onDelete: "cascade" }),
+    addedAt: timestamp("added_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.bookId, t.recipeId] }),
+    index("book_recipes_recipe_idx").on(t.recipeId),
+  ],
 );
 
 export const cookLog = pinkbox.table(

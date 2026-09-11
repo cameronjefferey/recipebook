@@ -16,6 +16,11 @@ index cards, and pages torn out of cookbooks and cooking magazines.
 - **Keeps the original forever.** The photo is the source of truth and is one tap
   away from every recipe. The transcription exists so recipes are searchable and
   scalable.
+- **A shelf of recipe books.** Make as many as you like — Breakfast, Sides, What
+  the kids will eat — and file a recipe into as many of them as fit. Open one and
+  swipe from page to page, ordered A–Z, newest, or best loved. Five books are
+  always on the shelf and keep themselves current, including *Not in a book*, so
+  nothing quietly goes missing.
 - **Cook from it.** Scale servings by ½×, 2×, or 3×, tap ingredients off as you
   go, and use a full-screen cook mode that keeps the screen awake.
 - **Marks what is worth repeating.** Keeper, Want to try, Nope. Recipes gather a
@@ -49,6 +54,11 @@ To load sample data, including three recipes and a ready-made login:
 npx tsx scripts/seed.ts
 ```
 
+With the dev server running, `PB_TOKEN=<session token> npm run smoke` drives a
+real browser at three phone sizes over the shelf, the pager and every page of
+the shell. The token is printed by the seed script. It uses the Chrome already
+on the machine, so nothing is downloaded, and it cleans up after itself.
+
 ## Deploying to Render
 
 `render.yaml` describes a free Node web service. Two values must be set by hand
@@ -71,12 +81,23 @@ token in an HTTP-only cookie, stored only as a hash.
 
 ```
 app/(auth)      sign in, join
-app/(app)       the box, add, search, settings, recipe pages
+app/(app)       the box, the shelf, add, search, settings, recipe pages
+app/(app)/book  the shelf, and /book/[id] to flip through one
 app/cook/[id]   full-screen cook mode, outside the tab bar
 app/api         image serving, capture upload, transcription
 lib/ai          transcription prompt and the structured output schema
+lib/books       the shelf: membership, the standing books, page ordering
 lib/ingredients parsing, fraction formatting, and scaling
 ```
+
+The app shell is exactly one screen tall and the middle scrolls, so the header
+and tabs stay put and a page can ask for the height that is actually left rather
+than guessing at the chrome. The flip view depends on that.
+
+Books are a join table, not a field on the recipe, because a thing is regularly
+both a weeknight dinner and one the children will eat. The standing books
+(*Everything*, *Keepers*, *Want to try*, *Best loved*, *Not in a book*) are
+derived on read, so they can never drift.
 
 Ingredients are stored as structured JSONB rather than plain strings, which is
 what makes scaling work. They are edited as ordinary text lines and re-parsed on

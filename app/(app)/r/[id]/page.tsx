@@ -3,6 +3,7 @@ import { eq, and, asc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { recipes, recipeImages, recipeTags } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
+import { booksForRecipe } from "@/lib/books";
 import { RecipeView } from "@/components/recipe-view";
 
 export default async function RecipePage({
@@ -21,7 +22,7 @@ export default async function RecipePage({
 
   if (!recipe) notFound();
 
-  const [images, tags] = await Promise.all([
+  const [images, tags, books] = await Promise.all([
     db
       .select({
         id: recipeImages.id,
@@ -35,6 +36,7 @@ export default async function RecipePage({
       .select({ tag: recipeTags.tag })
       .from(recipeTags)
       .where(eq(recipeTags.recipeId, id)),
+    booksForRecipe(user.householdId, id),
   ]);
 
   return (
@@ -58,6 +60,7 @@ export default async function RecipePage({
       }}
       images={images}
       tags={tags.map((t) => t.tag)}
+      books={books}
     />
   );
 }
