@@ -230,6 +230,14 @@ export const bookRecipes = pinkbox.table(
     recipeId: uuid("recipe_id")
       .notNull()
       .references(() => recipes.id, { onDelete: "cascade" }),
+    /**
+     * Who filed it. A shared book can hold recipes from several houses, and
+     * this is how a guest's contributions are told apart from the owner's —
+     * both to credit them and to take them out again if access is withdrawn.
+     */
+    addedBy: uuid("added_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
     addedAt: timestamp("added_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -257,6 +265,15 @@ export const bookShares = pinkbox.table(
     recipientName: text("recipient_name").notNull(),
     /** the secret in the URL, kept readable so the link can be sent again */
     token: text("token").notNull().unique(),
+    /**
+     * Bound when the recipient opens the link while signed in. Until then the
+     * link is the only way in, which is what lets somebody who will never make
+     * an account still be handed a book.
+     */
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    /** may they put their own recipes in, as in a shared photo album */
+    canAdd: boolean("can_add").notNull().default(false),
     createdBy: uuid("created_by").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -266,7 +283,10 @@ export const bookShares = pinkbox.table(
       .notNull()
       .defaultNow(),
   },
-  (t) => [index("book_shares_book_idx").on(t.bookId)],
+  (t) => [
+    index("book_shares_book_idx").on(t.bookId),
+    index("book_shares_user_idx").on(t.userId),
+  ],
 );
 
 export const cookLog = pinkbox.table(

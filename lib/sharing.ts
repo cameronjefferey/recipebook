@@ -44,6 +44,9 @@ export type Share = {
   lastViewedAt: Date | null;
   viewCount: number;
   createdAt: Date;
+  canAdd: boolean;
+  /** set once they have opened it while signed in */
+  acceptedAt: Date | null;
 };
 
 export async function listShares(
@@ -58,6 +61,8 @@ export async function listShares(
       lastViewedAt: bookShares.lastViewedAt,
       viewCount: bookShares.viewCount,
       createdAt: bookShares.createdAt,
+      canAdd: bookShares.canAdd,
+      acceptedAt: bookShares.acceptedAt,
     })
     .from(bookShares)
     .innerJoin(books, eq(books.id, bookShares.bookId))
@@ -73,6 +78,7 @@ export type SharedBook = {
   bookName: string;
   recipientName: string;
   householdName: string;
+  ownerHouseholdId: string;
   lastViewedAt: Date | null;
 };
 
@@ -87,6 +93,7 @@ export async function resolveShare(token: string): Promise<SharedBook | null> {
       bookName: books.name,
       recipientName: bookShares.recipientName,
       householdName: households.name,
+      ownerHouseholdId: books.householdId,
       lastViewedAt: bookShares.lastViewedAt,
     })
     .from(bookShares)

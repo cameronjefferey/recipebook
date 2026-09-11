@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { recipes, recipeImages, recipeTags } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
 import { isUuid } from "@/lib/ids";
+import { visibleRecipe } from "@/lib/access";
 import { booksForRecipe } from "@/lib/books";
 import { RecipeView } from "@/components/recipe-view";
 
@@ -16,13 +17,17 @@ export default async function RecipePage({
   const { id } = await params;
   if (!isUuid(id)) notFound();
 
+  // Readable if it is ours, or if it sits in a book we have been let into.
   const [recipe] = await db
     .select()
     .from(recipes)
-    .where(and(eq(recipes.id, id), eq(recipes.householdId, user.householdId)))
+    .where(and(eq(recipes.id, id), visibleRecipe(user)))
     .limit(1);
 
   if (!recipe) notFound();
+
+  // Seeing somebody else's recipe is not the same as being able to touch it.
+  const mine = recipe.householdId === user.householdId;
 
   const [images, tags, books] = await Promise.all([
     db
@@ -38,7 +43,7 @@ export default async function RecipePage({
       .select({ tag: recipeTags.tag })
       .from(recipeTags)
       .where(eq(recipeTags.recipeId, id)),
-    booksForRecipe(user.householdId, id),
+    mine ? booksForRecipe(user, id) : Promise.resolve([]),
   ]);
 
   return (
@@ -63,6 +68,7 @@ export default async function RecipePage({
       images={images}
       tags={tags.map((t) => t.tag)}
       books={books}
+      mine={mine}
     />
   );
 }

@@ -23,11 +23,12 @@ export default async function OpenBookPage({
   const { id } = await params;
   const { by, at } = await searchParams;
 
-  const book = await resolveBook(user.householdId, id);
+  const book = await resolveBook(user, id);
   if (!book) notFound();
 
   const order = toBookOrder(by);
   const pages = await listBookPages(user.householdId, book.id, order);
+  const theirs = !!book.ownerName;
 
   const openAt = at
     ? pages.findIndex((p) => p.kind === "recipe" && p.recipe.id === at)
@@ -45,10 +46,17 @@ export default async function OpenBookPage({
         >
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="font-display min-w-0 flex-1 truncate text-xl">
-          {book.name}
-        </h1>
-        {book.smart ? null : (
+        <div className="min-w-0 flex-1">
+          <h1 className="font-display truncate text-xl">{book.name}</h1>
+          {theirs ? (
+            <p className="hand -mt-0.5 truncate text-[0.85rem] text-browned">
+              {book.canAdd
+                ? `from ${book.ownerName} · you can add to this`
+                : `from ${book.ownerName}`}
+            </p>
+          ) : null}
+        </div>
+        {book.smart || theirs ? null : (
           <>
             <Link
               href={`/book/${book.id}/share`}

@@ -42,11 +42,18 @@ export function RecipeView({
   images,
   tags,
   books,
+  mine = true,
 }: {
   recipe: Recipe;
   images: { id: string; kind: "original" | "photo"; rotation: number }[];
   tags: string[];
   books: { id: string; name: string; inBook: boolean }[];
+  /**
+   * False when this is somebody else's recipe, met through a book they
+   * shared. It stays fully readable and cookable; what goes is everything
+   * that would write to it, because their box is not ours to annotate.
+   */
+  mine?: boolean;
 }) {
   const [factor, setFactor] = useState(1);
   const [checked, setChecked] = useState<Set<string>>(new Set());
@@ -90,7 +97,7 @@ export function RecipeView({
       </header>
 
       <div className="no-print flex flex-wrap gap-2">
-        {STATUSES.map(({ key, label }) => (
+        {(mine ? STATUSES : []).map(({ key, label }) => (
           <button
             key={key}
             onClick={() => {
@@ -215,7 +222,7 @@ export function RecipeView({
         </section>
       ) : null}
 
-      <BookPicker recipeId={recipe.id} books={books} />
+      {mine ? <BookPicker recipeId={recipe.id} books={books} /> : null}
 
       {tags.length ? (
         <ul className="no-print flex flex-wrap gap-2">
@@ -257,18 +264,22 @@ export function RecipeView({
         >
           Start cooking
         </Link>
-        <Button
-          variant="secondary"
-          onClick={() => startTransition(() => logCook(recipe.id))}
-        >
-          I made this
-        </Button>
-        <Link
-          href={`/book/all?at=${recipe.id}`}
-          className="tap inline-flex items-center justify-center rounded-full text-[0.9rem] font-bold text-browned"
-        >
-          Flip through from here
-        </Link>
+        {mine ? (
+          <>
+            <Button
+              variant="secondary"
+              onClick={() => startTransition(() => logCook(recipe.id))}
+            >
+              I made this
+            </Button>
+            <Link
+              href={`/book/all?at=${recipe.id}`}
+              className="tap inline-flex items-center justify-center rounded-full text-[0.9rem] font-bold text-browned"
+            >
+              Flip through from here
+            </Link>
+          </>
+        ) : null}
       </div>
     </article>
   );

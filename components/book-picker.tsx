@@ -5,7 +5,13 @@ import { createBookWithRecipe, setRecipeInBook } from "@/lib/actions/books";
 import { CheckIcon } from "@/components/icons";
 import { Button, Input } from "@/components/ui";
 
-type Choice = { id: string; name: string; inBook: boolean };
+type Choice = {
+  id: string;
+  name: string;
+  inBook: boolean;
+  /** set when the book belongs to somebody else and they allow contributions */
+  ownerName?: string | null;
+};
 
 /** Which books this recipe lives in. Toggling is immediate. */
 export function BookPicker({
@@ -54,6 +60,11 @@ export function BookPicker({
             >
               {choice.inBook ? <CheckIcon className="h-4 w-4" /> : null}
               {choice.name}
+              {choice.ownerName ? (
+                <span className="font-normal opacity-70">
+                  · {choice.ownerName}
+                </span>
+              ) : null}
             </button>
           </li>
         ))}

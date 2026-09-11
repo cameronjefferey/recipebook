@@ -6,6 +6,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { books, bookRecipes, recipes } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
+import { bookAccess } from "@/lib/access";
 
 export type BookState = { error?: string };
 
@@ -72,7 +73,14 @@ export async function deleteBook(bookId: string) {
   redirect("/book");
 }
 
-/** Put a recipe into a book, or take it out again. */
+/**
+ * Put a recipe into a book, or take it out again.
+ *
+ * The recipe must be this household's either way: filing somebody else's
+ * recipe, or quietly taking it out of their book, is not on. The book only
+ * has to be one they may add to, which is what lets a contributor put their
+ * own recipes into a book somebody else owns.
+ */
 export async function setRecipeInBook(
   recipeId: string,
   bookId: string,
@@ -80,8 +88,7 @@ export async function setRecipeInBook(
 ) {
   const user = await requireUser();
 
-  // Both sides have to belong to this household before anything is written.
-  const [[recipe], [book]] = await Promise.all([
+  const [[recipe], access] = await Promise.all([
     db
       .select({ id: recipes.id })
       .from(recipes)
@@ -89,18 +96,14 @@ export async function setRecipeInBook(
         and(eq(recipes.id, recipeId), eq(recipes.householdId, user.householdId)),
       )
       .limit(1),
-    db
-      .select({ id: books.id })
-      .from(books)
-      .where(and(eq(books.id, bookId), eq(books.householdId, user.householdId)))
-      .limit(1),
+    bookAccess(user, bookId),
   ]);
-  if (!recipe || !book) return;
+  if (!recipe || !access?.canAdd) return;
 
   if (inBook) {
     await db
       .insert(bookRecipes)
-      .values({ bookId, recipeId })
+      .values({ bookId, recipeId, addedBy: user.id })
       .onConflictDoNothing();
   } else {
     await db
@@ -133,7 +136,7 @@ export async function createBookWithRecipe(recipeId: string, name: string) {
   const bookId = await upsertBook(user.householdId, bookName);
   await db
     .insert(bookRecipes)
-    .values({ bookId, recipeId })
+    .values({ bookId, recipeId, addedBy: user.id })
     .onConflictDoNothing();
 
   revalidatePath("/book");

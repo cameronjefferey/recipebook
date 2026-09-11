@@ -1,8 +1,9 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { recipeImages } from "@/lib/db/schema";
+import { recipeImages, recipes } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { isUuid } from "@/lib/ids";
+import { visibleRecipe } from "@/lib/access";
 
 export async function GET(
   _req: Request,
@@ -14,12 +15,13 @@ export async function GET(
   const { id } = await params;
   if (!isUuid(id)) return new Response("Not found", { status: 404 });
 
+  // Follows the recipe rather than the household: a shared book shows other
+  // people's recipes, and a recipe without its photograph is half a recipe.
   const [image] = await db
-    .select()
+    .select({ mime: recipeImages.mime, bytes: recipeImages.bytes })
     .from(recipeImages)
-    .where(
-      and(eq(recipeImages.id, id), eq(recipeImages.householdId, user.householdId)),
-    )
+    .innerJoin(recipes, eq(recipes.id, recipeImages.recipeId))
+    .where(and(eq(recipeImages.id, id), visibleRecipe(user)))
     .limit(1);
 
   if (!image) return new Response("Not found", { status: 404 });

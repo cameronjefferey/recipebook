@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { randomBytes } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users, households } from "@/lib/db/schema";
@@ -13,6 +14,11 @@ import {
 } from "@/lib/auth";
 
 export type AuthState = { error?: string };
+
+/** Guessed at, this would let a stranger into somebody's box, so: 128 bits. */
+function newBoxCode() {
+  return randomBytes(16).toString("base64url");
+}
 
 export async function loginAction(
   _prev: AuthState,
@@ -65,15 +71,24 @@ export async function joinAction(
     .limit(1);
   if (existing) return { error: "There is already an account for that email." };
 
-  // The first person to join creates the box; everyone after shares it.
-  let [household] = await db.select().from(households).limit(1);
-  if (!household) {
+  // Two different permissions, easily confused. The code above says whether
+  // you may make an account at all; this one says whether you may walk into
+  // somebody's existing box. Without a box code you get one of your own,
+  // which is what makes it possible to share only some of it with someone.
+  const boxCode = String(formData.get("box") ?? "").trim();
+  let household;
+
+  if (boxCode) {
+    [household] = await db
+      .select()
+      .from(households)
+      .where(eq(households.inviteCode, boxCode))
+      .limit(1);
+    if (!household) return { error: "That box invitation is not right." };
+  } else {
     [household] = await db
       .insert(households)
-      .values({
-        name: "The Pink Recipe Box",
-        inviteCode: process.env.INVITE_CODE ?? "family",
-      })
+      .values({ name: `${name}'s recipes`, inviteCode: newBoxCode() })
       .returning();
   }
 

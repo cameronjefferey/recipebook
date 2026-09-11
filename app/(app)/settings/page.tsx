@@ -1,18 +1,26 @@
 import { eq, count } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { recipes } from "@/lib/db/schema";
+import { households, recipes } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
 import { Card } from "@/components/ui";
+import { BoxInvite } from "@/components/box-invite";
 import { InstallHint } from "@/components/install-hint";
 import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function SettingsPage() {
   const user = await requireUser();
 
-  const [{ total }] = await db
-    .select({ total: count() })
-    .from(recipes)
-    .where(eq(recipes.householdId, user.householdId));
+  const [[{ total }], [household]] = await Promise.all([
+    db
+      .select({ total: count() })
+      .from(recipes)
+      .where(eq(recipes.householdId, user.householdId)),
+    db
+      .select({ inviteCode: households.inviteCode })
+      .from(households)
+      .where(eq(households.id, user.householdId))
+      .limit(1),
+  ]);
 
   return (
     <div className="space-y-5">
@@ -25,6 +33,8 @@ export default async function SettingsPage() {
           {total} {total === 1 ? "recipe" : "recipes"} in {user.householdName}.
         </p>
       </Card>
+
+      <BoxInvite code={household.inviteCode} boxName={user.householdName} />
 
       <InstallHint />
 

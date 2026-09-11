@@ -8,7 +8,12 @@ import {
   useSyncExternalStore,
   useTransition,
 } from "react";
-import { revokeShare, shareBook, type ShareState } from "@/lib/actions/shares";
+import {
+  revokeShare,
+  setShareCanAdd,
+  shareBook,
+  type ShareState,
+} from "@/lib/actions/shares";
 import { Button, Card, ErrorNote, Input } from "@/components/ui";
 import { CheckIcon } from "@/components/icons";
 
@@ -18,6 +23,8 @@ type Share = {
   token: string;
   lastViewedAt: Date | string | null;
   viewCount: number;
+  canAdd: boolean;
+  acceptedAt: Date | string | null;
 };
 
 const noop = () => () => {};
@@ -85,6 +92,14 @@ export function ShareManager({
             {pending ? "…" : "Share"}
           </Button>
         </div>
+        <label className="flex items-center gap-2.5 py-1 text-[0.9rem]">
+          <input
+            type="checkbox"
+            name="canAdd"
+            className="h-5 w-5 shrink-0 accent-pink"
+          />
+          Let them add their own recipes to this book
+        </label>
       </form>
 
       {shares.length === 0 ? (
@@ -106,6 +121,7 @@ export function ShareManager({
 
 function ShareRow({ share }: { share: Share }) {
   const [copied, setCopied] = useState(false);
+  const [canAdd, setCanAdd] = useState(share.canAdd);
   const [pending, startTransition] = useTransition();
   const link = `${useOrigin()}/shared/${share.token}`;
 
@@ -126,7 +142,14 @@ function ShareRow({ share }: { share: Share }) {
     <Card className="p-3">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
-          <p className="font-bold">{share.recipientName}</p>
+          <p className="font-bold">
+            {share.recipientName}
+            {share.acceptedAt ? (
+              <span className="ml-2 text-[0.72rem] font-bold tracking-wide text-browned uppercase">
+                has an account
+              </span>
+            ) : null}
+          </p>
           <p className="text-[0.8rem] text-muted">
             {seen(share)}
             {share.viewCount > 0
@@ -145,6 +168,22 @@ function ShareRow({ share }: { share: Share }) {
           Take back
         </button>
       </div>
+
+      <label className="mt-1 flex items-center gap-2.5 py-1 text-[0.85rem] text-muted">
+        <input
+          type="checkbox"
+          checked={canAdd}
+          disabled={pending}
+          onChange={(e) => {
+            // Held locally as well, or the tick sits unmoved until the server
+            // has been round and the box looks broken.
+            setCanAdd(e.target.checked);
+            startTransition(() => setShareCanAdd(share.id, e.target.checked));
+          }}
+          className="h-4.5 w-4.5 shrink-0 accent-pink"
+        />
+        Can add their own recipes
+      </label>
 
       <div className="mt-2 flex items-center gap-2">
         <code className="no-scrollbar min-w-0 flex-1 overflow-x-auto rounded-card bg-sink px-2.5 py-2 text-[0.72rem] whitespace-nowrap text-muted">

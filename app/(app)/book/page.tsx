@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { listShelf, type ShelfBook } from "@/lib/books";
+import { listShelf, type ShelfBook, type SharedShelfBook } from "@/lib/books";
 import { shareCounts } from "@/lib/sharing";
 import { NewBookForm } from "@/components/new-book-form";
 import { ShareIcon } from "@/components/icons";
@@ -8,8 +8,8 @@ import { Eyebrow } from "@/components/ui";
 
 export default async function ShelfPage() {
   const user = await requireUser();
-  const [{ smart, mine }, shared] = await Promise.all([
-    listShelf(user.householdId),
+  const [{ smart, mine, shared }, sharedOut] = await Promise.all([
+    listShelf(user),
     shareCounts(user.householdId),
   ]);
 
@@ -31,13 +31,26 @@ export default async function ShelfPage() {
           <ul className="grid grid-cols-2 gap-3">
             {mine.map((book) => (
               <li key={book.id}>
-                <BookCover book={book} sharedWith={shared.get(book.id) ?? 0} />
+                <BookCover book={book} sharedWith={sharedOut.get(book.id) ?? 0} />
               </li>
             ))}
           </ul>
         )}
         <NewBookForm />
       </section>
+
+      {shared.length > 0 ? (
+        <section className="space-y-3">
+          <Eyebrow>Shared with you</Eyebrow>
+          <ul className="grid grid-cols-2 gap-3">
+            {shared.map((book) => (
+              <li key={book.id}>
+                <BookCover book={book} from={book.ownerName} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="space-y-3">
         <Eyebrow>Always here</Eyebrow>
@@ -56,9 +69,13 @@ export default async function ShelfPage() {
 function BookCover({
   book,
   sharedWith = 0,
+  from,
 }: {
-  book: ShelfBook;
+  book: ShelfBook | SharedShelfBook;
+  /** how many people this household has given it to */
   sharedWith?: number;
+  /** whose book it is, when it is not ours */
+  from?: string;
 }) {
   return (
     <Link
@@ -86,6 +103,11 @@ function BookCover({
         {book.blurb ? (
           <p className="text-[0.75rem] text-muted">
             {book.count} {book.count === 1 ? "recipe" : "recipes"}
+          </p>
+        ) : null}
+        {from ? (
+          <p className="hand mt-0.5 truncate text-[0.8rem] text-browned">
+            from {from}
           </p>
         ) : null}
       </div>

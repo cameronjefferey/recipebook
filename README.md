@@ -25,6 +25,10 @@ index cards, and pages torn out of cookbooks and cooking magazines.
   own. They need no account, can read that one book and nothing else, and cannot
   change a thing. Take one person's link back and it stops working at once,
   without disturbing anybody else's.
+- **Or let them add to it.** Somebody with a box of their own can keep a shared
+  book on their shelf and put their own recipes in, the way a shared photo
+  album works. Their recipes stay theirs: you can read and cook them, not edit
+  them, and they leave with their owner if the link is taken back.
 - **Cook from it.** Scale servings by ½×, 2×, or 3×, tap ingredients off as you
   go, and use a full-screen cook mode that keeps the screen awake.
 - **Marks what is worth repeating.** Keeper, Want to try, Nope. Recipes gather a
@@ -63,6 +67,13 @@ real browser at three phone sizes over the shelf, the pager and every page of
 the shell. The token is printed by the seed script. It uses the Chrome already
 on the machine, so nothing is downloaded, and it cleans up after itself.
 
+It also signs a second person up and passes a book between the two boxes, which
+needs `DATABASE_URL` and `INVITE_CODE` in the environment (`set -a; source
+.env.local`); without them that section says it was skipped rather than
+pretending to pass. Run it against `next start` as well as `next dev`: dev-only
+instrumentation reports a console error on the shared page that a real build
+does not.
+
 ## Deploying to Render
 
 `render.yaml` describes a free Node web service. Two values must be set by hand
@@ -92,6 +103,7 @@ app/shared      what a guest sees, signed out, one book only
 app/api         image serving, capture upload, transcription
 lib/ai          transcription prompt and the structured output schema
 lib/books       the shelf: membership, the standing books, page ordering
+lib/access      who may see a recipe, and who may change it
 lib/sharing     tokens, and every read a guest is allowed
 lib/ingredients parsing, fraction formatting, and scaling
 ```
@@ -104,6 +116,18 @@ Books are a join table, not a field on the recipe, because a thing is regularly
 both a weeknight dinner and one the children will eat. The standing books
 (*Everything*, *Keepers*, *Want to try*, *Best loved*, *Not in a book*) are
 derived on read, so they can never drift.
+
+Signing up gets you a box of your own. Joining somebody else's — a household
+sharing one collection — needs that box's own invite code, which is a different
+permission from the one that lets you make an account at all, and is generated
+rather than configured so that being allowed to sign up is not the same as being
+allowed to walk into the first box you find.
+
+Once a book can be contributed to, seeing a recipe and changing it stop being
+the same question, so they are answered separately in `lib/access.ts`:
+`visibleRecipe` is wide (yours, or in a book you have been let into, or in a
+book you own) while every write stays scoped to the household that owns the
+recipe. Nothing else restates either rule.
 
 A share is one row per person, so each has a token of their own and revoking is
 a delete. The token is the entire credential, so every read a guest makes is

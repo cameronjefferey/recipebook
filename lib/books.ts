@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import type { Ingredient, Instruction } from "@/lib/db/schema";
 import { books, bookRecipes, recipes } from "@/lib/db/schema";
 import { firstImages } from "@/lib/recipes";
-import { isUuid } from "@/lib/ids";
+import { bookAccess, sharedWithMe } from "@/lib/access";
+import type { CurrentUser } from "@/lib/auth";
 
 /* ------------------------------------------------------------------ *
  * The shelf. Each book is a collection of recipes; a recipe belongs to
@@ -48,7 +49,14 @@ export function isSmartBook(id: string) {
   return SMART_IDS.has(id);
 }
 
-/** Recipes belonging to a book, as a WHERE clause on `recipes`. */
+/**
+ * Recipes belonging to a book, as a WHERE clause on `recipes`.
+ *
+ * The standing books describe this household's own collection, so they stay
+ * scoped to it. A real book does not: once shared it can hold recipes from
+ * several houses, and everyone let in should see all of them, so membership
+ * of the book is the whole test.
+ */
 function scopeOf(householdId: string, bookId: string): SQL {
   const mine = eq(recipes.householdId, householdId);
   switch (bookId) {
@@ -66,10 +74,7 @@ function scopeOf(householdId: string, bookId: string): SQL {
         sql`NOT EXISTS (SELECT 1 FROM ${bookRecipes} WHERE ${bookRecipes.recipeId} = ${recipes.id})`,
       )!;
     default:
-      return and(
-        mine,
-        sql`EXISTS (SELECT 1 FROM ${bookRecipes} WHERE ${bookRecipes.recipeId} = ${recipes.id} AND ${bookRecipes.bookId} = ${bookId}::uuid)`,
-      )!;
+      return sql`EXISTS (SELECT 1 FROM ${bookRecipes} WHERE ${bookRecipes.recipeId} = ${recipes.id} AND ${bookRecipes.bookId} = ${bookId}::uuid)`;
   }
 }
 
@@ -83,16 +88,24 @@ export type ShelfBook = {
   rotation: number;
 };
 
+/** A book somebody else owns, sitting on this shelf because they shared it. */
+export type SharedShelfBook = ShelfBook & {
+  ownerName: string;
+  canAdd: boolean;
+};
+
 /**
  * Everything needed to draw the shelf in three queries, rather than a count
  * and a cover per book. A household has a few hundred recipes at most, so the
  * tallying is cheaper done here than in round trips.
  */
-export async function listShelf(householdId: string): Promise<{
+export async function listShelf(user: CurrentUser): Promise<{
   smart: ShelfBook[];
   mine: ShelfBook[];
+  shared: SharedShelfBook[];
 }> {
-  const [rows, mineRows] = await Promise.all([
+  const householdId = user.householdId;
+  const [rows, mineRows, sharedRows] = await Promise.all([
     db
       .select({
         id: recipes.id,
@@ -107,6 +120,7 @@ export async function listShelf(householdId: string): Promise<{
       .from(books)
       .where(eq(books.householdId, householdId))
       .orderBy(asc(books.position), asc(books.name)),
+    sharedWithMe(user),
   ]);
 
   const ids = rows.map((r) => r.id);
@@ -175,28 +189,91 @@ export async function listShelf(householdId: string): Promise<{
     return shelfBook(b.id, b.name, null, false, members);
   });
 
-  return { smart, mine };
+  // A shared book holds recipes this household does not own, so its contents
+  // cannot be counted from `rows` and have to be asked for separately.
+  const sharedIds = sharedRows.map((b) => b.id);
+  const sharedMembers = sharedIds.length
+    ? await db
+        .select({
+          bookId: bookRecipes.bookId,
+          recipeId: bookRecipes.recipeId,
+        })
+        .from(bookRecipes)
+        .innerJoin(recipes, eq(recipes.id, bookRecipes.recipeId))
+        .where(inArray(bookRecipes.bookId, sharedIds))
+        .orderBy(desc(recipes.createdAt))
+    : [];
+
+  const sharedCovers = await firstImages(
+    sharedMembers.map((m) => m.recipeId),
+  );
+  const bySharedBook = new Map<string, string[]>();
+  for (const m of sharedMembers) {
+    if (!bySharedBook.has(m.bookId)) bySharedBook.set(m.bookId, []);
+    bySharedBook.get(m.bookId)!.push(m.recipeId);
+  }
+
+  const shared: SharedShelfBook[] = sharedRows.map((b) => {
+    const members = bySharedBook.get(b.id) ?? [];
+    const cover = members.map((r) => sharedCovers.get(r)).find(Boolean);
+    return {
+      id: b.id,
+      name: b.name,
+      blurb: null,
+      smart: false,
+      count: members.length,
+      coverId: cover?.id ?? null,
+      rotation: cover?.rotation ?? 0,
+      ownerName: b.ownerName,
+      canAdd: b.canAdd,
+    };
+  });
+
+  return { smart, mine, shared };
 }
 
-export type ResolvedBook = { id: string; name: string; smart: boolean };
+export type ResolvedBook = {
+  id: string;
+  name: string;
+  smart: boolean;
+  /** somebody else's book, on this shelf because it was shared */
+  ownerName: string | null;
+  canAdd: boolean;
+  canManage: boolean;
+};
 
+/**
+ * Takes the whole user rather than a household id, because a book on this
+ * shelf is not necessarily this household's: `scopeOf` stops filtering by
+ * household for a real book, and this is the check that earns it.
+ */
 export async function resolveBook(
-  householdId: string,
+  user: CurrentUser,
   id: string,
 ): Promise<ResolvedBook | null> {
   const smart = SMART_BOOKS.find((b) => b.id === id);
-  if (smart) return { id: smart.id, name: smart.name, smart: true };
+  if (smart) {
+    return {
+      id: smart.id,
+      name: smart.name,
+      smart: true,
+      ownerName: null,
+      canAdd: false,
+      canManage: false,
+    };
+  }
 
-  // Anything else has to look like a uuid before it reaches the ::uuid cast.
-  if (!isUuid(id)) return null;
+  const access = await bookAccess(user, id);
+  if (!access) return null;
 
-  const [row] = await db
-    .select({ id: books.id, name: books.name })
-    .from(books)
-    .where(and(eq(books.id, id), eq(books.householdId, householdId)))
-    .limit(1);
-
-  return row ? { ...row, smart: false } : null;
+  return {
+    id: access.bookId,
+    name: access.name,
+    smart: false,
+    ownerName: access.role === "owner" ? null : access.ownerName,
+    canAdd: access.canAdd,
+    canManage: access.canManage,
+  };
 }
 
 export type BookRecipe = {
@@ -353,20 +430,41 @@ export async function fileUnderCategory(
     .onConflictDoNothing();
 }
 
-/** Books this recipe sits in, plus every book available to put it in. */
-export async function booksForRecipe(householdId: string, recipeId: string) {
-  const [all, mine] = await Promise.all([
+/**
+ * Books this recipe sits in, plus every book it could go in: this household's
+ * own, and any shared one they have been given leave to add to. Offering the
+ * latter is the whole point of a shared book — it is how a recipe of yours
+ * reaches somebody else's shelf.
+ */
+export async function booksForRecipe(user: CurrentUser, recipeId: string) {
+  const [own, shared, filed] = await Promise.all([
     db
       .select({ id: books.id, name: books.name })
       .from(books)
-      .where(eq(books.householdId, householdId))
+      .where(eq(books.householdId, user.householdId))
       .orderBy(asc(books.position), asc(books.name)),
+    sharedWithMe(user),
     db
       .select({ bookId: bookRecipes.bookId })
       .from(bookRecipes)
       .where(eq(bookRecipes.recipeId, recipeId)),
   ]);
 
-  const inBook = new Set(mine.map((m) => m.bookId));
-  return all.map((b) => ({ ...b, inBook: inBook.has(b.id) }));
+  const inBook = new Set(filed.map((m) => m.bookId));
+  return [
+    ...own.map((b) => ({
+      id: b.id,
+      name: b.name,
+      inBook: inBook.has(b.id),
+      ownerName: null as string | null,
+    })),
+    ...shared
+      .filter((b) => b.canAdd)
+      .map((b) => ({
+        id: b.id,
+        name: b.name,
+        inBook: inBook.has(b.id),
+        ownerName: b.ownerName,
+      })),
+  ];
 }

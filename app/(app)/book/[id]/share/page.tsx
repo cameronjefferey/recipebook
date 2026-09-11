@@ -18,8 +18,10 @@ export default async function ShareBookPage({
   // is no fixed thing to hand over. Sharing is for books you made.
   if (isSmartBook(id)) notFound();
 
-  const book = await resolveBook(user.householdId, id);
-  if (!book || book.smart) notFound();
+  const book = await resolveBook(user, id);
+  // Only the household that owns a book may hand it on; a book shared with you
+  // is not yours to pass around.
+  if (!book || book.smart || !book.canManage) notFound();
 
   const shares = await listShares(user.householdId, book.id);
 

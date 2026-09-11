@@ -338,6 +338,149 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   await ctx.close();
 }
 
+/* ============================ two boxes, one book passed between them */
+// Needs the sign-up code and a database to tidy up after itself, both of which
+// come from the environment: neither belongs in the repository.
+const INVITE = process.env.INVITE_CODE ?? process.env.PB_INVITE;
+if (!process.env.DATABASE_URL || !INVITE) {
+  console.log("\nSHARING BETWEEN TWO BOXES");
+  check("skipped: needs DATABASE_URL and INVITE_CODE", false, "set them and run again");
+}
+if (process.env.DATABASE_URL && INVITE) {
+  console.log("\nSHARING BETWEEN TWO BOXES");
+  const stamp = Date.now();
+  const BOOK = `Smoke shared book ${stamp}`;
+  const sql = (await import("postgres")).default(process.env.DATABASE_URL);
+
+  /** A person with a box of their own, made the way anybody would make one. */
+  async function signUp(who) {
+    const ctx = await browser.newContext({ ...devices["iPhone 13"] });
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    await page.goto(`${BASE}/join`, { waitUntil: "networkidle" });
+    await page.getByLabel("Your name").fill(who);
+    await page.getByLabel("Email").fill(`${who}${stamp}@smoke.test`);
+    await page.getByLabel("Password").fill("apasswordthatislong");
+    await page.getByLabel("Invite code").fill(INVITE);
+    await page.getByRole("button", { name: /Create my box/ }).click();
+    await page.waitForURL(`${BASE}/box`, { timeout: 20000 });
+    return { ctx, page, errors };
+  }
+
+  async function write(page, title) {
+    await page.goto(`${BASE}/add/write`, { waitUntil: "networkidle" });
+    await page.getByLabel("Name").fill(title);
+    await page.getByLabel("Ingredients").fill("1 thing");
+    await page.getByLabel("Steps").fill("Do it.");
+    await page.getByRole("button", { name: /Save|Add/ }).first().click();
+    await page.waitForURL(/\/r\//, { timeout: 20000 });
+  }
+
+  const { ctx: owner, page: op, errors: ownerErrors } = await openApp("iPhone 13");
+  const guest = await signUp("Smokeguest");
+
+  check(
+    "signing up gets you a box of your own, not somebody else's",
+    !/Turkey|Tart|Carrots|Teriyaki/.test(await guest.page.locator("body").innerText()),
+  );
+
+  await op.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  await op.getByLabel("New book name").fill(BOOK);
+  await op.getByRole("button", { name: "Add" }).click();
+  await op.waitForFunction(
+    (n) => [...document.querySelectorAll("h3")].some((h) => h.textContent === n),
+    BOOK,
+    { timeout: 10000 },
+  );
+  await op.locator("a", { has: op.locator("h3", { hasText: BOOK }) }).first().click();
+  await op.waitForURL(/\/book\/[0-9a-f-]{36}/);
+  const bookId = op.url().match(/\/book\/([0-9a-f-]{36})/)[1];
+
+  await op.getByRole("link", { name: "Share" }).click();
+  await op.waitForURL(/\/share$/);
+  await op.getByLabel("Who is it for").fill("Smokeguest");
+  await op.getByLabel(/Let them add their own/).check();
+  await op.getByRole("button", { name: "Share" }).click();
+  await op.waitForFunction(() => document.body.innerText.includes("Smokeguest"), null, {
+    timeout: 10000,
+  });
+  const link = await op.locator("code").first().innerText();
+
+  await guest.page.goto(link, { waitUntil: "networkidle" });
+  await guest.page.getByRole("button", { name: /Keep this on my shelf/ }).click();
+  await guest.page.waitForURL(/\/book\//, { timeout: 20000 });
+  await guest.page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  check(
+    "an accepted book lands under Shared with you",
+    /Shared with you/i.test(await guest.page.locator("body").innerText()),
+  );
+
+  await write(guest.page, `Smoke Guest Dish ${stamp}`);
+  await guest.page.getByRole("button", { name: new RegExp(BOOK) }).click();
+  await guest.page.waitForFunction(
+    (n) =>
+      [...document.querySelectorAll("button")]
+        .find((x) => x.textContent.includes(n))
+        ?.getAttribute("aria-pressed") === "true",
+    BOOK,
+    { timeout: 10000 },
+  );
+
+  await op.goto(`${BASE}/book/${bookId}`, { waitUntil: "networkidle" });
+  check(
+    "the owner sees what a contributor put in",
+    (await op.locator("body").innerText()).includes("Smoke Guest Dish"),
+  );
+  await op.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  check(
+    "but it does not join the owner's own box",
+    !(await op.locator("body").innerText()).includes("Smoke Guest Dish"),
+  );
+
+  // what the guest may not do
+  const forbidden = await Promise.all([
+    guest.ctx.request.get(`${BASE}/book/${bookId}/share`, { maxRedirects: 0 }),
+    guest.ctx.request.get(`${BASE}/box`, { maxRedirects: 0 }),
+  ]);
+  check("a contributor cannot pass the book on", forbidden[0].status() === 404);
+  check("and has a box of their own to land in", forbidden[1].status() === 200);
+
+  await op.goto(`${BASE}/book/${bookId}/share`, { waitUntil: "networkidle" });
+  op.once("dialog", (d) => d.accept());
+  await op
+    .locator("li", { hasText: "Smokeguest" })
+    .getByRole("button", { name: "Take back" })
+    .click();
+  await op.waitForFunction(() => !document.body.innerText.includes("Smokeguest"), null, {
+    timeout: 10000,
+  });
+  check(
+    "taking it back closes the book",
+    (await guest.ctx.request.get(`${BASE}/book/${bookId}`, { maxRedirects: 0 })).status() === 404,
+  );
+  await guest.page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  check(
+    "but the contributor keeps their own recipe",
+    (await guest.page.locator("body").innerText()).includes("Smoke Guest Dish"),
+  );
+
+  check("no owner page errors", ownerErrors.length === 0, ownerErrors.slice(0, 1).join(""));
+  check("no guest page errors", guest.errors.length === 0, guest.errors.slice(0, 1).join(""));
+
+  // put the kitchen back
+  await op.goto(`${BASE}/book/${bookId}`, { waitUntil: "networkidle" });
+  op.once("dialog", (d) => d.accept());
+  await op.getByRole("button", { name: "Edit" }).click();
+  await op.getByRole("button", { name: "Delete this book" }).click();
+  await op.waitForURL(`${BASE}/book`, { timeout: 10000 });
+
+  await sql`DELETE FROM pinkbox.households WHERE name LIKE ${"Smokeguest%"}`;
+  await sql.end();
+  await guest.ctx.close();
+  await owner.close();
+}
+
 /* ==================================================== addresses that are junk */
 {
   console.log("\nJUNK ADDRESSES");

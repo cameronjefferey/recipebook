@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { BOOK_ORDERS, toBookOrder } from "@/lib/books";
 import { listSharedPages, recordView, resolveShare } from "@/lib/sharing";
+import { getCurrentUser } from "@/lib/auth";
+import { acceptShare } from "@/lib/actions/shares";
 import { BookClient } from "@/components/book-client";
 
 /**
@@ -28,6 +30,11 @@ export default async function SharedBookPage({
 
   const share = await resolveShare(token);
   if (!share) notFound();
+
+  // Somebody with an account should not have to keep the email to come back to
+  // this, so it can be put on their own shelf instead.
+  const user = await getCurrentUser();
+  const canKeep = !!user && user.householdId !== share.ownerHouseholdId;
 
   const pages = await listSharedPages(share.bookId, order);
 
@@ -69,9 +76,13 @@ export default async function SharedBookPage({
       </main>
 
       <footer className="pb-safe shrink-0 px-5 pb-3 text-center">
-        <p className="text-[0.75rem] text-muted">
-          The Pink Recipe Box · you are reading a shared book
-        </p>
+        {canKeep ? (
+          <KeepOnMyShelf token={token} />
+        ) : (
+          <p className="text-[0.75rem] text-muted">
+            The Pink Recipe Box · you are reading a shared book
+          </p>
+        )}
       </footer>
 
       {/* Suspended so the book is not held up by a bookkeeping write. */}
@@ -79,6 +90,20 @@ export default async function SharedBookPage({
         <RecordVisit shareId={share.shareId} lastViewedAt={share.lastViewedAt} />
       </Suspense>
     </div>
+  );
+}
+
+/** A plain form, so it works before any JavaScript has arrived. */
+function KeepOnMyShelf({ token }: { token: string }) {
+  return (
+    <form action={acceptShare.bind(null, token)}>
+      <button
+        type="submit"
+        className="tap inline-flex items-center justify-center rounded-full bg-pink px-6 text-[0.9rem] font-bold text-page"
+      >
+        Keep this on my shelf
+      </button>
+    </form>
   );
 }
 
