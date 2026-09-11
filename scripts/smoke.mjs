@@ -93,6 +93,32 @@ async function openApp(deviceName) {
     );
     check("ticking it files the recipe", true);
 
+    // Making a book from the recipe page: the book is only real once the
+    // server has made it, so the picker has to take the server's word for
+    // what exists rather than the list it was first handed.
+    const picker = page.locator("section", {
+      has: page.locator("h2", { hasText: "In these books" }),
+    });
+    const chipsBefore = (await picker.locator("button").allInnerTexts()).length;
+    await page.getByRole("button", { name: "+ New book" }).click();
+    await page.getByLabel("New book name").fill("Smoke picker book");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    const made = picker.getByRole("button", { name: "Smoke picker book", exact: true });
+    await made.waitFor({ timeout: 10000 }).catch(() => {});
+    check("a book made from the recipe shows up without a reload", await made.isVisible());
+    check(
+      "and it is one more chip, not a replacement",
+      (await picker.locator("button").allInnerTexts()).length === chipsBefore + 1,
+    );
+    check("and the recipe is already in it", (await made.getAttribute("aria-pressed")) === "true");
+
+    await page.reload({ waitUntil: "networkidle" });
+    check(
+      "it was really saved, and only once",
+      (await picker.locator("button").allInnerTexts()).filter((t) => t === "Smoke picker book")
+        .length === 1,
+    );
+
     await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
     const card = page
       .locator("a", { has: page.locator("h3", { hasText: "Smoke test book" }) })
@@ -122,6 +148,20 @@ async function openApp(deviceName) {
   await page.getByRole("button", { name: "Delete this book" }).click();
   await page.waitForURL(`${BASE}/book`, { timeout: 10000 });
   check("deleting removes it from the shelf", !(await shelf()).some((n) => n.startsWith("Smoke test")));
+
+  // and take the one made from the recipe page away again
+  const leftover = page.locator("a", {
+    has: page.locator("h3", { hasText: "Smoke picker book" }),
+  });
+  if (await leftover.count()) {
+    await leftover.first().click();
+    await page.waitForURL(/\/book\/[0-9a-f-]{36}/);
+    page.once("dialog", (d) => d.accept());
+    await page.getByRole("button", { name: "Edit" }).click();
+    await page.getByRole("button", { name: "Delete this book" }).click();
+    await page.waitForURL(`${BASE}/book`, { timeout: 10000 });
+  }
+  check("nothing is left behind", !(await shelf()).some((n) => n.startsWith("Smoke ")));
 
   await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
   check(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { createBookWithRecipe, setRecipeInBook } from "@/lib/actions/books";
 import { CheckIcon } from "@/components/icons";
 import { Button, Input } from "@/components/ui";
@@ -11,9 +11,34 @@ type Choice = {
   inBook: boolean;
   /** set when the book belongs to somebody else and they allow contributions */
   ownerName?: string | null;
+  /** on its way to the server and not yet a real book */
+  pending?: boolean;
 };
 
-/** Which books this recipe lives in. Toggling is immediate. */
+type Patch =
+  | { kind: "toggle"; id: string; inBook: boolean }
+  | { kind: "add"; name: string };
+
+function apply(choices: Choice[], patch: Patch): Choice[] {
+  if (patch.kind === "toggle") {
+    return choices.map((c) =>
+      c.id === patch.id ? { ...c, inBook: patch.inBook } : c,
+    );
+  }
+  return [
+    ...choices,
+    { id: `pending:${patch.name}`, name: patch.name, inBook: true, pending: true },
+  ];
+}
+
+/**
+ * Which books this recipe lives in. Toggling shows at once and is confirmed
+ * behind the scenes.
+ *
+ * The list is read from the server on every render rather than copied into
+ * state, because making a book adds something only the server knows the id of:
+ * held in `useState` the new book would be saved and then never appear.
+ */
 export function BookPicker({
   recipeId,
   books,
@@ -21,17 +46,17 @@ export function BookPicker({
   recipeId: string;
   books: Choice[];
 }) {
-  const [choices, setChoices] = useState(books);
+  const [choices, patch] = useOptimistic(books, apply);
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [, startTransition] = useTransition();
 
   const toggle = (id: string) => {
     const next = !choices.find((c) => c.id === id)?.inBook;
-    setChoices((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, inBook: next } : c)),
-    );
-    startTransition(() => setRecipeInBook(recipeId, id, next));
+    startTransition(async () => {
+      patch({ kind: "toggle", id, inBook: next });
+      await setRecipeInBook(recipeId, id, next);
+    });
   };
 
   const addBook = () => {
@@ -39,7 +64,22 @@ export function BookPicker({
     if (!clean) return;
     setName("");
     setAdding(false);
-    startTransition(() => createBookWithRecipe(recipeId, clean));
+
+    // Naming a book you already have files the recipe into that one rather
+    // than making a second book of the same name, so show that instead of a
+    // duplicate chip that would vanish a moment later.
+    const same = choices.find(
+      (c) => c.name.toLowerCase() === clean.toLowerCase() && !c.ownerName,
+    );
+    if (same) {
+      if (!same.inBook) toggle(same.id);
+      return;
+    }
+
+    startTransition(async () => {
+      patch({ kind: "add", name: clean });
+      await createBookWithRecipe(recipeId, clean);
+    });
   };
 
   return (
@@ -52,11 +92,12 @@ export function BookPicker({
             <button
               onClick={() => toggle(choice.id)}
               aria-pressed={choice.inBook}
+              disabled={choice.pending}
               className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-[0.9rem] font-bold ${
                 choice.inBook
                   ? "border-pink bg-pink text-page"
                   : "border-line bg-card text-muted"
-              }`}
+              } ${choice.pending ? "opacity-60" : ""}`}
             >
               {choice.inBook ? <CheckIcon className="h-4 w-4" /> : null}
               {choice.name}
