@@ -218,6 +218,126 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   await ctx.close();
 }
 
+/* ============================================ sharing a book with somebody */
+{
+  console.log("\nSHARING");
+  const { ctx, page, errors } = await openApp("iPhone 13");
+
+  // a book of its own, so the test never depends on what is on the shelf
+  await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  await page.getByLabel("New book name").fill("Smoke share book");
+  await page.getByRole("button", { name: "Add" }).click();
+  await page.waitForFunction(
+    () => [...document.querySelectorAll("h3")].some((h) => h.textContent === "Smoke share book"),
+    null,
+    { timeout: 10000 },
+  );
+
+  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  const anyRecipe = await page.locator("ul.grid li a").count();
+  let sharedTitle = null;
+  if (anyRecipe > 0) {
+    await page.locator("ul.grid li a").first().click();
+    await page.waitForURL(/\/r\//);
+    sharedTitle = await page.locator("h1").innerText();
+    await page.getByRole("button", { name: "Smoke share book", exact: true }).click();
+    await page.waitForFunction(
+      () => {
+        const b = [...document.querySelectorAll("button")].find(
+          (x) => x.textContent.trim() === "Smoke share book",
+        );
+        return b?.getAttribute("aria-pressed") === "true";
+      },
+      null,
+      { timeout: 10000 },
+    );
+  }
+
+  await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  await page
+    .locator("a", { has: page.locator("h3", { hasText: "Smoke share book" }) })
+    .first()
+    .click();
+  await page.waitForURL(/\/book\/[0-9a-f-]{36}/);
+  const bookId = page.url().match(/\/book\/([0-9a-f-]{36})/)[1];
+
+  await page.getByRole("link", { name: "Share" }).click();
+  await page.waitForURL(/\/share$/);
+  await page.getByLabel("Who is it for").fill("Smoke guest");
+  await page.getByRole("button", { name: "Share" }).click();
+  await page.waitForFunction(
+    () => document.body.innerText.includes("Smoke guest"),
+    null,
+    { timeout: 10000 },
+  );
+  const link = await page.locator("code").first().innerText();
+  check("a link is minted", /\/shared\/[\w-]{20,}$/.test(link), link);
+
+  // a browser with no session at all, which is what the recipient has
+  const guest = await browser.newContext({ ...devices["iPhone 13"] });
+  const gp = await guest.newPage();
+  const guestErrors = [];
+  gp.on("pageerror", (e) => guestErrors.push(e.message));
+
+  const opened = await gp.goto(link, { waitUntil: "networkidle" });
+  check("it opens with no account", opened.status() === 200, `HTTP ${opened.status()}`);
+  const guestText = await gp.locator("body").innerText();
+  check("the book is named for the guest", guestText.includes("Smoke share book"));
+  if (sharedTitle) check("the recipe is readable", guestText.includes(sharedTitle));
+  check("a guest gets no tab bar", (await gp.locator("nav.no-print").count()) === 0);
+  check(
+    "a guest gets no Open or Start cooking",
+    (await gp.getByRole("link", { name: /^(Open|Start cooking)$/ }).count()) === 0,
+  );
+  check(
+    "search engines are told to stay away",
+    ((await gp.locator('meta[name="robots"]').getAttribute("content")) ?? "").includes("noindex"),
+  );
+
+  for (const path of ["/box", "/book", "/settings"]) {
+    const r = await guest.request.get(BASE + path, { maxRedirects: 0 });
+    check(`a guest is turned away from ${path}`, r.status() === 307, `HTTP ${r.status()}`);
+  }
+
+  const token = link.split("/").pop();
+  const stranger = await guest.request.get(`${BASE}/api/shared/${token}/images/${crypto.randomUUID()}`);
+  check("an unrelated photo is refused", stranger.status() === 404, `HTTP ${stranger.status()}`);
+
+  // taking it back has to bite immediately
+  await page.goto(`${BASE}/book/${bookId}/share`, { waitUntil: "networkidle" });
+  page.once("dialog", (d) => d.accept());
+  await page
+    .locator("li", { hasText: "Smoke guest" })
+    .getByRole("button", { name: "Take back" })
+    .click();
+  await page.waitForFunction(
+    () => !document.body.innerText.includes("Smoke guest"),
+    null,
+    { timeout: 10000 },
+  );
+  const revoked = await guest.request.get(link);
+  check("the link dies when taken back", revoked.status() === 404, `HTTP ${revoked.status()}`);
+  await gp.goto(link, { waitUntil: "networkidle" });
+  check(
+    "and says so in plain words",
+    /link is not working/i.test(await gp.locator("body").innerText()),
+  );
+
+  check("no guest page errors", guestErrors.length === 0, guestErrors.slice(0, 2).join(" | "));
+  await guest.close();
+
+  // tidy the book away again
+  await page.goto(`${BASE}/book/${bookId}`, { waitUntil: "networkidle" });
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Edit" }).click();
+  await page.getByRole("button", { name: "Delete this book" }).click();
+  await page.waitForURL(`${BASE}/book`, { timeout: 10000 });
+  check("the test book is cleaned up", !(await page.locator("section ul li a h3").allInnerTexts()).includes("Smoke share book"));
+
+  check("no owner page errors", errors.length === 0, errors.slice(0, 2).join(" | "));
+  await ctx.close();
+}
+
 /* ================================= the shell holds together on every page */
 {
   console.log("\nSHELL");

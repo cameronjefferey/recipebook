@@ -21,12 +21,19 @@ export function BookClient({
   pages,
   initialIndex,
   orders,
-  bookId,
+  basePath,
+  imageBase = "/api/images",
+  showActions = true,
 }: {
   pages: BookLeaf[];
   initialIndex: number;
   orders: { key: string; label: string; active: boolean }[];
-  bookId: string;
+  /** where the ordering pills point, e.g. "/book/<id>" */
+  basePath: string;
+  /** photo URLs hang off this, so a guest can be served through their token */
+  imageBase?: string;
+  /** off for guests, who have nowhere to open or cook a recipe */
+  showActions?: boolean;
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [index, setIndex] = useState(initialIndex);
@@ -123,24 +130,24 @@ export function BookClient({
           <ul className="flex gap-2">
             {orders.map(({ key, label, active }) => (
               <li key={key}>
-                <Link
-                  href={`/book/${bookId}?by=${key}`}
-                  className={pill(active)}
-                >
+                <Link href={`${basePath}?by=${key}`} className={pill(active)}>
                   {label}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-        {/* Bordered rather than filled, so it does not read as a fourth pill. */}
-        <button
-          onClick={surprise}
-          aria-label="Turn to a recipe at random"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
-        >
-          <DieIcon className="h-5 w-5" />
-        </button>
+        {/* Bordered rather than filled, so it does not read as a fourth pill.
+            Hidden in a one-recipe book, where there is nowhere to turn to. */}
+        {total > 1 ? (
+          <button
+            onClick={surprise}
+            aria-label="Turn to a recipe at random"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
+          >
+            <DieIcon className="h-5 w-5" />
+          </button>
+        ) : null}
       </div>
 
       <div
@@ -162,6 +169,8 @@ export function BookClient({
                 number={numbers[i]}
                 total={total}
                 near={Math.abs(i - index) <= 1}
+                imageBase={imageBase}
+                showActions={showActions}
               />
             )}
           </div>
@@ -243,11 +252,15 @@ function RecipeLeaf({
   number,
   total,
   near,
+  imageBase,
+  showActions,
 }: {
   recipe: BookRecipe;
   number: number;
   total: number;
   near: boolean;
+  imageBase: string;
+  showActions: boolean;
 }) {
   const ingredients = groupIngredients(recipe.ingredients);
   const steps = groupInstructions(recipe.instructions);
@@ -272,7 +285,7 @@ function RecipeLeaf({
         <div className="h-40 max-h-[38%] shrink-0 overflow-hidden bg-sink">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`/api/images/${recipe.imageId}`}
+            src={`${imageBase}/${recipe.imageId}`}
             alt=""
             loading="lazy"
             className="h-full w-full object-cover"
@@ -349,20 +362,22 @@ function RecipeLeaf({
               </section>
             ) : null}
 
-            <div className="mt-5 flex gap-2">
-              <Link
-                href={`/r/${recipe.id}`}
-                className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
-              >
-                Open
-              </Link>
-              <Link
-                href={`/cook/${recipe.id}`}
-                className="tap flex flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
-              >
-                Start cooking
-              </Link>
-            </div>
+            {showActions ? (
+              <div className="mt-5 flex gap-2">
+                <Link
+                  href={`/r/${recipe.id}`}
+                  className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
+                >
+                  Open
+                </Link>
+                <Link
+                  href={`/cook/${recipe.id}`}
+                  className="tap flex flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
+                >
+                  Start cooking
+                </Link>
+              </div>
+            ) : null}
           </>
         ) : null}
 

@@ -107,6 +107,18 @@ export function CheckIcon({ className }: P) {
   );
 }
 
+/** Two dots joined to a third: a book passed to somebody. */
+export function ShareIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <circle {...stroke} cx="18" cy="5.5" r="2.5" />
+      <circle {...stroke} cx="6" cy="12" r="2.5" />
+      <circle {...stroke} cx="18" cy="18.5" r="2.5" />
+      <path {...stroke} d="m8.2 10.8 7.6-4M8.2 13.2l7.6 4" />
+    </svg>
+  );
+}
+
 export function PhotoIcon({ className }: P) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>

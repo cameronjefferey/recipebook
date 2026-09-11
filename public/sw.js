@@ -5,7 +5,7 @@
  * sleeping free-tier server. Everything else can require the network.
  */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `pages-${VERSION}`;
 const ASSETS = `assets-${VERSION}`;
 const IMAGES = `images-${VERSION}`;
@@ -70,6 +70,16 @@ self.addEventListener("fetch", (event) => {
 
   // Uploading and transcribing must always hit the network.
   if (url.pathname.startsWith("/api/captures")) return;
+
+  // A shared book belongs to somebody else and can be taken back. Keeping a
+  // copy on the guest's device would make "take the link back" a half-truth,
+  // so these always ask the server and are never stored.
+  if (
+    url.pathname.startsWith("/shared/") ||
+    url.pathname.startsWith("/api/shared/")
+  ) {
+    return;
+  }
 
   // Stored photos never change once written.
   if (url.pathname.startsWith("/api/images/")) {

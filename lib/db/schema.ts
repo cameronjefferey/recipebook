@@ -240,6 +240,35 @@ export const bookRecipes = pinkbox.table(
   ],
 );
 
+/**
+ * A book handed to one person by name, each with a link of their own, so that
+ * "Aunt Carol can no longer see this" is possible without disturbing anybody
+ * else. Recipients never need an account: the token in the link is the whole
+ * credential, and it only ever buys a read of this one book.
+ */
+export const bookShares = pinkbox.table(
+  "book_shares",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookId: uuid("book_id")
+      .notNull()
+      .references(() => books.id, { onDelete: "cascade" }),
+    /** who it went to, in the owner's own words: "Aunt Carol" */
+    recipientName: text("recipient_name").notNull(),
+    /** the secret in the URL, kept readable so the link can be sent again */
+    token: text("token").notNull().unique(),
+    createdBy: uuid("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    lastViewedAt: timestamp("last_viewed_at", { withTimezone: true }),
+    viewCount: integer("view_count").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("book_shares_book_idx").on(t.bookId)],
+);
+
 export const cookLog = pinkbox.table(
   "cook_log",
   {

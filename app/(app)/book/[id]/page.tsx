@@ -48,7 +48,17 @@ export default async function OpenBookPage({
         <h1 className="font-display min-w-0 flex-1 truncate text-xl">
           {book.name}
         </h1>
-        {book.smart ? null : <BookMenu bookId={book.id} name={book.name} />}
+        {book.smart ? null : (
+          <>
+            <Link
+              href={`/book/${book.id}/share`}
+              className="tap flex items-center justify-center px-2 text-[0.85rem] font-bold text-browned"
+            >
+              Share
+            </Link>
+            <BookMenu bookId={book.id} name={book.name} />
+          </>
+        )}
       </div>
 
       {pages.length === 0 ? (
@@ -63,7 +73,7 @@ export default async function OpenBookPage({
         </div>
       ) : (
         <BookClient
-          bookId={book.id}
+          basePath={`/book/${book.id}`}
           pages={pages}
           initialIndex={openAt > 0 ? openAt : 0}
           orders={BOOK_ORDERS.map(({ key, label }) => ({

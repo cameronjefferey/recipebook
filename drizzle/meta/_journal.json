@@ -15,6 +15,13 @@
       "when": 1789099578777,
       "tag": "0001_foamy_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789102426074,
+      "tag": "0002_glossy_maverick",
+      "breakpoints": true
     }
   ]
 }

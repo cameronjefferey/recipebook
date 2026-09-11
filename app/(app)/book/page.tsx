@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { listShelf, type ShelfBook } from "@/lib/books";
+import { shareCounts } from "@/lib/sharing";
 import { NewBookForm } from "@/components/new-book-form";
+import { ShareIcon } from "@/components/icons";
 import { Eyebrow } from "@/components/ui";
 
 export default async function ShelfPage() {
   const user = await requireUser();
-  const { smart, mine } = await listShelf(user.householdId);
+  const [{ smart, mine }, shared] = await Promise.all([
+    listShelf(user.householdId),
+    shareCounts(user.householdId),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -26,7 +31,7 @@ export default async function ShelfPage() {
           <ul className="grid grid-cols-2 gap-3">
             {mine.map((book) => (
               <li key={book.id}>
-                <BookCover book={book} />
+                <BookCover book={book} sharedWith={shared.get(book.id) ?? 0} />
               </li>
             ))}
           </ul>
@@ -48,7 +53,13 @@ export default async function ShelfPage() {
   );
 }
 
-function BookCover({ book }: { book: ShelfBook }) {
+function BookCover({
+  book,
+  sharedWith = 0,
+}: {
+  book: ShelfBook;
+  sharedWith?: number;
+}) {
   return (
     <Link
       href={`/book/${book.id}`}
@@ -78,6 +89,16 @@ function BookCover({ book }: { book: ShelfBook }) {
           </p>
         ) : null}
       </div>
+
+      {sharedWith > 0 ? (
+        <span
+          title={`Shared with ${sharedWith} ${sharedWith === 1 ? "person" : "people"}`}
+          className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-card/90 px-2 py-1 text-[0.7rem] font-bold text-browned"
+        >
+          <ShareIcon className="h-3 w-3" />
+          {sharedWith}
+        </span>
+      ) : null}
 
       {/* Last, so it paints over the gradient and runs the full height. */}
       <span className="absolute inset-y-0 left-0 w-2.5 bg-pink" />

@@ -21,6 +21,10 @@ index cards, and pages torn out of cookbooks and cooking magazines.
   swipe from page to page, ordered A–Z, newest, or best loved. Five books are
   always on the shelf and keep themselves current, including *Not in a book*, so
   nothing quietly goes missing.
+- **Share a book with one person.** Everyone you share with gets a link of their
+  own. They need no account, can read that one book and nothing else, and cannot
+  change a thing. Take one person's link back and it stops working at once,
+  without disturbing anybody else's.
 - **Cook from it.** Scale servings by ½×, 2×, or 3×, tap ingredients off as you
   go, and use a full-screen cook mode that keeps the screen awake.
 - **Marks what is worth repeating.** Keeper, Want to try, Nope. Recipes gather a
@@ -84,9 +88,11 @@ app/(auth)      sign in, join
 app/(app)       the box, the shelf, add, search, settings, recipe pages
 app/(app)/book  the shelf, and /book/[id] to flip through one
 app/cook/[id]   full-screen cook mode, outside the tab bar
+app/shared      what a guest sees, signed out, one book only
 app/api         image serving, capture upload, transcription
 lib/ai          transcription prompt and the structured output schema
 lib/books       the shelf: membership, the standing books, page ordering
+lib/sharing     tokens, and every read a guest is allowed
 lib/ingredients parsing, fraction formatting, and scaling
 ```
 
@@ -98,6 +104,14 @@ Books are a join table, not a field on the recipe, because a thing is regularly
 both a weeknight dinner and one the children will eat. The standing books
 (*Everything*, *Keepers*, *Want to try*, *Best loved*, *Not in a book*) are
 derived on read, so they can never drift.
+
+A share is one row per person, so each has a token of their own and revoking is
+a delete. The token is the entire credential, so every read a guest makes is
+scoped by it in `lib/sharing.ts` and nowhere else — including photographs, which
+are checked against the recipe's membership of *that* book rather than the
+household, or sharing one book would quietly hand over the pictures in all of
+them. Shared pages are the one thing the service worker refuses to keep, so
+taking a link back is not a half-truth on a device that has already seen it.
 
 Ingredients are stored as structured JSONB rather than plain strings, which is
 what makes scaling work. They are edited as ordinary text lines and re-parsed on
