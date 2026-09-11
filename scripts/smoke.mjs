@@ -338,6 +338,30 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   await ctx.close();
 }
 
+/* ==================================================== addresses that are junk */
+{
+  console.log("\nJUNK ADDRESSES");
+  const { ctx } = await openApp("iPhone 13");
+
+  // Postgres refuses to compare a uuid column with "abc" and raises, so
+  // anything taking an id from the URL has to check the shape first or a
+  // wrong address becomes a 500.
+  for (const path of [
+    "/r/abc",
+    "/cook/abc",
+    "/book/abc",
+    "/book/abc/share",
+    "/api/images/abc",
+    "/api/captures/abc/image",
+    "/api/shared/nope/images/abc",
+    "/shared/nope",
+  ]) {
+    const res = await ctx.request.get(BASE + path, { maxRedirects: 0 });
+    check(`${path} is a plain 404`, res.status() === 404, `HTTP ${res.status()}`);
+  }
+  await ctx.close();
+}
+
 /* ================================= the shell holds together on every page */
 {
   console.log("\nSHELL");

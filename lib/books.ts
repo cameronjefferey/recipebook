@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import type { Ingredient, Instruction } from "@/lib/db/schema";
 import { books, bookRecipes, recipes } from "@/lib/db/schema";
 import { firstImages } from "@/lib/recipes";
+import { isUuid } from "@/lib/ids";
 
 /* ------------------------------------------------------------------ *
  * The shelf. Each book is a collection of recipes; a recipe belongs to
@@ -42,8 +43,6 @@ export const SMART_BOOKS = [
 export type SmartBookId = (typeof SMART_BOOKS)[number]["id"];
 
 const SMART_IDS = new Set<string>(SMART_BOOKS.map((b) => b.id));
-const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function isSmartBook(id: string) {
   return SMART_IDS.has(id);
@@ -189,7 +188,7 @@ export async function resolveBook(
   if (smart) return { id: smart.id, name: smart.name, smart: true };
 
   // Anything else has to look like a uuid before it reaches the ::uuid cast.
-  if (!UUID.test(id)) return null;
+  if (!isUuid(id)) return null;
 
   const [row] = await db
     .select({ id: books.id, name: books.name })

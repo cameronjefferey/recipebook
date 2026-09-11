@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { recipes } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
+import { isUuid } from "@/lib/ids";
 import { CookMode } from "@/components/cook-mode";
 
 export default async function CookPage({
@@ -12,6 +13,7 @@ export default async function CookPage({
 }) {
   const user = await requireUser();
   const { id } = await params;
+  if (!isUuid(id)) notFound();
 
   const [recipe] = await db
     .select()

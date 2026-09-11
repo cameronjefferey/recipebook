@@ -2,6 +2,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { captures } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth";
+import { isUuid } from "@/lib/ids";
 
 export async function GET(
   _req: Request,
@@ -11,6 +12,7 @@ export async function GET(
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { id } = await params;
+  if (!isUuid(id)) return new Response("Not found", { status: 404 });
 
   const [capture] = await db
     .select({

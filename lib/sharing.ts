@@ -11,6 +11,7 @@ import {
   recipes,
 } from "@/lib/db/schema";
 import { firstImages } from "@/lib/recipes";
+import { isUuid } from "@/lib/ids";
 import type { BookLeaf, BookOrder, BookRecipe } from "@/lib/books";
 
 /** The same choices the owner has, minus the letter dividers. */
@@ -156,7 +157,7 @@ export async function listSharedPages(
  * hand over the photographs of every other book in the box.
  */
 export async function sharedImage(token: string, imageId: string) {
-  if (!token || !imageId) return null;
+  if (!token || !isUuid(imageId)) return null;
 
   const [image] = await db
     .select({
