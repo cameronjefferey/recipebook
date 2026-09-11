@@ -22,19 +22,25 @@ export async function fetchPage(url: string) {
       Accept: "text/html,application/xhtml+xml",
     },
     redirect: "follow",
+    // A recipe brings its components in with it, so a slow site must not be
+    // allowed to hold the whole import open.
+    signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok) throw new Error("That page could not be opened.");
 
   return {
     html: await response.text(),
     host: parsedUrl.hostname.replace(/^www\./, ""),
+    // Where we ended up after redirects, which is what relative links in the
+    // page are relative to.
+    finalUrl: response.url || url,
   };
 }
 
 export async function importFromUrl(url: string): Promise<ImportedRecipe> {
-  const { html, host } = await fetchPage(url);
+  const { html, host, finalUrl } = await fetchPage(url);
 
-  const fromMarkup = parseRecipeJsonLd(html, host);
+  const fromMarkup = parseRecipeJsonLd(html, host, finalUrl);
   if (fromMarkup) return fromMarkup;
 
   // No usable markup, so read the page text with the model.

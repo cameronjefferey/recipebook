@@ -6,6 +6,11 @@ import { requireUser } from "@/lib/auth";
 import { isUuid } from "@/lib/ids";
 import { visibleRecipe } from "@/lib/access";
 import { booksForRecipe } from "@/lib/books";
+import {
+  componentGroup,
+  loadComponents,
+  withComponents,
+} from "@/lib/component-recipes";
 import { RecipeView } from "@/components/recipe-view";
 
 export default async function RecipePage({
@@ -29,7 +34,7 @@ export default async function RecipePage({
   // Seeing somebody else's recipe is not the same as being able to touch it.
   const mine = recipe.householdId === user.householdId;
 
-  const [images, tags, books] = await Promise.all([
+  const [images, tags, books, componentsByUrl] = await Promise.all([
     db
       .select({
         id: recipeImages.id,
@@ -44,7 +49,18 @@ export default async function RecipePage({
       .from(recipeTags)
       .where(eq(recipeTags.recipeId, id)),
     mine ? booksForRecipe(user, id) : Promise.resolve([]),
+    loadComponents(user, recipe.householdId, recipe.ingredients),
   ]);
+
+  // Some ingredients are recipes. Fold those in so the list is everything you
+  // need to shop for and the steps are everything you need to do.
+  const { ingredients, instructions } = withComponents(recipe, componentsByUrl);
+  const components = [...componentsByUrl].map(([url, part]) => ({
+    url,
+    id: part.id,
+    title: part.title,
+    group: componentGroup(part.title),
+  }));
 
   return (
     <RecipeView
@@ -57,8 +73,8 @@ export default async function RecipePage({
         servingsText: recipe.servingsText,
         prepMinutes: recipe.prepMinutes,
         cookMinutes: recipe.cookMinutes,
-        ingredients: recipe.ingredients,
-        instructions: recipe.instructions,
+        ingredients,
+        instructions,
         notes: recipe.notes,
         status: recipe.status,
         sourceName: recipe.sourceName,
@@ -68,6 +84,7 @@ export default async function RecipePage({
       images={images}
       tags={tags.map((t) => t.tag)}
       books={books}
+      components={components}
       mine={mine}
     />
   );

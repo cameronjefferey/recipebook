@@ -33,7 +33,12 @@ index cards, and pages torn out of cookbooks and cooking magazines.
   go, and use a full-screen cook mode that keeps the screen awake.
 - **Marks what is worth repeating.** Keeper, Want to try, Nope. Recipes gather a
   dog-eared corner and butter splatters the more they are cooked.
-- Also imports from a web link, or you can type a recipe in by hand.
+- **Imports from a web link, parts and all.** Plenty of recipes lean on another
+  recipe — "1½ cups Mexican street corn salad" is a whole other job, and the
+  page says so by linking the words. Those come in too, as recipes of their own,
+  with their ingredients folded into the list and their steps put ahead of the
+  recipe's own in cook mode. Links to a shop are left where they belong.
+- Or you can type a recipe in by hand.
 
 ## Running it locally
 
@@ -106,6 +111,7 @@ lib/books       the shelf: membership, the standing books, page ordering
 lib/access      who may see a recipe, and who may change it
 lib/sharing     tokens, and every read a guest is allowed
 lib/ingredients parsing, fraction formatting, and scaling
+lib/component-recipes  recipes that are an ingredient of another recipe
 ```
 
 The app shell is exactly one screen tall and the middle scrolls, so the header
@@ -116,6 +122,21 @@ Books are a join table, not a field on the recipe, because a thing is regularly
 both a weeknight dinner and one the children will eat. The standing books
 (*Everything*, *Keepers*, *Want to try*, *Best loved*, *Not in a book*) are
 derived on read, so they can never drift.
+
+An ingredient that is really another recipe is remembered as that recipe's web
+address rather than its id, so the two find each other whichever order they were
+brought in and whether or not the other one is here yet. Matching is on
+`sourceKey`: the address with the protocol, `www.`, query and trailing slash
+taken off. Which links count is decided twice — off-site links are shopping, and
+a same-site link only survives if the page it points at publishes a recipe of
+its own. Following stops after one step, so one paste cannot walk a whole site.
+
+The parts belong to whoever owns the recipe rather than whoever is reading it,
+and still have to pass `visibleRecipe`, so opening a salad somebody shared
+cannot fold your copy of a component into her recipe, and sharing one recipe
+does not hand over everything it happens to mention. The flip-through view is
+the exception: it shows a recipe as written, because it is one query for a
+whole book and is served to guests as well as owners.
 
 Signing up gets you a box of your own. Joining somebody else's — a household
 sharing one collection — needs that box's own invite code, which is a different

@@ -11,6 +11,7 @@ import {
 } from "@/lib/ingredients";
 import { logCook, setStatus } from "@/lib/actions/recipes";
 import { BookPicker } from "@/components/book-picker";
+import { ChevronRight } from "@/components/icons";
 import { Button } from "@/components/ui";
 
 type Recipe = {
@@ -37,17 +38,29 @@ const STATUSES = [
   { key: "nope", label: "Nope" },
 ] as const;
 
+/** A recipe this one is partly made of, already on the shelf. */
+type Component = {
+  /** the address the ingredient points with, which is how it is matched */
+  url: string;
+  id: string;
+  title: string;
+  /** the heading its own ingredients and steps were folded in under */
+  group: string;
+};
+
 export function RecipeView({
   recipe,
   images,
   tags,
   books,
+  components = [],
   mine = true,
 }: {
   recipe: Recipe;
   images: { id: string; kind: "original" | "photo"; rotation: number }[];
   tags: string[];
   books: { id: string; name: string; inBook: boolean }[];
+  components?: Component[];
   /**
    * False when this is somebody else's recipe, met through a book they
    * shared. It stays fully readable and cookable; what goes is everything
@@ -66,6 +79,9 @@ export function RecipeView({
     recipe.ingredients.map((i) => scaleIngredient(i, factor)),
   );
   const stepGroups = groupInstructions(recipe.instructions);
+
+  const partByUrl = new Map(components.map((c) => [c.url, c]));
+  const partByGroup = new Map(components.map((c) => [c.group, c]));
 
   const toggle = (key: string) =>
     setChecked((prev) => {
@@ -156,38 +172,65 @@ export function RecipeView({
           </div>
         </div>
 
-        {groups.map((group, gi) => (
-          <div key={gi} className="mb-4">
-            {group.name ? (
-              <h3 className="mb-1 text-[0.8rem] font-bold tracking-wide text-browned uppercase">
-                {group.name}
-              </h3>
-            ) : null}
-            <ul className="space-y-1">
-              {group.items.map((ing, i) => {
-                const key = `${gi}-${i}`;
-                const done = checked.has(key);
-                return (
-                  <li key={key}>
-                    <button
-                      onClick={() => toggle(key)}
-                      className={`no-select flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left text-[1.05rem] ${
-                        done ? "text-muted line-through" : ""
-                      }`}
-                    >
-                      <span
-                        className={`mt-1 h-5 w-5 shrink-0 rounded border-2 ${
-                          done ? "border-pink bg-pink" : "border-pink-mid"
+        {groups.map((group, gi) => {
+          // A heading that names a component recipe is a way through to it.
+          const heading = partByGroup.get(group.name);
+          return (
+            <div key={gi} className="mb-4">
+              {group.name && heading ? (
+                <Link
+                  href={`/r/${heading.id}`}
+                  className="mb-1 flex items-center gap-1 text-[0.8rem] font-bold tracking-wide text-pink uppercase"
+                >
+                  {group.name}
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : group.name ? (
+                <h3 className="mb-1 text-[0.8rem] font-bold tracking-wide text-browned uppercase">
+                  {group.name}
+                </h3>
+              ) : null}
+              <ul className="space-y-1">
+                {group.items.map((ing, i) => {
+                  const key = `${gi}-${i}`;
+                  const done = checked.has(key);
+                  const part = ing.component
+                    ? partByUrl.get(ing.component)
+                    : undefined;
+                  return (
+                    <li key={key} className="flex items-start">
+                      <button
+                        onClick={() => toggle(key)}
+                        className={`no-select flex flex-1 items-start gap-3 rounded-lg px-2 py-2 text-left text-[1.05rem] ${
+                          done ? "text-muted line-through" : ""
                         }`}
-                      />
-                      <span>{formatIngredient(ing)}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+                      >
+                        <span
+                          className={`mt-1 h-5 w-5 shrink-0 rounded border-2 ${
+                            done ? "border-pink bg-pink" : "border-pink-mid"
+                          }`}
+                        />
+                        <span>{formatIngredient(ing)}</span>
+                      </button>
+                      {/* Beside the tick rather than inside it, so that
+                          checking off an ingredient and opening the recipe it
+                          stands for are not the same tap. */}
+                      {part ? (
+                        <Link
+                          href={`/r/${part.id}`}
+                          aria-label={`Open ${part.title}`}
+                          className="tap -mr-2 flex shrink-0 items-center justify-center text-pink"
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </Link>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
       </section>
 
       <section>

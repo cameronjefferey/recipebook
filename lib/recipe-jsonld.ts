@@ -1,4 +1,5 @@
 import { parseIngredient } from "@/lib/ingredients";
+import { ingredientLinks } from "@/lib/ingredient-links";
 import type { Ingredient, Instruction } from "@/lib/db/schema";
 
 export type ImportedRecipe = {
@@ -104,6 +105,7 @@ export function stripHtml(html: string) {
 export function parseRecipeJsonLd(
   html: string,
   sourceName: string,
+  pageUrl?: string,
 ): ImportedRecipe | null {
   const scripts = html.matchAll(
     /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
@@ -120,10 +122,20 @@ export function parseRecipeJsonLd(
     const node = collectNodes(json).find(isRecipeNode);
     if (!node) continue;
 
-    const ingredients: Ingredient[] = (node.recipeIngredient ?? [])
+    const lines: string[] = (node.recipeIngredient ?? [])
       .map((line: unknown) => String(line))
-      .filter(Boolean)
-      .map((line: string) => parseIngredient(line));
+      .filter(Boolean);
+
+    // The markup gives the words; only the page itself says which of them
+    // were a link to another recipe.
+    const links = pageUrl
+      ? ingredientLinks(html, pageUrl, lines)
+      : lines.map(() => null);
+
+    const ingredients: Ingredient[] = lines.map((line, i) => {
+      const parsed = parseIngredient(line);
+      return links[i] ? { ...parsed, component: links[i] } : parsed;
+    });
 
     const instructions = flattenInstructions(node.recipeInstructions);
     if (!ingredients.length && !instructions.length) continue;

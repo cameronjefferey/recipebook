@@ -66,6 +66,17 @@ export function CookMode({
   const last = step >= steps.length - 1;
   const scaled = ingredients.map((i) => scaleIngredient(i, factor));
 
+  // Grouped, so a folded-in component is named rather than tipped in among
+  // the rest. Ticking is by position in the flat list, which is what the
+  // checkboxes were counting before there were headings.
+  const groups: { name: string; items: { ing: Ingredient; at: number }[] }[] = [];
+  scaled.forEach((ing, at) => {
+    const name = ing.group?.trim() ?? "";
+    const group = groups.find((g) => g.name === name);
+    if (group) group.items.push({ ing, at });
+    else groups.push({ name, items: [{ ing, at }] });
+  });
+
   function finish() {
     startTransition(async () => {
       await logCook(id);
@@ -112,35 +123,44 @@ export function CookMode({
             ) : null}
           </div>
 
-          <ul className="space-y-1">
-            {scaled.map((ing, i) => {
-              const done = checked.has(i);
-              return (
-                <li key={i}>
-                  <button
-                    onClick={() =>
-                      setChecked((prev) => {
-                        const next = new Set(prev);
-                        if (next.has(i)) next.delete(i);
-                        else next.add(i);
-                        return next;
-                      })
-                    }
-                    className={`flex w-full items-start gap-3 rounded-lg px-2 py-3 text-left text-[1.25rem] ${
-                      done ? "text-muted line-through" : ""
-                    }`}
-                  >
-                    <span
-                      className={`mt-1.5 h-6 w-6 shrink-0 rounded border-2 ${
-                        done ? "border-pink bg-pink" : "border-pink-mid"
-                      }`}
-                    />
-                    <span>{formatIngredient(ing)}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          {groups.map((group) => (
+            <div key={group.name} className="mb-4">
+              {group.name ? (
+                <h2 className="mb-1 text-[0.9rem] font-bold tracking-wide text-browned uppercase">
+                  {group.name}
+                </h2>
+              ) : null}
+              <ul className="space-y-1">
+                {group.items.map(({ ing, at }) => {
+                  const done = checked.has(at);
+                  return (
+                    <li key={at}>
+                      <button
+                        onClick={() =>
+                          setChecked((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(at)) next.delete(at);
+                            else next.add(at);
+                            return next;
+                          })
+                        }
+                        className={`flex w-full items-start gap-3 rounded-lg px-2 py-3 text-left text-[1.25rem] ${
+                          done ? "text-muted line-through" : ""
+                        }`}
+                      >
+                        <span
+                          className={`mt-1.5 h-6 w-6 shrink-0 rounded border-2 ${
+                            done ? "border-pink bg-pink" : "border-pink-mid"
+                          }`}
+                        />
+                        <span>{formatIngredient(ing)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </div>
       ) : (
         <>

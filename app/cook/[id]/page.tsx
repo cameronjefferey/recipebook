@@ -5,6 +5,7 @@ import { recipes } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
 import { visibleRecipe } from "@/lib/access";
 import { isUuid } from "@/lib/ids";
+import { loadComponents, withComponents } from "@/lib/component-recipes";
 import { CookMode } from "@/components/cook-mode";
 
 export default async function CookPage({
@@ -24,13 +25,19 @@ export default async function CookPage({
 
   if (!recipe) notFound();
 
+  // Cooking this means cooking its parts, and their steps come first.
+  const { ingredients, instructions } = withComponents(
+    recipe,
+    await loadComponents(user, recipe.householdId, recipe.ingredients),
+  );
+
   return (
     <CookMode
       id={recipe.id}
       title={recipe.title}
       servings={recipe.servings}
-      ingredients={recipe.ingredients}
-      instructions={recipe.instructions}
+      ingredients={ingredients}
+      instructions={instructions}
     />
   );
 }

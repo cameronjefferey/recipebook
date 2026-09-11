@@ -33,6 +33,13 @@ export type Ingredient = {
   group?: string | null;
   /** transcription was unsure; surfaced for confirmation in review */
   uncertain?: boolean;
+  /**
+   * This ingredient is a recipe in its own right, like "1½ cups Mexican
+   * street corn salad": the address of that recipe. Kept as the address
+   * rather than an id so the two find each other whichever order they are
+   * brought in, and whether or not the other one is here yet.
+   */
+  component?: string | null;
 };
 
 export type Instruction = {
@@ -136,6 +143,12 @@ export const recipes = pinkbox.table(
     status: recipeStatus("status").notNull().default("none"),
     sourceKind: sourceKind("source_kind").notNull().default("manual"),
     sourceUrl: text("source_url"),
+    /**
+     * `sourceUrl` with the protocol, "www.", query and trailing slash taken
+     * off, so one recipe linking to another matches however the address was
+     * written. See `sourceKeyOf`.
+     */
+    sourceKey: text("source_key"),
     /** "Cook's Country, Dec/Jan 2017, p.11" or "Grandma Ruth's card" */
     sourceName: text("source_name"),
 
@@ -155,6 +168,7 @@ export const recipes = pinkbox.table(
   (t) => [
     index("recipes_household_idx").on(t.householdId),
     index("recipes_household_created_idx").on(t.householdId, t.createdAt),
+    index("recipes_source_key_idx").on(t.householdId, t.sourceKey),
   ],
 );
 

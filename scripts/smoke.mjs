@@ -378,6 +378,152 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   await ctx.close();
 }
 
+/* ================== ingredients that are themselves recipes ============== */
+// Served from here rather than fetched off the web, so the check is about our
+// code and not about whether somebody else's site is up today. Needs the
+// database only to clear up after itself: recipes have no delete button.
+if (!process.env.DATABASE_URL) {
+  console.log("\nINGREDIENTS THAT ARE RECIPES");
+  note("this section", "needs DATABASE_URL to tidy up after itself");
+}
+if (process.env.DATABASE_URL) {
+  console.log("\nINGREDIENTS THAT ARE RECIPES");
+  const { createServer } = await import("node:http");
+  const sql = (await import("postgres")).default(process.env.DATABASE_URL);
+  const forget = () =>
+    sql`DELETE FROM pinkbox.recipes WHERE title IN ('Smoke Component Salad', 'Smoke Corn Relish')`;
+  await forget();
+
+  const recipePage = (name, ingredients, steps) => `<!doctype html><html><head>
+<script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Recipe",
+    name,
+    recipeIngredient: ingredients.map((i) => i.text),
+    recipeInstructions: steps.map((text) => ({ "@type": "HowToStep", text })),
+    recipeYield: "4 servings",
+  })}</script></head><body><ul class="ingredients">${ingredients
+    .map(
+      (i) =>
+        `<li>&#x25a2; ${i.href ? `${i.before} <a href="${i.href}">${i.link}</a>` : i.text}</li>`,
+    )
+    .join("")}</ul></body></html>`;
+
+  const pages = {
+    "/salad": recipePage(
+      "Smoke Component Salad",
+      [
+        { text: "4 cups shredded kale" },
+        // links out to a shop, which is not a recipe however it is dressed up
+        { text: "1/8 teaspoon sea salt", before: "1/8 teaspoon", link: "sea salt", href: "https://amzn.to/nope" },
+        // links to a recipe on the same site
+        { text: "1 1/2 cups smoke corn relish", before: "1 1/2 cups", link: "smoke corn relish", href: "/relish" },
+        // links to the same site, but at an address that is never a recipe
+        { text: "2 tablespoons olive oil", before: "2 tablespoons", link: "olive oil", href: "/go/oil" },
+        // links to a page on the same site that has no recipe on it
+        { text: "1 pinch smoked paprika", before: "1 pinch", link: "smoked paprika", href: "/about" },
+      ],
+      ["Toss the kale.", "Add the relish."],
+    ),
+    "/relish": recipePage(
+      "Smoke Corn Relish",
+      [{ text: "2 cups corn" }, { text: "1 diced jalapeno" }],
+      ["Char the corn.", "Stir in the jalapeno."],
+    ),
+    "/about": "<!doctype html><html><body><h1>About us</h1></body></html>",
+  };
+
+  const server = createServer((req, res) => {
+    const body = pages[req.url.replace(/\/$/, "")] ?? pages[req.url];
+    if (!body) {
+      res.writeHead(404).end("no");
+      return;
+    }
+    res.writeHead(200, { "Content-Type": "text/html" }).end(body);
+  });
+  await new Promise((r) => server.listen(0, "127.0.0.1", r));
+  const origin = `http://127.0.0.1:${server.address().port}`;
+
+  const { ctx, page, errors } = await openApp("iPhone 13");
+  try {
+    await page.goto(`${BASE}/add/link`, { waitUntil: "networkidle" });
+    await page.locator('input[name="url"]').fill(`${origin}/salad`);
+    await page.getByRole("button", { name: /add|import|get/i }).first().click();
+    await page.waitForURL(/\/r\/[0-9a-f-]{36}/, { timeout: 60000 });
+    const saladId = page.url().split("/r/")[1];
+
+    const body = await page.locator("main").innerText();
+    check("the recipe arrives", /Smoke Component Salad/i.test(await page.locator("h1").innerText()));
+    check(
+      "the linked recipe is folded in under its own heading",
+      /for the smoke corn relish/i.test(body),
+      body.match(/For the [^\n]+/gi)?.join(" | ") ?? "none",
+    );
+    check("with its own ingredients", /jalapeno/i.test(body));
+    check(
+      "only the real recipe link counts",
+      (await page.getByRole("link", { name: /^Open / }).count()) === 1,
+      "sea salt is a shop, /go/ is an advert, /about is not a recipe",
+    );
+
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    const shelf = await page.locator("body").innerText();
+    check("the component is a recipe of its own now", /Smoke Corn Relish/i.test(shelf));
+    check("and nothing else was dragged in", !/About us/i.test(shelf));
+
+    // steps: make the relish, then the salad
+    await page.goto(`${BASE}/cook/${saladId}`, { waitUntil: "networkidle" });
+    const first = await page.locator("p").filter({ hasText: /Step 1 of/i }).innerText();
+    check("cooking begins with the component", /smoke corn relish/i.test(first), first);
+    check("and counts all four steps", /of 4/i.test(first), first);
+
+    // asking for the same page again must not make a second relish
+    await page.goto(`${BASE}/add/link`, { waitUntil: "networkidle" });
+    await page.locator('input[name="url"]').fill(`${origin}/salad/`); // trailing slash
+    await page.getByRole("button", { name: /add|import|get/i }).first().click();
+    await page.waitForURL(/\/r\/[0-9a-f-]{36}/, { timeout: 60000 });
+    const again = page.url().split("/r/")[1];
+
+    const onShelf = async (title) =>
+      (await page.locator("ul.grid li a").allInnerTexts()).filter((t) =>
+        t.split("\n").some((line) => line.trim() === title),
+      ).length;
+
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    check(
+      "importing it twice reuses the component rather than copying it",
+      (await onShelf("Smoke Corn Relish")) === 1,
+      `${await onShelf("Smoke Corn Relish")} relishes`,
+    );
+
+    check("the second import is its own recipe", again !== saladId);
+
+    // If the component is ever thrown away, the recipe that leant on it must
+    // still read as the ordinary line it always was.
+    await sql`DELETE FROM pinkbox.recipes WHERE title = 'Smoke Corn Relish'`;
+    await page.goto(`${BASE}/r/${saladId}`, { waitUntil: "networkidle" });
+    const orphaned = await page.locator("main").innerText();
+    check("losing the component leaves the recipe readable", /smoke corn relish/i.test(orphaned));
+    check("with no heading for a recipe that is gone", !/for the smoke corn relish/i.test(orphaned));
+    check(
+      "and no link to nowhere",
+      (await page.getByRole("link", { name: /^Open / }).count()) === 0,
+    );
+
+    check("no page errors", errors.length === 0, errors.slice(0, 2).join(" | "));
+  } finally {
+    await forget();
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    check(
+      "nothing is left behind",
+      !/Smoke Component Salad|Smoke Corn Relish/i.test(await page.locator("body").innerText()),
+    );
+    await ctx.close();
+    await sql.end();
+    server.close();
+  }
+}
+
 /* ============================ two boxes, one book passed between them */
 // Needs the sign-up code and a database to tidy up after itself, both of which
 // come from the environment: neither belongs in the repository.
