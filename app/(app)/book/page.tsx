@@ -65,9 +65,6 @@ function BookCover({ book }: { book: ShelfBook }) {
         />
       ) : null}
 
-      {/* the spine, always pink, always down the left */}
-      <span className="absolute inset-y-0 left-0 w-2.5 bg-pink" />
-
       <div className="relative flex h-full flex-col justify-end bg-gradient-to-t from-card via-card/90 to-transparent p-3 pl-5">
         <h3 className="font-display text-[1.05rem] leading-tight">
           {book.name}
@@ -81,6 +78,9 @@ function BookCover({ book }: { book: ShelfBook }) {
           </p>
         ) : null}
       </div>
+
+      {/* Last, so it paints over the gradient and runs the full height. */}
+      <span className="absolute inset-y-0 left-0 w-2.5 bg-pink" />
     </Link>
   );
 }
