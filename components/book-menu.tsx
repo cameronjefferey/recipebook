@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { deleteBook, renameBook } from "@/lib/actions/books";
 import { Button, Input } from "@/components/ui";
 
-/** Rename or remove a book. Deleting the book never deletes its recipes. */
+/** Rename or remove a box. Deleting the box never deletes its recipes. */
 export function BookMenu({ bookId, name }: { bookId: string; name: string }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(name);
@@ -36,7 +36,7 @@ export function BookMenu({ bookId, name }: { bookId: string; name: string }) {
           name="name"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          aria-label="Book name"
+          aria-label="Box name"
           autoFocus
         />
         <div className="flex gap-2">
@@ -60,11 +60,11 @@ export function BookMenu({ bookId, name }: { bookId: string; name: string }) {
           disabled={pending}
           className="w-full"
           onClick={() => {
-            if (!confirm(`Delete the book "${name}"? The recipes stay.`)) return;
+            if (!confirm(`Delete the box "${name}"? The recipes stay.`)) return;
             startTransition(() => deleteBook(bookId));
           }}
         >
-          Delete this book
+          Delete this box
         </Button>
       </form>
     </div>

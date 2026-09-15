@@ -15,7 +15,7 @@ import { isUuid } from "@/lib/ids";
 
 function touchPlan(recipeId?: string) {
   revalidatePath("/plan");
-  revalidatePath("/book");
+  revalidatePath("/box");
   if (recipeId) revalidatePath(`/r/${recipeId}`);
 }
 

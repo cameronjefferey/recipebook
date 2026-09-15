@@ -38,7 +38,7 @@ export const SMART_BOOKS = [
   { id: "keepers", name: "Keepers", blurb: "the ones with a ribbon" },
   { id: "want-to-try", name: "Want to try", blurb: "not made yet" },
   { id: "loved", name: "Best loved", blurb: "cooked the most" },
-  { id: "unfiled", name: "Not in a book", blurb: "still to be sorted" },
+  { id: "unfiled", name: "Not in a box", blurb: "still to be sorted" },
 ] as const;
 
 export type SmartBookId = (typeof SMART_BOOKS)[number]["id"];
@@ -391,10 +391,10 @@ export async function listBookPages(
 }
 
 /**
- * File a new recipe into the book named after its category, making the book if
- * the shelf has not got one yet. Without this the shelf would slowly go stale:
+ * File a new recipe into the box named after its category, making the box if
+ * there is not one yet. Without this the box would slowly go stale:
  * transcription suggests a category, and everything new would otherwise pile up
- * in "Not in a book" however carefully it had been labelled.
+ * in "Not in a box" however carefully it had been labelled.
  */
 export async function fileUnderCategory(
   householdId: string,

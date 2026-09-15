@@ -12,7 +12,7 @@ import { BookMenu } from "@/components/book-menu";
 import { ChevronLeft } from "@/components/icons";
 import { ButtonLink } from "@/components/ui";
 
-export default async function OpenBookPage({
+export default async function OpenBoxPage({
   params,
   searchParams,
 }: {
@@ -40,8 +40,8 @@ export default async function OpenBookPage({
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="relative flex items-center gap-1">
         <Link
-          href="/book"
-          aria-label="Back to the shelf"
+          href="/box"
+          aria-label="Back to the box"
           className="tap -ml-3 flex items-center justify-center text-pink"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -59,7 +59,7 @@ export default async function OpenBookPage({
         {book.smart || theirs ? null : (
           <>
             <Link
-              href={`/book/${book.id}/share`}
+              href={`/box/${book.id}/share`}
               className="tap flex items-center justify-center px-2 text-[0.85rem] font-bold text-browned"
             >
               Share
@@ -71,17 +71,17 @@ export default async function OpenBookPage({
 
       {pages.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <p className="font-display text-2xl text-pink">This book is empty</p>
+          <p className="font-display text-2xl text-pink">This box is empty</p>
           <p className="hand mt-2 text-browned">
             open a recipe and file it in here
           </p>
-          <ButtonLink href="/box" variant="secondary" className="mt-6">
-            Go to the box
+          <ButtonLink href="/recipes" variant="secondary" className="mt-6">
+            Go to your recipes
           </ButtonLink>
         </div>
       ) : (
         <BookClient
-          basePath={`/book/${book.id}`}
+          basePath={`/box/${book.id}`}
           pages={pages}
           initialIndex={openAt > 0 ? openAt : 0}
           orders={BOOK_ORDERS.map(({ key, label }) => ({

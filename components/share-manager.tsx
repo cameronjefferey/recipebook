@@ -98,7 +98,7 @@ export function ShareManager({
             name="canAdd"
             className="h-5 w-5 shrink-0 accent-pink"
           />
-          Let them add their own recipes to this book
+          Let them add their own recipes to this box
         </label>
       </form>
 
@@ -159,7 +159,7 @@ function ShareRow({ share }: { share: Share }) {
         </div>
         <button
           onClick={() => {
-            if (!confirm(`Stop ${share.recipientName} seeing this book?`)) return;
+            if (!confirm(`Stop ${share.recipientName} seeing this box?`)) return;
             startTransition(() => revokeShare(share.id));
           }}
           disabled={pending}

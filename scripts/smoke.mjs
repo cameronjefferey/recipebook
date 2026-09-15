@@ -40,51 +40,61 @@ async function openApp(deviceName) {
   return { ctx, page, errors };
 }
 
-/* ============================================== shelf and book management */
+/* ===================================================== the box, and its boxes */
 {
-  console.log("\nSHELF AND BOOKS");
+  console.log("\nTHE BOX");
   const { ctx, page, errors } = await openApp("iPhone 13");
 
-  await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
-  await page.screenshot({ path: `${SHOTS}/shelf.png`, fullPage: true });
+  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.screenshot({ path: `${SHOTS}/box.png`, fullPage: true });
 
-  const shelf = () => page.locator("section ul li a h3").allInnerTexts();
-  const shelfNames = await shelf();
+  const boxList = () => page.locator("section ul li a h3").allInnerTexts();
+  const boxNames = await boxList();
   check(
-    "the standing books are always there",
-    ["Everything", "Keepers", "Want to try", "Best loved", "Not in a book"].every((n) =>
-      shelfNames.includes(n),
+    "the standing boxes are always there",
+    ["Everything", "Keepers", "Want to try", "Best loved", "Not in a box"].every((n) =>
+      boxNames.includes(n),
     ),
-    shelfNames.join(", "),
+    boxNames.join(", "),
   );
 
-  await page.getByLabel("New book name").fill("Smoke test book");
+  // tapping one opens the lid before the page underneath takes over — not
+  // an instant jump, so there is something to see in between
+  const everything = page.getByRole("link", { name: "Open Everything" });
+  const beforeUrl = page.url();
+  await everything.click();
+  check("the tap does not jump straight there", page.url() === beforeUrl);
+  await page.waitForURL(`${BASE}/box/all`, { timeout: 2000 });
+  check("but it lands inside a moment later", true);
+  await page.goBack({ waitUntil: "networkidle" });
+
+  await page.getByLabel("New box name").fill("Smoke test box");
   await page.getByRole("button", { name: "Add" }).click();
   await page.waitForFunction(
-    () => [...document.querySelectorAll("h3")].some((h) => h.textContent === "Smoke test book"),
+    () => [...document.querySelectorAll("h3")].some((h) => h.textContent === "Smoke test box"),
     null,
     { timeout: 10000 },
   );
-  check("a new book reaches the shelf", true);
+  check("a new box shows up", true);
 
   // file a recipe into it
-  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
   const recipeCount = await page.locator("ul.grid li a").count();
   if (recipeCount === 0) {
-    note("filing a recipe", "the box is empty");
+    note("filing a recipe", "there are no recipes yet");
   } else {
     await page.locator("ul.grid li a").first().click();
     await page.waitForURL(/\/r\//);
     const title = await page.locator("h1").innerText();
 
-    const chip = page.getByRole("button", { name: "Smoke test book", exact: true });
-    check("the book picker offers the new book", await chip.isVisible());
+    const chip = page.getByRole("button", { name: "Smoke test box", exact: true });
+    check("the box picker offers the new box", await chip.isVisible());
     check("it starts out unticked", (await chip.getAttribute("aria-pressed")) === "false");
     await chip.click();
     await page.waitForFunction(
       () => {
         const b = [...document.querySelectorAll("button")].find(
-          (x) => x.textContent.trim() === "Smoke test book",
+          (x) => x.textContent.trim() === "Smoke test box",
         );
         return b?.getAttribute("aria-pressed") === "true";
       },
@@ -93,19 +103,19 @@ async function openApp(deviceName) {
     );
     check("ticking it files the recipe", true);
 
-    // Making a book from the recipe page: the book is only real once the
+    // Making a box from the recipe page: the box is only real once the
     // server has made it, so the picker has to take the server's word for
     // what exists rather than the list it was first handed.
     const picker = page.locator("section", {
-      has: page.locator("h2", { hasText: "In these books" }),
+      has: page.locator("h2", { hasText: "In these boxes" }),
     });
     const chipsBefore = (await picker.locator("button").allInnerTexts()).length;
-    await page.getByRole("button", { name: "+ New book" }).click();
-    await page.getByLabel("New book name").fill("Smoke picker book");
+    await page.getByRole("button", { name: "+ New box" }).click();
+    await page.getByLabel("New box name").fill("Smoke picker box");
     await page.getByRole("button", { name: "Add", exact: true }).click();
-    const made = picker.getByRole("button", { name: "Smoke picker book", exact: true });
+    const made = picker.getByRole("button", { name: "Smoke picker box", exact: true });
     await made.waitFor({ timeout: 10000 }).catch(() => {});
-    check("a book made from the recipe shows up without a reload", await made.isVisible());
+    check("a box made from the recipe shows up without a reload", await made.isVisible());
     check(
       "and it is one more chip, not a replacement",
       (await picker.locator("button").allInnerTexts()).length === chipsBefore + 1,
@@ -115,57 +125,57 @@ async function openApp(deviceName) {
     await page.reload({ waitUntil: "networkidle" });
     check(
       "it was really saved, and only once",
-      (await picker.locator("button").allInnerTexts()).filter((t) => t === "Smoke picker book")
+      (await picker.locator("button").allInnerTexts()).filter((t) => t === "Smoke picker box")
         .length === 1,
     );
 
-    await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
     const card = page
-      .locator("a", { has: page.locator("h3", { hasText: "Smoke test book" }) })
+      .locator("a", { has: page.locator("h3", { hasText: "Smoke test box" }) })
       .first();
-    check("the shelf counts it", /1 recipe\b/.test(await card.innerText()));
+    check("the box counts it", /1 recipe\b/.test(await card.innerText()));
 
     await card.click();
-    await page.waitForURL(/\/book\/[0-9a-f-]{36}/);
-    check("the book opens on that recipe", (await page.locator("article h2").first().innerText()) === title);
+    await page.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
+    check("the box opens on that recipe", (await page.locator("article h2").first().innerText()) === title);
   }
 
   // rename, then delete, and confirm the recipes survive
-  await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
   await page
-    .locator("a", { has: page.locator("h3", { hasText: "Smoke test book" }) })
+    .locator("a", { has: page.locator("h3", { hasText: "Smoke test box" }) })
     .first()
     .click();
-  await page.waitForURL(/\/book\/[0-9a-f-]{36}/);
+  await page.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
   await page.getByRole("button", { name: "Edit" }).click();
-  await page.getByLabel("Book name").fill("Smoke test renamed");
+  await page.getByLabel("Box name").fill("Smoke test renamed");
   await page.getByRole("button", { name: "Save" }).click();
   await page.waitForTimeout(1200);
   check("renaming sticks", (await page.locator("h1").innerText()).includes("Smoke test renamed"));
 
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Edit" }).click();
-  await page.getByRole("button", { name: "Delete this book" }).click();
-  await page.waitForURL(`${BASE}/book`, { timeout: 10000 });
-  check("deleting removes it from the shelf", !(await shelf()).some((n) => n.startsWith("Smoke test")));
+  await page.getByRole("button", { name: "Delete this box" }).click();
+  await page.waitForURL(`${BASE}/box`, { timeout: 10000 });
+  check("deleting removes it from the box list", !(await boxList()).some((n) => n.startsWith("Smoke test")));
 
   // and take the one made from the recipe page away again
   const leftover = page.locator("a", {
-    has: page.locator("h3", { hasText: "Smoke picker book" }),
+    has: page.locator("h3", { hasText: "Smoke picker box" }),
   });
   if (await leftover.count()) {
     await leftover.first().click();
-    await page.waitForURL(/\/book\/[0-9a-f-]{36}/);
+    await page.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
     page.once("dialog", (d) => d.accept());
     await page.getByRole("button", { name: "Edit" }).click();
-    await page.getByRole("button", { name: "Delete this book" }).click();
-    await page.waitForURL(`${BASE}/book`, { timeout: 10000 });
+    await page.getByRole("button", { name: "Delete this box" }).click();
+    await page.waitForURL(`${BASE}/box`, { timeout: 10000 });
   }
-  check("nothing is left behind", !(await shelf()).some((n) => n.startsWith("Smoke ")));
+  check("nothing is left behind", !(await boxList()).some((n) => n.startsWith("Smoke ")));
 
-  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
   check(
-    "deleting a book keeps its recipes",
+    "deleting a box keeps its recipes",
     (await page.locator("ul.grid li a").count()) === recipeCount,
   );
 
@@ -178,7 +188,7 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   console.log(`\nPAGER — ${deviceName}`);
   const { ctx, page } = await openApp(deviceName);
 
-  await page.goto(`${BASE}/book/all?by=title`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/box/all?by=title`, { waitUntil: "networkidle" });
   await page.waitForTimeout(500);
 
   const track = page.locator('[role="region"][aria-label="Recipe pages"]');
@@ -258,33 +268,33 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   await ctx.close();
 }
 
-/* ============================================ sharing a book with somebody */
+/* ============================================= sharing a box with somebody */
 {
   console.log("\nSHARING");
   const { ctx, page, errors } = await openApp("iPhone 13");
 
-  // a book of its own, so the test never depends on what is on the shelf
-  await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
-  await page.getByLabel("New book name").fill("Smoke share book");
+  // a box of its own, so the test never depends on what is already there
+  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.getByLabel("New box name").fill("Smoke share box");
   await page.getByRole("button", { name: "Add" }).click();
   await page.waitForFunction(
-    () => [...document.querySelectorAll("h3")].some((h) => h.textContent === "Smoke share book"),
+    () => [...document.querySelectorAll("h3")].some((h) => h.textContent === "Smoke share box"),
     null,
     { timeout: 10000 },
   );
 
-  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
   const anyRecipe = await page.locator("ul.grid li a").count();
   let sharedTitle = null;
   if (anyRecipe > 0) {
     await page.locator("ul.grid li a").first().click();
     await page.waitForURL(/\/r\//);
     sharedTitle = await page.locator("h1").innerText();
-    await page.getByRole("button", { name: "Smoke share book", exact: true }).click();
+    await page.getByRole("button", { name: "Smoke share box", exact: true }).click();
     await page.waitForFunction(
       () => {
         const b = [...document.querySelectorAll("button")].find(
-          (x) => x.textContent.trim() === "Smoke share book",
+          (x) => x.textContent.trim() === "Smoke share box",
         );
         return b?.getAttribute("aria-pressed") === "true";
       },
@@ -293,13 +303,13 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
     );
   }
 
-  await page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
   await page
-    .locator("a", { has: page.locator("h3", { hasText: "Smoke share book" }) })
+    .locator("a", { has: page.locator("h3", { hasText: "Smoke share box" }) })
     .first()
     .click();
-  await page.waitForURL(/\/book\/[0-9a-f-]{36}/);
-  const bookId = page.url().match(/\/book\/([0-9a-f-]{36})/)[1];
+  await page.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
+  const bookId = page.url().match(/\/box\/([0-9a-f-]{36})/)[1];
 
   await page.getByRole("link", { name: "Share" }).click();
   await page.waitForURL(/\/share$/);
@@ -322,7 +332,7 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   const opened = await gp.goto(link, { waitUntil: "networkidle" });
   check("it opens with no account", opened.status() === 200, `HTTP ${opened.status()}`);
   const guestText = await gp.locator("body").innerText();
-  check("the book is named for the guest", guestText.includes("Smoke share book"));
+  check("the box is named for the guest", guestText.includes("Smoke share box"));
   if (sharedTitle) check("the recipe is readable", guestText.includes(sharedTitle));
   check("a guest gets no tab bar", (await gp.locator("nav.no-print").count()) === 0);
   check(
@@ -334,7 +344,7 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
     ((await gp.locator('meta[name="robots"]').getAttribute("content")) ?? "").includes("noindex"),
   );
 
-  for (const path of ["/box", "/book", "/settings"]) {
+  for (const path of ["/box", "/recipes", "/settings"]) {
     const r = await guest.request.get(BASE + path, { maxRedirects: 0 });
     check(`a guest is turned away from ${path}`, r.status() === 307, `HTTP ${r.status()}`);
   }
@@ -344,7 +354,7 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   check("an unrelated photo is refused", stranger.status() === 404, `HTTP ${stranger.status()}`);
 
   // taking it back has to bite immediately
-  await page.goto(`${BASE}/book/${bookId}/share`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/box/${bookId}/share`, { waitUntil: "networkidle" });
   page.once("dialog", (d) => d.accept());
   await page
     .locator("li", { hasText: "Smoke guest" })
@@ -366,13 +376,13 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   check("no guest page errors", guestErrors.length === 0, guestErrors.slice(0, 2).join(" | "));
   await guest.close();
 
-  // tidy the book away again
-  await page.goto(`${BASE}/book/${bookId}`, { waitUntil: "networkidle" });
+  // tidy the box away again
+  await page.goto(`${BASE}/box/${bookId}`, { waitUntil: "networkidle" });
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Edit" }).click();
-  await page.getByRole("button", { name: "Delete this book" }).click();
-  await page.waitForURL(`${BASE}/book`, { timeout: 10000 });
-  check("the test book is cleaned up", !(await page.locator("section ul li a h3").allInnerTexts()).includes("Smoke share book"));
+  await page.getByRole("button", { name: "Delete this box" }).click();
+  await page.waitForURL(`${BASE}/box`, { timeout: 10000 });
+  check("the test box is cleaned up", !(await page.locator("section ul li a h3").allInnerTexts()).includes("Smoke share box"));
 
   check("no owner page errors", errors.length === 0, errors.slice(0, 2).join(" | "));
   await ctx.close();
@@ -466,10 +476,10 @@ if (process.env.DATABASE_URL) {
       "sea salt is a shop, /go/ is an advert, /about is not a recipe",
     );
 
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
-    const shelf = await page.locator("body").innerText();
-    check("the component is a recipe of its own now", /Smoke Corn Relish/i.test(shelf));
-    check("and nothing else was dragged in", !/About us/i.test(shelf));
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
+    const gridText = await page.locator("body").innerText();
+    check("the component is a recipe of its own now", /Smoke Corn Relish/i.test(gridText));
+    check("and nothing else was dragged in", !/About us/i.test(gridText));
 
     // steps: make the relish, then the salad
     await page.goto(`${BASE}/cook/${saladId}`, { waitUntil: "networkidle" });
@@ -484,16 +494,16 @@ if (process.env.DATABASE_URL) {
     await page.waitForURL(/\/r\/[0-9a-f-]{36}/, { timeout: 60000 });
     const again = page.url().split("/r/")[1];
 
-    const onShelf = async (title) =>
+    const onGrid = async (title) =>
       (await page.locator("ul.grid li a").allInnerTexts()).filter((t) =>
         t.split("\n").some((line) => line.trim() === title),
       ).length;
 
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     check(
       "importing it twice reuses the component rather than copying it",
-      (await onShelf("Smoke Corn Relish")) === 1,
-      `${await onShelf("Smoke Corn Relish")} relishes`,
+      (await onGrid("Smoke Corn Relish")) === 1,
+      `${await onGrid("Smoke Corn Relish")} relishes`,
     );
 
     check("the second import is its own recipe", again !== saladId);
@@ -513,7 +523,7 @@ if (process.env.DATABASE_URL) {
     check("no page errors", errors.length === 0, errors.slice(0, 2).join(" | "));
   } finally {
     await forget();
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     check(
       "nothing is left behind",
       !/Smoke Component Salad|Smoke Corn Relish/i.test(await page.locator("body").innerText()),
@@ -591,8 +601,8 @@ if (process.env.DATABASE_URL) {
       "8 corn tortillas",
     ]);
 
-    // the second one, added in a batch from the box grid
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    // the second one, added in a batch from the recipes grid
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     await page.getByRole("button", { name: "Select", exact: true }).click();
     await page.getByRole("button", { name: `Select ${TACOS}` }).click();
     await page.getByRole("button", { name: /Add 1 to this week/ }).click();
@@ -682,7 +692,7 @@ if (process.env.DATABASE_URL) {
           ?.getAttribute("aria-checked") === "false",
     );
 
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     check(
       "the tab bar drops Plan once it's off",
       !(await page.locator("nav.no-print").innerText()).includes("Plan"),
@@ -710,7 +720,7 @@ if (process.env.DATABASE_URL) {
       /Smoke Plan Chili/.test(await planBody()) && /3 cloves garlic, minced/i.test(await planBody()),
     );
 
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     check(
       "the tab and Select mode are back too",
       (await page.locator("nav.no-print").innerText()).includes("Plan") &&
@@ -735,7 +745,7 @@ if (process.env.DATABASE_URL) {
     check("the plan is empty", !/Smoke Plan Tacos/.test(await planBody()));
     check("so is the grocery list", !/tortillas/i.test(await planBody()));
 
-    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     check(
       "starting a new week never touches the recipes themselves",
       /Smoke Plan Tacos/.test(await page.locator("body").innerText()),
@@ -749,7 +759,7 @@ if (process.env.DATABASE_URL) {
   }
 }
 
-/* ============================ two boxes, one book passed between them */
+/* ==================== two households, sharing one box between them ==== */
 // Needs the sign-up code and a database to tidy up after itself, both of which
 // come from the environment: neither belongs in the repository.
 const INVITE = process.env.INVITE_CODE ?? process.env.PB_INVITE;
@@ -760,7 +770,7 @@ if (!process.env.DATABASE_URL || !INVITE) {
 if (process.env.DATABASE_URL && INVITE) {
   console.log("\nSHARING BETWEEN TWO BOXES");
   const stamp = Date.now();
-  const BOOK = `Smoke shared book ${stamp}`;
+  const BOX = `Smoke shared box ${stamp}`;
   const sql = (await import("postgres")).default(process.env.DATABASE_URL);
 
   /** A person with a box of their own, made the way anybody would make one. */
@@ -775,7 +785,7 @@ if (process.env.DATABASE_URL && INVITE) {
     await page.getByLabel("Password").fill("apasswordthatislong");
     await page.getByLabel("Invite code").fill(INVITE);
     await page.getByRole("button", { name: /Create my box/ }).click();
-    await page.waitForURL(`${BASE}/box`, { timeout: 20000 });
+    await page.waitForURL(`${BASE}/recipes`, { timeout: 20000 });
     return { ctx, page, errors };
   }
 
@@ -796,17 +806,17 @@ if (process.env.DATABASE_URL && INVITE) {
     !/Turkey|Tart|Carrots|Teriyaki/.test(await guest.page.locator("body").innerText()),
   );
 
-  await op.goto(`${BASE}/book`, { waitUntil: "networkidle" });
-  await op.getByLabel("New book name").fill(BOOK);
+  await op.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await op.getByLabel("New box name").fill(BOX);
   await op.getByRole("button", { name: "Add" }).click();
   await op.waitForFunction(
     (n) => [...document.querySelectorAll("h3")].some((h) => h.textContent === n),
-    BOOK,
+    BOX,
     { timeout: 10000 },
   );
-  await op.locator("a", { has: op.locator("h3", { hasText: BOOK }) }).first().click();
-  await op.waitForURL(/\/book\/[0-9a-f-]{36}/);
-  const bookId = op.url().match(/\/book\/([0-9a-f-]{36})/)[1];
+  await op.locator("a", { has: op.locator("h3", { hasText: BOX }) }).first().click();
+  await op.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
+  const bookId = op.url().match(/\/box\/([0-9a-f-]{36})/)[1];
 
   await op.getByRole("link", { name: "Share" }).click();
   await op.waitForURL(/\/share$/);
@@ -819,16 +829,16 @@ if (process.env.DATABASE_URL && INVITE) {
   const link = await op.locator("code").first().innerText();
 
   await guest.page.goto(link, { waitUntil: "networkidle" });
-  await guest.page.getByRole("button", { name: /Keep this on my shelf/ }).click();
-  await guest.page.waitForURL(/\/book\//, { timeout: 20000 });
-  await guest.page.goto(`${BASE}/book`, { waitUntil: "networkidle" });
+  await guest.page.getByRole("button", { name: /Keep this in my box/ }).click();
+  await guest.page.waitForURL(/\/box\//, { timeout: 20000 });
+  await guest.page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
   check(
-    "an accepted book lands under Shared with you",
+    "an accepted box lands under Shared with you",
     /Shared with you/i.test(await guest.page.locator("body").innerText()),
   );
 
   // planning is a personal note on top of anything visible, not a change to
-  // the recipe, so a recipe let into a shared book can be planned by the
+  // the recipe, so a recipe let into a shared box can be planned by the
   // guest same as any other — right up until access is taken back.
   const SHARED_MEAL = `Smoke Shared Meal ${stamp}`;
   await op.goto(`${BASE}/add/write`, { waitUntil: "networkidle" });
@@ -838,17 +848,17 @@ if (process.env.DATABASE_URL && INVITE) {
   await op.getByRole("button", { name: /Save|Add/ }).first().click();
   await op.waitForURL(/\/r\//, { timeout: 20000 });
   const sharedMealId = op.url().split("/r/")[1];
-  await op.getByRole("button", { name: new RegExp(BOOK) }).click();
+  await op.getByRole("button", { name: new RegExp(BOX) }).click();
   await op.waitForFunction(
     (n) =>
       [...document.querySelectorAll("button")]
         .find((x) => x.textContent.includes(n))
         ?.getAttribute("aria-pressed") === "true",
-    BOOK,
+    BOX,
     { timeout: 10000 },
   );
 
-  // The book itself is a flip-through pager, so go straight to the recipe by
+  // The box itself is a flip-through pager, so go straight to the recipe by
   // address rather than hunting for it a page at a time.
   await guest.page.goto(`${BASE}/r/${sharedMealId}`, { waitUntil: "networkidle" });
   await guest.page.getByRole("button", { name: "Cook this week" }).click();
@@ -858,7 +868,7 @@ if (process.env.DATABASE_URL && INVITE) {
 
   await guest.page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
   check(
-    "a guest can plan a recipe shared into their shelf",
+    "a guest can plan a recipe shared into their box",
     (await guest.page.locator("main").innerText()).includes(SHARED_MEAL),
   );
   check(
@@ -867,36 +877,36 @@ if (process.env.DATABASE_URL && INVITE) {
   );
 
   await write(guest.page, `Smoke Guest Dish ${stamp}`);
-  await guest.page.getByRole("button", { name: new RegExp(BOOK) }).click();
+  await guest.page.getByRole("button", { name: new RegExp(BOX) }).click();
   await guest.page.waitForFunction(
     (n) =>
       [...document.querySelectorAll("button")]
         .find((x) => x.textContent.includes(n))
         ?.getAttribute("aria-pressed") === "true",
-    BOOK,
+    BOX,
     { timeout: 10000 },
   );
 
-  await op.goto(`${BASE}/book/${bookId}`, { waitUntil: "networkidle" });
+  await op.goto(`${BASE}/box/${bookId}`, { waitUntil: "networkidle" });
   check(
     "the owner sees what a contributor put in",
     (await op.locator("body").innerText()).includes("Smoke Guest Dish"),
   );
-  await op.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await op.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
   check(
-    "but it does not join the owner's own box",
+    "but it does not join the owner's own recipes",
     !(await op.locator("body").innerText()).includes("Smoke Guest Dish"),
   );
 
   // what the guest may not do
   const forbidden = await Promise.all([
-    guest.ctx.request.get(`${BASE}/book/${bookId}/share`, { maxRedirects: 0 }),
+    guest.ctx.request.get(`${BASE}/box/${bookId}/share`, { maxRedirects: 0 }),
     guest.ctx.request.get(`${BASE}/box`, { maxRedirects: 0 }),
   ]);
-  check("a contributor cannot pass the book on", forbidden[0].status() === 404);
+  check("a contributor cannot pass the box on", forbidden[0].status() === 404);
   check("and has a box of their own to land in", forbidden[1].status() === 200);
 
-  await op.goto(`${BASE}/book/${bookId}/share`, { waitUntil: "networkidle" });
+  await op.goto(`${BASE}/box/${bookId}/share`, { waitUntil: "networkidle" });
   op.once("dialog", (d) => d.accept());
   await op
     .locator("li", { hasText: "Smokeguest" })
@@ -906,10 +916,10 @@ if (process.env.DATABASE_URL && INVITE) {
     timeout: 10000,
   });
   check(
-    "taking it back closes the book",
-    (await guest.ctx.request.get(`${BASE}/book/${bookId}`, { maxRedirects: 0 })).status() === 404,
+    "taking it back closes the box",
+    (await guest.ctx.request.get(`${BASE}/box/${bookId}`, { maxRedirects: 0 })).status() === 404,
   );
-  await guest.page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await guest.page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
   check(
     "but the contributor keeps their own recipe",
     (await guest.page.locator("body").innerText()).includes("Smoke Guest Dish"),
@@ -917,7 +927,7 @@ if (process.env.DATABASE_URL && INVITE) {
 
   await guest.page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
   check(
-    "losing access to a book takes its meal off the guest's plan too",
+    "losing access to a box takes its meal off the guest's plan too",
     !(await guest.page.locator("main").innerText()).includes(SHARED_MEAL),
   );
 
@@ -925,11 +935,11 @@ if (process.env.DATABASE_URL && INVITE) {
   check("no guest page errors", guest.errors.length === 0, guest.errors.slice(0, 1).join(""));
 
   // put the kitchen back
-  await op.goto(`${BASE}/book/${bookId}`, { waitUntil: "networkidle" });
+  await op.goto(`${BASE}/box/${bookId}`, { waitUntil: "networkidle" });
   op.once("dialog", (d) => d.accept());
   await op.getByRole("button", { name: "Edit" }).click();
-  await op.getByRole("button", { name: "Delete this book" }).click();
-  await op.waitForURL(`${BASE}/book`, { timeout: 10000 });
+  await op.getByRole("button", { name: "Delete this box" }).click();
+  await op.waitForURL(`${BASE}/box`, { timeout: 10000 });
 
   await sql`DELETE FROM pinkbox.recipes WHERE title = ${SHARED_MEAL}`;
   await sql`DELETE FROM pinkbox.households WHERE name LIKE ${"Smokeguest%"}`;
@@ -949,8 +959,8 @@ if (process.env.DATABASE_URL && INVITE) {
   for (const path of [
     "/r/abc",
     "/cook/abc",
-    "/book/abc",
-    "/book/abc/share",
+    "/box/abc",
+    "/box/abc/share",
     "/api/images/abc",
     "/api/captures/abc/image",
     "/api/shared/nope/images/abc",
@@ -967,9 +977,9 @@ if (process.env.DATABASE_URL && INVITE) {
   console.log("\nSHELL");
   const { ctx, page, errors } = await openApp("iPhone SE");
 
-  await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
   const first = await page.locator("ul.grid li a").first().getAttribute("href");
-  const paths = ["/box", "/search", "/settings", "/add", "/book", "/book/all", "/plan"];
+  const paths = ["/box", "/recipes", "/search", "/settings", "/add", "/box/all", "/plan"];
   if (first) paths.push(first);
 
   for (const path of paths) {

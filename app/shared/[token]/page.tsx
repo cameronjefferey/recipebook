@@ -32,7 +32,7 @@ export default async function SharedBookPage({
   if (!share) notFound();
 
   // Somebody with an account should not have to keep the email to come back to
-  // this, so it can be put on their own shelf instead.
+  // this, so it can be kept in their own box instead.
   const user = await getCurrentUser();
   const canKeep = !!user && user.householdId !== share.ownerHouseholdId;
 
@@ -56,7 +56,7 @@ export default async function SharedBookPage({
               Nothing in here yet
             </p>
             <p className="hand mt-2 text-browned">
-              this book has not been filled in
+              this box has not been filled in
             </p>
           </div>
         ) : (
@@ -77,15 +77,15 @@ export default async function SharedBookPage({
 
       <footer className="pb-safe shrink-0 px-5 pb-3 text-center">
         {canKeep ? (
-          <KeepOnMyShelf token={token} />
+          <KeepInMyBox token={token} />
         ) : (
           <p className="text-[0.75rem] text-muted">
-            The Pink Recipe Box · you are reading a shared book
+            The Pink Recipe Box · you are reading a shared box
           </p>
         )}
       </footer>
 
-      {/* Suspended so the book is not held up by a bookkeeping write. */}
+      {/* Suspended so the box is not held up by a bookkeeping write. */}
       <Suspense fallback={null}>
         <RecordVisit shareId={share.shareId} lastViewedAt={share.lastViewedAt} />
       </Suspense>
@@ -94,14 +94,14 @@ export default async function SharedBookPage({
 }
 
 /** A plain form, so it works before any JavaScript has arrived. */
-function KeepOnMyShelf({ token }: { token: string }) {
+function KeepInMyBox({ token }: { token: string }) {
   return (
     <form action={acceptShare.bind(null, token)}>
       <button
         type="submit"
         className="tap inline-flex items-center justify-center rounded-full bg-pink px-6 text-[0.9rem] font-bold text-page"
       >
-        Keep this on my shelf
+        Keep this in my box
       </button>
     </form>
   );

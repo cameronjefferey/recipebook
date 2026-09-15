@@ -11,10 +11,9 @@ import {
   SearchIcon,
 } from "@/components/icons";
 
-// "Shelf" rather than "Books", which reads too much like "Box" at a glance.
 const allTabs = [
+  { href: "/recipes", label: "Recipes", Icon: BookIcon },
   { href: "/box", label: "Box", Icon: BoxIcon },
-  { href: "/book", label: "Shelf", Icon: BookIcon },
   { href: "/plan", label: "Plan", Icon: CartIcon, plan: true },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
   { href: "/search", label: "Search", Icon: SearchIcon },

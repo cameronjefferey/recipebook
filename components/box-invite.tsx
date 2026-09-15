@@ -15,9 +15,10 @@ function useOrigin() {
 }
 
 /**
- * Sharing a book is for people with a box of their own. This is the other
- * thing: bringing somebody into *this* box, so the two of you keep one
- * collection between you, the way a household actually works.
+ * Sharing a single box (one collection) is for handing over just that one.
+ * This is the other thing: bringing somebody into the whole household, so
+ * the two of you share every box and recipe between you, the way a
+ * household actually works.
  */
 export function BoxInvite({
   code,
@@ -45,8 +46,8 @@ export function BoxInvite({
       <p className="font-bold">Share this whole box</p>
       <p className="mt-1 text-[0.9rem] text-muted">
         Anyone who joins with this link keeps {boxName} with you: same recipes,
-        same books, both of you able to change them. To let somebody see only
-        part of it, share a single book from the shelf instead.
+        same boxes, both of you able to change them. To let somebody see only
+        part of it, share a single box instead.
       </p>
 
       <div className="mt-3 flex items-center gap-2">

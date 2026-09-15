@@ -6,7 +6,7 @@ import { listShares } from "@/lib/sharing";
 import { ShareManager } from "@/components/share-manager";
 import { ChevronLeft } from "@/components/icons";
 
-export default async function ShareBookPage({
+export default async function ShareBoxPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -29,8 +29,8 @@ export default async function ShareBookPage({
     <div className="space-y-5">
       <div className="flex items-center gap-1">
         <Link
-          href={`/book/${book.id}`}
-          aria-label="Back to the book"
+          href={`/box/${book.id}`}
+          aria-label="Back to the box"
           className="tap -ml-3 flex items-center justify-center text-pink"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -41,7 +41,7 @@ export default async function ShareBookPage({
       </div>
 
       <p className="text-[0.95rem] text-muted">
-        Everyone gets a link of their own. They can read this one book and
+        Everyone gets a link of their own. They can read this one box and
         nothing else, they cannot change anything, and they do not need an
         account.
       </p>

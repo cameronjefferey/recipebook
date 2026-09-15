@@ -45,8 +45,8 @@ export async function shareBook(
     createdBy: user.id,
   });
 
-  revalidatePath(`/book/${bookId}/share`);
-  revalidatePath("/book");
+  revalidatePath(`/box/${bookId}/share`);
+  revalidatePath("/box");
   return {};
 }
 
@@ -65,7 +65,7 @@ export async function setShareCanAdd(shareId: string, canAdd: boolean) {
   if (!share) return;
 
   await db.update(bookShares).set({ canAdd }).where(eq(bookShares.id, shareId));
-  revalidatePath(`/book/${share.bookId}/share`);
+  revalidatePath(`/box/${share.bookId}/share`);
 }
 
 /**
@@ -108,15 +108,15 @@ export async function revokeShare(shareId: string) {
     );
   }
 
-  revalidatePath(`/book/${share.bookId}/share`);
-  revalidatePath(`/book/${share.bookId}`);
-  revalidatePath("/book");
+  revalidatePath(`/box/${share.bookId}/share`);
+  revalidatePath(`/box/${share.bookId}`);
+  revalidatePath("/box");
 }
 
 /**
- * Keeping a shared book on your own shelf. Until this the link is the only way
- * back to it, which is fine for somebody who will never make an account and no
- * use at all to somebody who has one.
+ * Keeping a shared box where you can find it again. Until this the link is
+ * the only way back to it, which is fine for somebody who will never make an
+ * account and no use at all to somebody who has one.
  */
 export async function acceptShare(token: string) {
   const user = await requireUser();
@@ -143,6 +143,6 @@ export async function acceptShare(token: string) {
     .set({ userId: user.id, acceptedAt: new Date() })
     .where(eq(bookShares.id, share.id));
 
-  revalidatePath("/book");
-  redirect(`/book/${share.bookId}`);
+  revalidatePath("/box");
+  redirect(`/box/${share.bookId}`);
 }

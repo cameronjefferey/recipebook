@@ -136,8 +136,8 @@ export function PlanClient({
         {state.planned.length === 0 ? (
           <p className="text-[0.95rem] text-muted">
             Nothing yet. Open a recipe and tap &ldquo;Cook this week,&rdquo; or{" "}
-            <Link href="/box" className="font-bold text-pink underline">
-              select a few from the box
+            <Link href="/recipes" className="font-bold text-pink underline">
+              select a few from your recipes
             </Link>
             .
           </p>

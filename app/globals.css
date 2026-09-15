@@ -138,6 +138,19 @@ body {
   color: var(--color-browned);
 }
 
+/* --- Signature: a box on the shelf, with a lid that tips open on tap,
+   hinged along its back edge, before the page underneath takes over. */
+@utility box-card {
+  perspective: 1000px;
+}
+@utility box-lid {
+  transform-origin: top center;
+  transform: rotateX(0deg);
+  transition:
+    transform 340ms cubic-bezier(0.3, 0, 0.22, 1),
+    opacity 340ms;
+}
+
 /* --- Flip view: a leaf of the book -------------------------------- *
    Shading down the left edge reads as the gutter of a bound book, and
    the offset shadows suggest the pages still to come underneath.      */

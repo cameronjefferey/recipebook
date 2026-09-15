@@ -23,7 +23,7 @@ export function NewBookForm() {
         <Input
           name="name"
           placeholder="Breakfast, Sides, What the kids eat…"
-          aria-label="New book name"
+          aria-label="New box name"
           maxLength={60}
           required
         />

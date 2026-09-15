@@ -88,7 +88,7 @@ export async function saveFromCapture(
       .update(captures)
       .set({ status: "discarded" })
       .where(eq(captures.id, captureId));
-    redirect("/box");
+    redirect("/recipes");
   }
 
   const standalone = kept.filter((r) => r.role === "main" || !r.mergeIntoMain);
@@ -187,9 +187,9 @@ export async function saveFromCapture(
     .set({ status: "filed" })
     .where(eq(captures.id, captureId));
 
+  revalidatePath("/recipes");
   revalidatePath("/box");
-  revalidatePath("/book");
-  redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/box");
+  redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/recipes");
 }
 
 export async function setStatus(
@@ -203,7 +203,7 @@ export async function setStatus(
     .where(
       and(eq(recipes.id, recipeId), eq(recipes.householdId, user.householdId)),
     );
-  revalidatePath("/box");
+  revalidatePath("/recipes");
   revalidatePath(`/r/${recipeId}`);
 }
 
@@ -227,7 +227,7 @@ export async function logCook(recipeId: string) {
     })
     .where(eq(recipes.id, recipeId));
 
-  revalidatePath("/box");
+  revalidatePath("/recipes");
   revalidatePath(`/r/${recipeId}`);
 }
 
@@ -238,8 +238,8 @@ export async function deleteRecipe(recipeId: string) {
     .where(
       and(eq(recipes.id, recipeId), eq(recipes.householdId, user.householdId)),
     );
-  revalidatePath("/box");
-  redirect("/box");
+  revalidatePath("/recipes");
+  redirect("/recipes");
 }
 
 export async function createManualRecipe(formData: FormData) {
@@ -272,7 +272,7 @@ export async function createManualRecipe(formData: FormData) {
 
   await fileUnderCategory(user.householdId, row.id, category);
 
+  revalidatePath("/recipes");
   revalidatePath("/box");
-  revalidatePath("/book");
   redirect(`/r/${row.id}`);
 }

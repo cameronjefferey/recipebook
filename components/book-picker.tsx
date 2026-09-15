@@ -32,12 +32,12 @@ function apply(choices: Choice[], patch: Patch): Choice[] {
 }
 
 /**
- * Which books this recipe lives in. Toggling shows at once and is confirmed
+ * Which boxes this recipe lives in. Toggling shows at once and is confirmed
  * behind the scenes.
  *
  * The list is read from the server on every render rather than copied into
- * state, because making a book adds something only the server knows the id of:
- * held in `useState` the new book would be saved and then never appear.
+ * state, because making a box adds something only the server knows the id of:
+ * held in `useState` the new box would be saved and then never appear.
  */
 export function BookPicker({
   recipeId,
@@ -65,8 +65,8 @@ export function BookPicker({
     setName("");
     setAdding(false);
 
-    // Naming a book you already have files the recipe into that one rather
-    // than making a second book of the same name, so show that instead of a
+    // Naming a box you already have files the recipe into that one rather
+    // than making a second box of the same name, so show that instead of a
     // duplicate chip that would vanish a moment later.
     const same = choices.find(
       (c) => c.name.toLowerCase() === clean.toLowerCase() && !c.ownerName,
@@ -84,7 +84,7 @@ export function BookPicker({
 
   return (
     <section className="no-print">
-      <h2 className="font-display mb-2 text-xl">In these books</h2>
+      <h2 className="font-display mb-2 text-xl">In these boxes</h2>
 
       <ul className="flex flex-wrap gap-2">
         {choices.map((choice) => (
@@ -116,7 +116,7 @@ export function BookPicker({
               onClick={() => setAdding(true)}
               className="inline-flex h-10 items-center rounded-full border border-dashed border-pink-mid px-4 text-[0.9rem] font-bold text-pink"
             >
-              + New book
+              + New box
             </button>
           </li>
         )}
@@ -133,8 +133,8 @@ export function BookPicker({
                 addBook();
               }
             }}
-            placeholder="Name the book"
-            aria-label="New book name"
+            placeholder="Name the box"
+            aria-label="New box name"
             maxLength={60}
             autoFocus
           />

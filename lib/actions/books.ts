@@ -14,7 +14,7 @@ function clean(name: string) {
   return name.trim().replace(/\s+/g, " ").slice(0, 60);
 }
 
-/** Returns the existing book when the name is already on the shelf. */
+/** Returns the existing book when the name is already on the box. */
 async function upsertBook(householdId: string, name: string) {
   const [existing] = await db
     .select({ id: books.id })
@@ -41,10 +41,10 @@ export async function createBook(
 ): Promise<BookState> {
   const user = await requireUser();
   const name = clean(String(formData.get("name") ?? ""));
-  if (!name) return { error: "Give the book a name." };
+  if (!name) return { error: "Give the box a name." };
 
   await upsertBook(user.householdId, name);
-  revalidatePath("/book");
+  revalidatePath("/box");
   return {};
 }
 
@@ -58,28 +58,28 @@ export async function renameBook(bookId: string, name: string) {
     .set({ name: next })
     .where(and(eq(books.id, bookId), eq(books.householdId, user.householdId)));
 
-  revalidatePath("/book");
-  revalidatePath(`/book/${bookId}`);
+  revalidatePath("/box");
+  revalidatePath(`/box/${bookId}`);
 }
 
 export async function deleteBook(bookId: string) {
   const user = await requireUser();
-  // Only the book goes; the recipes inside it stay in the box.
+  // Only the box goes; its recipes stay put.
   await db
     .delete(books)
     .where(and(eq(books.id, bookId), eq(books.householdId, user.householdId)));
 
-  revalidatePath("/book");
-  redirect("/book");
+  revalidatePath("/box");
+  redirect("/box");
 }
 
 /**
- * Put a recipe into a book, or take it out again.
+ * Put a recipe into a box, or take it out again.
  *
  * The recipe must be this household's either way: filing somebody else's
- * recipe, or quietly taking it out of their book, is not on. The book only
+ * recipe, or quietly taking it out of their box, is not on. The box only
  * has to be one they may add to, which is what lets a contributor put their
- * own recipes into a book somebody else owns.
+ * own recipes into a box somebody else owns.
  */
 export async function setRecipeInBook(
   recipeId: string,
@@ -113,12 +113,12 @@ export async function setRecipeInBook(
       );
   }
 
-  revalidatePath("/book");
-  revalidatePath(`/book/${bookId}`);
+  revalidatePath("/box");
+  revalidatePath(`/box/${bookId}`);
   revalidatePath(`/r/${recipeId}`);
 }
 
-/** Make a new book and drop this recipe straight into it. */
+/** Make a new box and drop this recipe straight into it. */
 export async function createBookWithRecipe(recipeId: string, name: string) {
   const user = await requireUser();
   const bookName = clean(name);
@@ -139,6 +139,6 @@ export async function createBookWithRecipe(recipeId: string, name: string) {
     .values({ bookId, recipeId, addedBy: user.id })
     .onConflictDoNothing();
 
-  revalidatePath("/book");
+  revalidatePath("/box");
   revalidatePath(`/r/${recipeId}`);
 }

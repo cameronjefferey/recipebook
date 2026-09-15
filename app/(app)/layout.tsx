@@ -15,7 +15,7 @@ export default async function AppLayout({
     // actually left over instead of guessing at the chrome.
     <div className="flex h-dvh flex-col">
       <header className="no-print pt-safe z-30 shrink-0 bg-pink px-5 py-3 text-page">
-        <Link href="/box" className="font-display block text-xl leading-none">
+        <Link href="/recipes" className="font-display block text-xl leading-none">
           The Pink Recipe Box
         </Link>
       </header>

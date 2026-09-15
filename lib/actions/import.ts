@@ -32,6 +32,6 @@ export async function importUrlAction(
     };
   }
 
-  revalidatePath("/box");
+  revalidatePath("/recipes");
   redirect(`/r/${recipeId}`);
 }

@@ -279,7 +279,7 @@ export function RecipeView({
           {tags.map((tag) => (
             <li key={tag}>
               <Link
-                href={`/box?tag=${encodeURIComponent(tag)}`}
+                href={`/recipes?tag=${encodeURIComponent(tag)}`}
                 className="inline-flex h-8 items-center rounded-full bg-pink-soft px-3 text-[0.8rem] font-bold text-pink"
               >
                 {tag}
@@ -323,7 +323,7 @@ export function RecipeView({
               I made this
             </Button>
             <Link
-              href={`/book/all?at=${recipe.id}`}
+              href={`/box/all?at=${recipe.id}`}
               className="tap inline-flex items-center justify-center rounded-full text-[0.9rem] font-bold text-browned"
             >
               Flip through from here
