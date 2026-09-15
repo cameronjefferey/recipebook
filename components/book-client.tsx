@@ -298,6 +298,25 @@ function RecipeLeaf({
         <h2 className="font-display text-2xl leading-tight">{recipe.title}</h2>
         {meta ? <p className="mt-1 text-[0.82rem] text-muted">{meta}</p> : null}
 
+        {/* Open or cook right away, without turning past the whole page
+            first — the same pair sits at the bottom too, once you have. */}
+        {showActions ? (
+          <div className="mt-3 flex gap-2">
+            <Link
+              href={`/r/${recipe.id}`}
+              className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
+            >
+              Open
+            </Link>
+            <Link
+              href={`/cook/${recipe.id}`}
+              className="tap flex flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
+            >
+              Start cooking
+            </Link>
+          </div>
+        ) : null}
+
         {near ? (
           <>
             {recipe.description ? (
