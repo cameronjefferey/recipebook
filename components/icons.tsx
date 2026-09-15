@@ -167,3 +167,123 @@ export function PencilIcon({ className }: P) {
     </svg>
   );
 }
+
+/* ============================== stand-ins for a recipe with no photo yet */
+
+/** Mains: a pot, lid slightly askew from whatever's simmering under it. */
+export function PotIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M5 11h14v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-5Z" />
+      <path {...stroke} d="M3.5 11h17M2 8.5l2 1M22 8.5l-2 1" />
+      <path {...stroke} d="M12 5.5c.9-1 2.2-1 2.6 0" />
+    </svg>
+  );
+}
+
+/** Desserts: a cupcake, one swirl of frosting and a cherry on top. */
+export function CupcakeIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M6.5 12h11l-1.3 7.2a2 2 0 0 1-2 1.8h-4.4a2 2 0 0 1-2-1.8L6.5 12Z" />
+      <path {...stroke} d="M7 12a5 5 0 0 1 10 0" />
+      <circle cx="12" cy="4.3" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Salads: a bowl with a leaf and a tomato tossed in. */
+export function SaladIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M3.5 12h17a7.5 7.5 0 0 1-15 4.5A7.5 7.5 0 0 1 3.5 12Z" />
+      <path {...stroke} d="M9 12c-.5-2.3.5-4 2.5-4.6M13.5 12c1-1.6.9-3.3-.3-4.6" />
+      <circle cx="15.5" cy="9.3" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Soups: a bowl with a little steam rising off it. */
+export function SoupIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M4 12h16a6 6 0 0 1-12 0H4Z" />
+      <path {...stroke} d="M4 12a2 2 0 0 1 0-4" />
+      <path {...stroke} d="M10 4.5c-1 1-1 1.8 0 2.8M14 4.5c-1 1-1 1.8 0 2.8" />
+    </svg>
+  );
+}
+
+/** Breads: a loaf, scored the way a real one is before it goes in. */
+export function BreadIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        {...stroke}
+        d="M4 13c0-4 2.5-7 8-7s8 3 8 7-2 5-8 5-8-1-8-5Z"
+      />
+      <path {...stroke} d="M9 8.5c-.6 1.4-.6 3 0 4.3M15 8.5c.6 1.4.6 3 0 4.3" />
+    </svg>
+  );
+}
+
+/** Drinks: a glass, a straw leaning against the rim. */
+export function DrinkIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M7.5 8h9l-1.2 10.3a2 2 0 0 1-2 1.7h-2.6a2 2 0 0 1-2-1.7L7.5 8Z" />
+      <path {...stroke} d="M6.5 8h11M16 4.5 12.5 8" />
+    </svg>
+  );
+}
+
+/** Sauces: a jar with a lid, the kind a batch gets put up in. */
+export function JarIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M6.5 9.5h11V18a2.5 2.5 0 0 1-2.5 2.5h-6A2.5 2.5 0 0 1 6.5 18V9.5Z" />
+      <path {...stroke} d="M8 9.5V6a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v3.5" />
+      <path {...stroke} d="M9.5 5V3.8M14.5 5V3.8" />
+    </svg>
+  );
+}
+
+/** Snacks: a wedge, bitten — this one didn't last long. */
+export function SnackIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M12 4 4 20h16L12 4Z" />
+      <path {...stroke} d="M12 9.5v6.5M9 12l6 1.5M9 15l6-1.5" />
+    </svg>
+  );
+}
+
+/** Breakfast: an egg, sunny side up in the pan. */
+export function EggIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M4 15a8 5 0 0 1 16 0 8 5 0 0 1-16 0Z" />
+      <circle {...stroke} cx="13" cy="14.3" r="3" />
+    </svg>
+  );
+}
+
+/** Sides: a small plate, set beside the main event. */
+export function SidePlateIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <circle {...stroke} cx="12" cy="12" r="8" />
+      <circle {...stroke} cx="12" cy="12" r="4" />
+    </svg>
+  );
+}
+
+/** No category at all, or one that named nothing above: a fork and spoon. */
+export function UtensilsIcon({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="M7 3v7a2 2 0 1 0 4 0V3M9 10v11" />
+      <path {...stroke} d="M16 3c-1.4 0-2.5 1.8-2.5 5s1.1 4 2.5 4v9" />
+    </svg>
+  );
+}

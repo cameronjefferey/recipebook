@@ -12,10 +12,12 @@ import {
 } from "@/lib/actions/plan";
 import { Eyebrow, Input, Button } from "@/components/ui";
 import { CheckIcon } from "@/components/icons";
+import { CategoryIcon } from "@/lib/category-icon";
 
 type Planned = {
   id: string;
   title: string;
+  category: string | null;
   servings: number | null;
   imageId: string | null;
   rotation: number;
@@ -163,9 +165,7 @@ export function PlanClient({
                         style={{ rotate: `${recipe.rotation}deg` }}
                       />
                     ) : (
-                      <span className="font-display text-lg text-pink-mid">
-                        {recipe.title.slice(0, 1).toUpperCase()}
-                      </span>
+                      <CategoryIcon category={recipe.category} className="h-6 w-6 text-pink-mid" />
                     )}
                   </span>
                   <span className="min-w-0">

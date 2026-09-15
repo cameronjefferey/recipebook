@@ -23,6 +23,7 @@ import type { CurrentUser } from "@/lib/auth";
 export type PlannedRecipe = {
   id: string;
   title: string;
+  category: string | null;
   servings: number | null;
   imageId: string | null;
   rotation: number;
@@ -154,6 +155,7 @@ export async function loadPlan(user: CurrentUser) {
       id: recipes.id,
       title: recipes.title,
       householdId: recipes.householdId,
+      category: recipes.category,
       servings: recipes.servings,
       ingredients: recipes.ingredients,
       instructions: recipes.instructions,
@@ -205,6 +207,7 @@ export async function loadPlan(user: CurrentUser) {
     planned: rows.map((r): PlannedRecipe => ({
       id: r.id,
       title: r.title,
+      category: r.category,
       servings: r.servings,
       imageId: covers.get(r.id)?.id ?? null,
       rotation: covers.get(r.id)?.rotation ?? 0,

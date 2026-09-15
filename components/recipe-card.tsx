@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { RecipeCard as Card } from "@/lib/recipes";
+import { CategoryIcon } from "@/lib/category-icon";
 
 /** Wear builds with use, then levels off so a favourite never looks ruined. */
 function splatterOpacity(timesCooked: number) {
@@ -27,8 +28,8 @@ export function RecipeCard({ recipe }: { recipe: Card }) {
             style={{ rotate: `${recipe.rotation}deg` }}
           />
         ) : (
-          <span className="font-display flex h-full items-center justify-center text-4xl text-pink-mid">
-            {recipe.title.slice(0, 1).toUpperCase()}
+          <span className="flex h-full items-center justify-center">
+            <CategoryIcon category={recipe.category} className="h-10 w-10 text-pink-mid" />
           </span>
         )}
       </div>

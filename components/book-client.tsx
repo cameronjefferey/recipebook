@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { BookLeaf, BookRecipe } from "@/lib/books";
+import { CategoryIcon } from "@/lib/category-icon";
 import {
   formatIngredient,
   groupIngredients,
@@ -292,7 +293,11 @@ function RecipeLeaf({
             style={{ rotate: `${recipe.rotation}deg` }}
           />
         </div>
-      ) : null}
+      ) : (
+        <div className="flex h-20 shrink-0 items-center justify-center bg-sink">
+          <CategoryIcon category={recipe.category} className="h-9 w-9 text-pink-mid" />
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
         <h2 className="font-display text-2xl leading-tight">{recipe.title}</h2>
