@@ -67,6 +67,8 @@ export type CurrentUser = {
   name: string;
   householdId: string;
   householdName: string;
+  /** whether this household has turned meal planning on. */
+  mealPlanEnabled: boolean;
 };
 
 /** Deduplicated per request, so layout and page do not each hit the database. */
@@ -82,6 +84,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
       name: users.name,
       householdId: users.householdId,
       householdName: households.name,
+      mealPlanEnabled: households.mealPlanEnabled,
     })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))

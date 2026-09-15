@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth";
 import { Card } from "@/components/ui";
 import { BoxInvite } from "@/components/box-invite";
 import { InstallHint } from "@/components/install-hint";
+import { MealPlanSettings } from "@/components/meal-plan-settings";
 import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function SettingsPage() {
@@ -35,6 +36,8 @@ export default async function SettingsPage() {
       </Card>
 
       <BoxInvite code={household.inviteCode} boxName={user.householdName} />
+
+      <MealPlanSettings enabled={user.mealPlanEnabled} />
 
       <InstallHint />
 

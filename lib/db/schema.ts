@@ -79,6 +79,10 @@ export const households = pinkbox.table("households", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   inviteCode: text("invite_code").notNull().unique(),
+  // A household-wide preference, not a security boundary: turning it off
+  // just hides the tab, the toggle, and "Select" — the plan and list
+  // already on it are left alone, and come right back if switched on again.
+  mealPlanEnabled: boolean("meal_plan_enabled").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

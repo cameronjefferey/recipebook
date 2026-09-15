@@ -113,6 +113,38 @@ export function ErrorNote({ children }: { children: ReactNode }) {
   );
 }
 
+export function Switch({
+  checked,
+  onChange,
+  disabled,
+  label,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  disabled?: boolean;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={onChange}
+      disabled={disabled}
+      className={`tap relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
+        checked ? "bg-pink" : "bg-line"
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-card shadow-sm transition-transform ${
+          checked ? "translate-x-5" : ""
+        }`}
+      />
+    </button>
+  );
+}
+
 /** Small uppercase label used above groups of things. */
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (

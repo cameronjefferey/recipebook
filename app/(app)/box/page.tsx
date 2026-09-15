@@ -93,7 +93,7 @@ export default async function BoxPage({
           </ButtonLink>
         </div>
       ) : (
-        <BoxGrid recipes={recipes} />
+        <BoxGrid recipes={recipes} planEnabled={user.mealPlanEnabled} />
       )}
     </div>
   );

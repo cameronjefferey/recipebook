@@ -69,8 +69,8 @@ export function RecipeView({
    * that would write to it, because their box is not ours to annotate.
    */
   mine?: boolean;
-  /** on this household's "cooking this week" list */
-  planned: boolean;
+  /** on this household's "cooking this week" list, or null if meal planning is turned off */
+  planned: boolean | null;
 }) {
   const [factor, setFactor] = useState(1);
   const [checked, setChecked] = useState<Set<string>>(new Set());
@@ -134,7 +134,9 @@ export function RecipeView({
             {label}
           </button>
         ))}
-        <MealPlanToggle recipeId={recipe.id} planned={planned} />
+        {planned !== null ? (
+          <MealPlanToggle recipeId={recipe.id} planned={planned} />
+        ) : null}
       </div>
 
       {original ? (

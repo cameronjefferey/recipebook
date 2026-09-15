@@ -12,17 +12,18 @@ import {
 } from "@/components/icons";
 
 // "Shelf" rather than "Books", which reads too much like "Box" at a glance.
-const tabs = [
+const allTabs = [
   { href: "/box", label: "Box", Icon: BoxIcon },
   { href: "/book", label: "Shelf", Icon: BookIcon },
-  { href: "/plan", label: "Plan", Icon: CartIcon },
+  { href: "/plan", label: "Plan", Icon: CartIcon, plan: true },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
   { href: "/search", label: "Search", Icon: SearchIcon },
   { href: "/settings", label: "Settings", Icon: GearIcon },
 ];
 
-export function TabBar() {
+export function TabBar({ planEnabled }: { planEnabled: boolean }) {
   const pathname = usePathname();
+  const tabs = allTabs.filter((tab) => planEnabled || !tab.plan);
 
   return (
     <nav className="no-print pb-safe z-30 shrink-0 border-t border-line bg-card/95 backdrop-blur">

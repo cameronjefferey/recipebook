@@ -7,7 +7,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireUser();
+  const user = await requireUser();
 
   return (
     // Exactly one screen tall, with the middle doing the scrolling. That keeps
@@ -24,7 +24,7 @@ export default async function AppLayout({
         {children}
       </main>
 
-      <TabBar />
+      <TabBar planEnabled={user.mealPlanEnabled} />
     </div>
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "pinkbox"."households" ADD COLUMN "meal_plan_enabled" boolean DEFAULT true NOT NULL;

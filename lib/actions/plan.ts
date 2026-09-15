@@ -22,6 +22,7 @@ function touchPlan(recipeId?: string) {
 /** Mark a recipe as cooking this week, or take it off the list. */
 export async function setPlanned(recipeId: string, planned: boolean) {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return;
   if (!(await canSeeRecipe(user, recipeId))) return;
 
   if (planned) {
@@ -46,6 +47,7 @@ export async function setPlanned(recipeId: string, planned: boolean) {
 /** Add several at once, from the box grid's select mode. */
 export async function addManyToPlan(recipeIds: string[]) {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return { added: 0 };
   const ids = [...new Set(recipeIds)].filter(isUuid);
   if (!ids.length) return { added: 0 };
 
@@ -76,6 +78,7 @@ export async function addManyToPlan(recipeIds: string[]) {
 /** Something to buy that no recipe called for. */
 export async function addGroceryExtra(text: string) {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return;
   const clean = text.trim().replace(/\s+/g, " ").slice(0, 80);
   if (!clean) return;
 
@@ -88,6 +91,7 @@ export async function addGroceryExtra(text: string) {
 
 export async function setGroceryExtraChecked(id: string, checked: boolean) {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return;
   await db
     .update(groceryExtras)
     .set({ checked })
@@ -99,6 +103,7 @@ export async function setGroceryExtraChecked(id: string, checked: boolean) {
 
 export async function removeGroceryExtra(id: string) {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return;
   await db
     .delete(groceryExtras)
     .where(
@@ -110,6 +115,7 @@ export async function removeGroceryExtra(id: string) {
 /** Cross a combined ingredient line off, or back on. */
 export async function setGroceryChecked(key: string, checked: boolean) {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return;
   if (checked) {
     await db
       .insert(groceryChecked)
@@ -131,6 +137,7 @@ export async function setGroceryChecked(key: string, checked: boolean) {
 /** Clear the week and start again: the plan, the checkmarks, and anything added by hand. */
 export async function startNewWeek() {
   const user = await requireUser();
+  if (!user.mealPlanEnabled) return;
   await Promise.all([
     db.delete(mealPlanItems).where(eq(mealPlanItems.householdId, user.householdId)),
     db.delete(groceryExtras).where(eq(groceryExtras.householdId, user.householdId)),

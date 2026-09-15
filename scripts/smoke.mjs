@@ -563,7 +563,7 @@ if (process.env.DATABASE_URL) {
     };
     const planBody = () => page.locator("main").innerText();
 
-    await write(CHILI, [
+    const chiliId = await write(CHILI, [
       "2 cloves garlic, minced",
       "1 cup flour",
       "salt and pepper",
@@ -668,6 +668,55 @@ if (process.env.DATABASE_URL) {
     await page.getByRole("button", { name: "Remove paper towels" }).click();
     await page.waitForFunction(() => !document.body.innerText.includes("paper towels"));
     check("removing a hand-added item takes it off for good", !/paper towels/i.test(await planBody()));
+
+    // the household-wide off switch, in Settings: hides the tab, the recipe-
+    // page toggle, and Select — but never touches what's already on the list
+    await page.goto(`${BASE}/settings`, { waitUntil: "networkidle" });
+    const planSwitch = page.getByRole("switch", { name: "Meal planning" });
+    check("meal planning starts on", (await planSwitch.getAttribute("aria-checked")) === "true");
+    await planSwitch.click();
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[role="switch"][aria-label="Meal planning"]')
+          ?.getAttribute("aria-checked") === "false",
+    );
+
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    check(
+      "the tab bar drops Plan once it's off",
+      !(await page.locator("nav.no-print").innerText()).includes("Plan"),
+    );
+    check(
+      "Select mode goes with it",
+      (await page.getByRole("button", { name: "Select", exact: true }).count()) === 0,
+    );
+
+    await page.goto(`${BASE}/r/${chiliId}`, { waitUntil: "networkidle" });
+    check(
+      "so does the toggle on the recipe page",
+      (await page.getByRole("button", { name: /Cook(ing)? this week/ }).count()) === 0,
+    );
+
+    await page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
+    check(
+      "a direct visit to /plan explains it's off rather than erroring",
+      /Meal planning is off/.test(await planBody()),
+    );
+    await page.getByRole("button", { name: "Turn it back on" }).click();
+    await page.waitForFunction(() => document.body.innerText.includes("Smoke Plan Chili"));
+    check(
+      "turning it back on picks the same list back up, untouched",
+      /Smoke Plan Chili/.test(await planBody()) && /3 cloves garlic, minced/i.test(await planBody()),
+    );
+
+    await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+    check(
+      "the tab and Select mode are back too",
+      (await page.locator("nav.no-print").innerText()).includes("Plan") &&
+        (await page.getByRole("button", { name: "Select", exact: true }).count()) === 1,
+    );
+    await page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
 
     // taking a meal off the plan recomputes the list, not just hides a row
     await page.getByRole("button", { name: `Take ${CHILI} off this week` }).click();

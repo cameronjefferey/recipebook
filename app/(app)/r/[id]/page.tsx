@@ -51,7 +51,7 @@ export default async function RecipePage({
       .where(eq(recipeTags.recipeId, id)),
     mine ? booksForRecipe(user, id) : Promise.resolve([]),
     loadComponents(user, recipe.householdId, recipe.ingredients),
-    isPlanned(user, id),
+    user.mealPlanEnabled ? isPlanned(user, id) : Promise.resolve(null),
   ]);
 
   // Some ingredients are recipes. Fold those in so the list is everything you

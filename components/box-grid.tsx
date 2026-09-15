@@ -11,9 +11,16 @@ import { Button } from "@/components/ui";
 /**
  * The box grid, with an optional select mode for picking several recipes at
  * once and dropping them straight onto this week's plan. Ordinary browsing
- * never notices it is there.
+ * never notices it is there — and if the household has turned meal planning
+ * off in Settings, it is not there at all.
  */
-export function BoxGrid({ recipes }: { recipes: Card[] }) {
+export function BoxGrid({
+  recipes,
+  planEnabled = true,
+}: {
+  recipes: Card[];
+  planEnabled?: boolean;
+}) {
   const [selecting, setSelecting] = useState(false);
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [message, setMessage] = useState<string | null>(null);
@@ -48,25 +55,27 @@ export function BoxGrid({ recipes }: { recipes: Card[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex min-h-8 items-center justify-between gap-3">
-        {message ? (
-          <p className="hand text-[0.95rem] text-browned">
-            {message} <Link href="/plan" className="underline">See the list</Link>
-          </p>
-        ) : (
-          <span />
-        )}
-        <button
-          onClick={() => {
-            setMessage(null);
-            if (selecting) stopSelecting();
-            else setSelecting(true);
-          }}
-          className="tap shrink-0 px-2 text-[0.9rem] font-bold text-pink"
-        >
-          {selecting ? "Cancel" : "Select"}
-        </button>
-      </div>
+      {planEnabled ? (
+        <div className="flex min-h-8 items-center justify-between gap-3">
+          {message ? (
+            <p className="hand text-[0.95rem] text-browned">
+              {message} <Link href="/plan" className="underline">See the list</Link>
+            </p>
+          ) : (
+            <span />
+          )}
+          <button
+            onClick={() => {
+              setMessage(null);
+              if (selecting) stopSelecting();
+              else setSelecting(true);
+            }}
+            className="tap shrink-0 px-2 text-[0.9rem] font-bold text-pink"
+          >
+            {selecting ? "Cancel" : "Select"}
+          </button>
+        </div>
+      ) : null}
 
       <ul className="grid grid-cols-2 gap-3">
         {recipes.map((recipe) => (
