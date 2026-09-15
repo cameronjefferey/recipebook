@@ -42,6 +42,17 @@ function textOf(value: any): string {
   return "";
 }
 
+/**
+ * A recipe here files under exactly one category, but plenty of sites cram
+ * several into `recipeCategory` — sometimes as an array, sometimes as one
+ * comma-separated string. Either way, take the first and drop the rest,
+ * rather than storing a run-on list nothing can filter by.
+ */
+function firstCategory(value: any): string | null {
+  const first = Array.isArray(value) ? value[0] : textOf(value).split(",")[0];
+  return textOf(first).trim() || null;
+}
+
 function flattenInstructions(
   value: any,
   group: string | null = null,
@@ -147,9 +158,7 @@ export function parseRecipeJsonLd(
     return {
       title: textOf(node.name) || "Untitled recipe",
       description: textOf(node.description) || null,
-      category: Array.isArray(categories)
-        ? textOf(categories[0]) || null
-        : textOf(categories) || null,
+      category: firstCategory(categories),
       servings: yieldInfo.servings,
       servingsText: yieldInfo.text,
       prepMinutes: parseMinutes(node.prepTime),
