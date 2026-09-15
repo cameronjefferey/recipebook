@@ -87,7 +87,15 @@ async function openApp(deviceName) {
     await page.waitForURL(/\/r\//);
     const title = await page.locator("h1").innerText();
 
-    const chip = page.getByRole("button", { name: "Smoke test box", exact: true });
+    // The recipe page shows the picker twice now — once up top, once at
+    // the bottom — so most of this scopes to just the first, and one check
+    // confirms the second is not its own, drifting copy.
+    const pickers = page.locator("section", {
+      has: page.locator("h2", { hasText: "In these boxes" }),
+    });
+    const picker = pickers.first();
+
+    const chip = picker.getByRole("button", { name: "Smoke test box", exact: true });
     check("the box picker offers the new box", await chip.isVisible());
     check("it starts out unticked", (await chip.getAttribute("aria-pressed")) === "false");
     await chip.click();
@@ -102,17 +110,28 @@ async function openApp(deviceName) {
       { timeout: 10000 },
     );
     check("ticking it files the recipe", true);
+    // The top one updates the instant it is clicked; the bottom is a
+    // separate copy of the same component and only catches up once the
+    // server action's revalidation reaches the page.
+    await page.waitForFunction(
+      () => {
+        const all = [...document.querySelectorAll("button")].filter(
+          (x) => x.textContent.trim() === "Smoke test box",
+        );
+        return all.every((b) => b.getAttribute("aria-pressed") === "true");
+      },
+      null,
+      { timeout: 10000 },
+    );
+    check("the picker at the bottom agrees", true);
 
     // Making a box from the recipe page: the box is only real once the
     // server has made it, so the picker has to take the server's word for
     // what exists rather than the list it was first handed.
-    const picker = page.locator("section", {
-      has: page.locator("h2", { hasText: "In these boxes" }),
-    });
     const chipsBefore = (await picker.locator("button").allInnerTexts()).length;
-    await page.getByRole("button", { name: "+ New box" }).click();
-    await page.getByLabel("New box name").fill("Smoke picker box");
-    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await picker.getByRole("button", { name: "+ New box" }).click();
+    await picker.getByLabel("New box name").fill("Smoke picker box");
+    await picker.getByRole("button", { name: "Add", exact: true }).click();
     const made = picker.getByRole("button", { name: "Smoke picker box", exact: true });
     await made.waitFor({ timeout: 10000 }).catch(() => {});
     check("a box made from the recipe shows up without a reload", await made.isVisible());
@@ -290,7 +309,11 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
     await page.locator("ul.grid li a").first().click();
     await page.waitForURL(/\/r\//);
     sharedTitle = await page.locator("h1").innerText();
-    await page.getByRole("button", { name: "Smoke share box", exact: true }).click();
+    // The recipe page shows the picker twice (top and bottom); either works.
+    await page
+      .getByRole("button", { name: "Smoke share box", exact: true })
+      .first()
+      .click();
     await page.waitForFunction(
       () => {
         const b = [...document.querySelectorAll("button")].find(
@@ -848,7 +871,8 @@ if (process.env.DATABASE_URL && INVITE) {
   await op.getByRole("button", { name: /Save|Add/ }).first().click();
   await op.waitForURL(/\/r\//, { timeout: 20000 });
   const sharedMealId = op.url().split("/r/")[1];
-  await op.getByRole("button", { name: new RegExp(BOX) }).click();
+  // The recipe page shows the picker twice; either instance works.
+  await op.getByRole("button", { name: new RegExp(BOX) }).first().click();
   await op.waitForFunction(
     (n) =>
       [...document.querySelectorAll("button")]
@@ -877,7 +901,7 @@ if (process.env.DATABASE_URL && INVITE) {
   );
 
   await write(guest.page, `Smoke Guest Dish ${stamp}`);
-  await guest.page.getByRole("button", { name: new RegExp(BOX) }).click();
+  await guest.page.getByRole("button", { name: new RegExp(BOX) }).first().click();
   await guest.page.waitForFunction(
     (n) =>
       [...document.querySelectorAll("button")]

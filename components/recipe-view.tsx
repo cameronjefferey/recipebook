@@ -139,6 +139,10 @@ export function RecipeView({
         ) : null}
       </div>
 
+      {/* Which boxes it's in, right up top too — so filing a recipe away
+          doesn't wait until you've scrolled past the whole thing. */}
+      {mine ? <BookPicker recipeId={recipe.id} books={books} /> : null}
+
       {original ? (
         <section className="no-print">
           <button
