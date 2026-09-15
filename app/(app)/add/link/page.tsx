@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { importUrlAction, type ImportState } from "@/lib/actions/import";
-import { Button, Card, ErrorNote, Field, Input } from "@/components/ui";
+import { BackLink, Button, Card, ErrorNote, Field, Input } from "@/components/ui";
 
 export default function LinkPage() {
   const [state, action, pending] = useActionState<ImportState, FormData>(
@@ -12,7 +12,10 @@ export default function LinkPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-2xl">Paste a web link</h1>
+      <div className="flex items-center gap-1">
+        <BackLink href="/add" label="Back to Add" />
+        <h1 className="font-display text-2xl">Paste a web link</h1>
+      </div>
 
       <Card className="p-4">
         <form action={action} className="space-y-4">

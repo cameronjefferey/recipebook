@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import type { ParsedPage, ParsedRecipe } from "@/lib/ai/schema";
 import { formatIngredient } from "@/lib/ingredients";
 import { saveFromCapture, type ReviewedRecipe } from "@/lib/actions/recipes";
-import { Button, Card, ErrorNote, Field, Input, Textarea } from "@/components/ui";
+import { BackLink, Button, Card, ErrorNote, Field, Input, Textarea } from "@/components/ui";
 
 type Line = { text: string; uncertain: boolean };
 
@@ -177,7 +177,10 @@ export function ReviewClient({
   return (
     <div className="space-y-5 pb-8">
       <header>
-        <h1 className="font-display text-2xl">Check the transcription</h1>
+        <div className="flex items-center gap-1">
+          <BackLink href="/add" label="Back to Add" />
+          <h1 className="font-display text-2xl">Check the transcription</h1>
+        </div>
         <p className="mt-1 text-[0.95rem] text-muted">
           The photo is kept for good. Fix anything that came out wrong.
         </p>

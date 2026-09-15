@@ -12,6 +12,7 @@ import {
 import { logCook, setStatus } from "@/lib/actions/recipes";
 import { BookPicker } from "@/components/book-picker";
 import { MealPlanToggle } from "@/components/meal-plan-toggle";
+import { BackButton } from "@/components/back-button";
 import { ChevronRight } from "@/components/icons";
 import { Button } from "@/components/ui";
 
@@ -97,6 +98,10 @@ export function RecipeView({
 
   return (
     <article className="space-y-6 pb-8">
+      <div className="no-print">
+        <BackButton fallback="/recipes" label="Back" />
+      </div>
+
       <header>
         <h1 className="font-display text-3xl leading-tight">{recipe.title}</h1>
         {recipe.description ? (

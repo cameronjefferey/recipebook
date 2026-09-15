@@ -1,13 +1,16 @@
 import { createManualRecipe } from "@/lib/actions/recipes";
 import { requireUser } from "@/lib/auth";
-import { Button, Card, Field, Input, Textarea } from "@/components/ui";
+import { BackLink, Button, Card, Field, Input, Textarea } from "@/components/ui";
 
 export default async function WritePage() {
   await requireUser();
 
   return (
     <div className="space-y-4">
-      <h1 className="font-display text-2xl">Type it in</h1>
+      <div className="flex items-center gap-1">
+        <BackLink href="/add" label="Back to Add" />
+        <h1 className="font-display text-2xl">Type it in</h1>
+      </div>
 
       <Card className="p-4">
         <form action={createManualRecipe} className="space-y-4">

@@ -881,6 +881,9 @@ if (process.env.DATABASE_URL && INVITE) {
     BOX,
     { timeout: 10000 },
   );
+  // That text is the click's own optimistic update; the guest is about to
+  // rely on the filing having actually reached the database.
+  await op.waitForLoadState("networkidle");
 
   // The box itself is a flip-through pager, so go straight to the recipe by
   // address rather than hunting for it a page at a time.
@@ -889,6 +892,10 @@ if (process.env.DATABASE_URL && INVITE) {
   await guest.page.waitForFunction(() => document.body.innerText.includes("Cooking this week"), null, {
     timeout: 10000,
   });
+  // That text is the click's own optimistic update, which lands before the
+  // server action it kicked off has actually written anything — wait for
+  // that request to finish too, or navigating straight to /plan can beat it.
+  await guest.page.waitForLoadState("networkidle");
 
   await guest.page.goto(`${BASE}/plan`, { waitUntil: "networkidle" });
   check(
@@ -910,6 +917,10 @@ if (process.env.DATABASE_URL && INVITE) {
     BOX,
     { timeout: 10000 },
   );
+  // As above: that is the click's own optimistic update. The owner is about
+  // to check for this from an entirely different page, so it actually needs
+  // the filing to have reached the database first.
+  await guest.page.waitForLoadState("networkidle");
 
   await op.goto(`${BASE}/box/${bookId}`, { waitUntil: "networkidle" });
   check(

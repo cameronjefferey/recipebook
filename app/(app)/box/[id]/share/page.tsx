@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { isSmartBook, resolveBook } from "@/lib/books";
 import { listShares } from "@/lib/sharing";
 import { ShareManager } from "@/components/share-manager";
-import { ChevronLeft } from "@/components/icons";
+import { BackLink } from "@/components/ui";
 
 export default async function ShareBoxPage({
   params,
@@ -28,13 +27,7 @@ export default async function ShareBoxPage({
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-1">
-        <Link
-          href={`/box/${book.id}`}
-          aria-label="Back to the box"
-          className="tap -ml-3 flex items-center justify-center text-pink"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Link>
+        <BackLink href={`/box/${book.id}`} label="Back to the box" />
         <h1 className="font-display min-w-0 flex-1 truncate text-xl">
           Share {book.name}
         </h1>

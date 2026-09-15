@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
+import { ChevronLeft } from "@/components/icons";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 
@@ -142,6 +143,24 @@ export function Switch({
         }`}
       />
     </button>
+  );
+}
+
+/**
+ * A back chevron to a fixed, single parent — pair it with a heading, the way
+ * the box and share pages already do. For a page reached from more than one
+ * place, `BackButton` (components/back-button.tsx) retraces actual history
+ * instead of guessing which parent to send someone to.
+ */
+export function BackLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className="tap -ml-3 flex shrink-0 items-center justify-center text-pink"
+    >
+      <ChevronLeft className="h-6 w-6" />
+    </Link>
   );
 }
 

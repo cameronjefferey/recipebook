@@ -9,8 +9,7 @@ import {
 } from "@/lib/books";
 import { BookClient } from "@/components/book-client";
 import { BookMenu } from "@/components/book-menu";
-import { ChevronLeft } from "@/components/icons";
-import { ButtonLink } from "@/components/ui";
+import { BackLink, ButtonLink } from "@/components/ui";
 
 export default async function OpenBoxPage({
   params,
@@ -39,13 +38,7 @@ export default async function OpenBoxPage({
     // and the pager takes what the title, pills and buttons do not want.
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="relative flex items-center gap-1">
-        <Link
-          href="/box"
-          aria-label="Back to the box"
-          className="tap -ml-3 flex items-center justify-center text-pink"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Link>
+        <BackLink href="/box" label="Back to the box" />
         <div className="min-w-0 flex-1">
           <h1 className="font-display truncate text-xl">{book.name}</h1>
           {theirs ? (
