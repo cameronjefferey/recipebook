@@ -103,7 +103,7 @@ export function RecipeView({
       </div>
 
       <header>
-        <h1 className="font-display text-3xl leading-tight">{recipe.title}</h1>
+        <h1 className="font-display ruled text-3xl leading-tight">{recipe.title}</h1>
         {recipe.description ? (
           <p className="mt-2 text-muted">{recipe.description}</p>
         ) : null}
@@ -171,7 +171,7 @@ export function RecipeView({
       ) : null}
 
       <section>
-        <div className="mb-3 flex items-center justify-between">
+        <div className="ruled mb-3 flex items-center justify-between">
           <h2 className="font-display text-xl">Ingredients</h2>
           <div className="no-print flex items-center gap-1">
             {[0.5, 1, 2, 3].map((f) => (
@@ -250,7 +250,7 @@ export function RecipeView({
       </section>
 
       <section>
-        <h2 className="font-display mb-3 text-xl">Steps</h2>
+        <h2 className="font-display ruled mb-3 text-xl">Steps</h2>
         {stepGroups.map((group, gi) => (
           <div key={gi} className="mb-4">
             {group.name ? (

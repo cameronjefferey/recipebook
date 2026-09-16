@@ -26,9 +26,13 @@
   --color-ink: #382a22;
   --color-muted: #8b7565;
   --color-line: #382a2218;
+  /* the one cool note in an otherwise warm box: the printed rule an
+     index card's own lines were laid down in. */
+  --color-rule: #5c6b7a3d;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  /* Titles and margin notes share one hand — see BRAND.md §5. */
+  --font-display: var(--font-caveat), cursive;
+  --font-sans: var(--font-source-serif), Georgia, serif;
   --font-hand: var(--font-caveat), cursive;
 
   --radius-card: 12px;
@@ -46,6 +50,12 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   overscroll-behavior-y: none;
+}
+
+/* Caveat reads thin next to Fraunces' old weight — every title needs the
+   boost to still look confidently written rather than jotted. */
+.font-display {
+  font-weight: 700;
 }
 
 /* Respect the notch and the home indicator when installed. */
@@ -128,6 +138,14 @@ body {
       color-mix(in srgb, var(--color-butter) 60%, transparent) 0 60%,
       transparent 62%
     );
+}
+
+/* --- Signature: the printed rule under a header, the way an index card
+   is actually ruled — the one cool color allowed in the whole palette,
+   and only ever this thin. Used sparingly: a title, a section name. --- */
+@utility ruled {
+  border-bottom: 1px solid var(--color-rule);
+  padding-bottom: 0.5rem;
 }
 
 /* --- Handwritten aside, used sparingly ----------------------------- */

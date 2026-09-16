@@ -1,24 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Nunito_Sans, Caveat } from "next/font/google";
+import { Caveat, Source_Serif_4 } from "next/font/google";
 import { ServiceWorker } from "@/components/service-worker";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  axes: ["SOFT", "WONK", "opsz"],
-  display: "swap",
-});
-
-const nunito = Nunito_Sans({
-  subsets: ["latin"],
-  variable: "--font-nunito",
-  display: "swap",
-});
-
+// One hand for every title and margin note — Mom's, consistently, rather
+// than a font sampler of "handwriting" faces. See BRAND.md §5.
 const caveat = Caveat({
   subsets: ["latin"],
   variable: "--font-caveat",
+  display: "swap",
+});
+
+// Body copy: plain and readable, closer to a typed card than a website's
+// default geometric sans.
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-source-serif",
+  axes: ["opsz"],
   display: "swap",
 });
 
@@ -46,7 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${nunito.variable} ${caveat.variable}`}
+      className={`${caveat.variable} ${sourceSerif.variable}`}
     >
       <body className="min-h-dvh">
         {children}

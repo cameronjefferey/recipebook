@@ -714,6 +714,11 @@ if (process.env.DATABASE_URL) {
           .querySelector('[role="switch"][aria-label="Meal planning"]')
           ?.getAttribute("aria-checked") === "false",
     );
+    // The switch above is optimistic — it flips before the server action
+    // behind it (and the layout revalidation it triggers) has necessarily
+    // finished. Give that request a moment to land before checking what a
+    // fresh page load shows, or this is a coin flip against the network.
+    await page.waitForLoadState("networkidle");
 
     await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
     check(
