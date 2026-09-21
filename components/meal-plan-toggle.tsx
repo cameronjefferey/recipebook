@@ -2,7 +2,6 @@
 
 import { useOptimistic, useTransition } from "react";
 import { setPlanned } from "@/lib/actions/plan";
-import { CalendarIcon, CheckIcon } from "@/components/icons";
 
 function apply(_state: boolean, next: boolean) {
   return next;
@@ -33,17 +32,10 @@ export function MealPlanToggle({
         });
       }}
       aria-pressed={isPlanned}
-      className={`tap inline-flex h-12 items-center gap-1.5 rounded-full border px-4 text-[0.9rem] font-bold ${
-        isPlanned
-          ? "border-pink bg-pink text-page"
-          : "border-line bg-card text-muted"
+      className={`tap inline-flex h-12 items-center px-2 text-[0.9rem] font-bold ${
+        isPlanned ? "text-pink" : "text-browned"
       }`}
     >
-      {isPlanned ? (
-        <CheckIcon className="h-4 w-4" />
-      ) : (
-        <CalendarIcon className="h-4 w-4" />
-      )}
       {isPlanned ? "Cooking this week" : "Cook this week"}
     </button>
   );

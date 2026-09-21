@@ -13,6 +13,11 @@ import {
 import { Eyebrow, Input, Button } from "@/components/ui";
 import { CheckIcon } from "@/components/icons";
 import { CategoryIcon } from "@/lib/category-icon";
+import {
+  groceryAisleFromText,
+  groupByAisle,
+  type GroceryAisle,
+} from "@/lib/grocery-aisle";
 
 type Planned = {
   id: string;
@@ -23,8 +28,14 @@ type Planned = {
   rotation: number;
 };
 
-type Line = { key: string; text: string; from: string[]; checked: boolean };
-type Extra = { id: string; text: string; checked: boolean };
+type Line = {
+  key: string;
+  text: string;
+  from: string[];
+  checked: boolean;
+  aisle: GroceryAisle;
+};
+type Extra = { id: string; text: string; checked: boolean; aisle: GroceryAisle };
 
 type State = { planned: Planned[]; lines: Line[]; extras: Extra[] };
 
@@ -58,7 +69,15 @@ function apply(state: State, action: Action): State {
     case "extraAdded":
       return {
         ...state,
-        extras: [...state.extras, { id: action.id, text: action.text, checked: false }],
+        extras: [
+          ...state.extras,
+          {
+            id: action.id,
+            text: action.text,
+            checked: false,
+            aisle: groceryAisleFromText(action.text),
+          },
+        ],
       };
   }
 }
@@ -131,6 +150,11 @@ export function PlanClient({
 
   const hasAnything = state.planned.length > 0 || state.extras.length > 0;
 
+  const grocery = groupByAisle([
+    ...state.lines.map((line) => ({ ...line, kind: "line" as const })),
+    ...state.extras.map((extra) => ({ ...extra, kind: "extra" as const })),
+  ]);
+
   return (
     <div className="space-y-8">
       <section className="space-y-3">
@@ -139,7 +163,7 @@ export function PlanClient({
           <p className="text-[0.95rem] text-muted">
             Nothing yet. Open a recipe and tap &ldquo;Cook this week,&rdquo; or{" "}
             <Link href="/recipes" className="font-bold text-pink underline">
-              select a few from your recipes
+              pick a few cards
             </Link>
             .
           </p>
@@ -148,7 +172,7 @@ export function PlanClient({
             {state.planned.map((recipe) => (
               <li
                 key={recipe.id}
-                className="flex items-center gap-3 rounded-card border border-line bg-card p-2"
+                className="flex items-center gap-3 rounded-[3px] border border-line bg-card p-2"
               >
                 <Link
                   href={`/r/${recipe.id}`}
@@ -193,53 +217,61 @@ export function PlanClient({
       <section className="space-y-3">
         <Eyebrow>Grocery list</Eyebrow>
 
-        {state.lines.length === 0 && state.extras.length === 0 ? (
+        {grocery.length === 0 ? (
           <p className="text-[0.95rem] text-muted">
             Add a few meals above and the ingredients will gather here.
           </p>
         ) : (
-          <ul className="space-y-1">
-            {state.lines.map((line) => (
-              <li key={line.key}>
-                <button
-                  onClick={() => toggleLine(line.key, !line.checked)}
-                  aria-pressed={line.checked}
-                  className="tap flex w-full items-start gap-3 rounded-lg px-2 py-1.5 text-left text-[1.05rem]"
-                >
-                  <Checkbox checked={line.checked} />
-                  <span className={line.checked ? "text-muted line-through" : ""}>
-                    {line.text}
-                    {line.from.length > 1 ? (
-                      <span className="mt-0.5 block text-[0.75rem] font-normal text-muted no-underline">
-                        for {line.from.join(", ")}
-                      </span>
-                    ) : null}
-                  </span>
-                </button>
-              </li>
+          <div className="space-y-5">
+            {grocery.map(({ aisle, items }) => (
+              <div key={aisle} className="space-y-1">
+                <h2 className="hand px-2 text-[1.15rem] text-browned">{aisle}</h2>
+                <ul>
+                  {items.map((item) =>
+                    item.kind === "line" ? (
+                      <li key={item.key}>
+                        <button
+                          onClick={() => toggleLine(item.key, !item.checked)}
+                          aria-pressed={item.checked}
+                          className="tap flex w-full items-start gap-3 rounded-lg px-2 py-1.5 text-left text-[1.05rem]"
+                        >
+                          <Checkbox checked={item.checked} />
+                          <span className={item.checked ? "text-muted line-through" : ""}>
+                            {item.text}
+                            {item.from.length > 1 ? (
+                              <span className="mt-0.5 block text-[0.75rem] font-normal text-muted no-underline">
+                                for {item.from.join(", ")}
+                              </span>
+                            ) : null}
+                          </span>
+                        </button>
+                      </li>
+                    ) : (
+                      <li key={item.id} className="flex items-center gap-1">
+                        <button
+                          onClick={() => toggleExtra(item.id, !item.checked)}
+                          aria-pressed={item.checked}
+                          className="tap flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left text-[1.05rem]"
+                        >
+                          <Checkbox checked={item.checked} />
+                          <span className={item.checked ? "text-muted line-through" : ""}>
+                            {item.text}
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => removeExtra(item.id)}
+                          aria-label={`Remove ${item.text}`}
+                          className="tap shrink-0 px-3 text-lg text-muted"
+                        >
+                          ×
+                        </button>
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </div>
             ))}
-            {state.extras.map((extra) => (
-              <li key={extra.id} className="flex items-center gap-1">
-                <button
-                  onClick={() => toggleExtra(extra.id, !extra.checked)}
-                  aria-pressed={extra.checked}
-                  className="tap flex flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left text-[1.05rem]"
-                >
-                  <Checkbox checked={extra.checked} />
-                  <span className={extra.checked ? "text-muted line-through" : ""}>
-                    {extra.text}
-                  </span>
-                </button>
-                <button
-                  onClick={() => removeExtra(extra.id)}
-                  aria-label={`Remove ${extra.text}`}
-                  className="tap shrink-0 px-3 text-lg text-muted"
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
+          </div>
         )}
 
         <div className="flex gap-2">
@@ -252,7 +284,7 @@ export function PlanClient({
                 addExtra();
               }
             }}
-            placeholder="Add something else, like paper towels"
+            placeholder="Milk, foil…"
             aria-label="Add an item to the grocery list"
             maxLength={80}
           />

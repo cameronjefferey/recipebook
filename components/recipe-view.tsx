@@ -100,7 +100,7 @@ export function RecipeView({
   return (
     <article className="space-y-6 pb-8">
       <div className="no-print">
-        <BackButton fallback="/box/all" label="Back" />
+        <BackButton fallback="/box" label="Back" />
       </div>
 
       <header>

@@ -58,16 +58,15 @@ async function openApp(deviceName) {
     boxNames.join(", "),
   );
 
-  // tapping one opens the lid before the page underneath takes over — not
-  // an instant jump, so there is something to see in between
+  // Standing views are slips at the top, not tins — tapping one should
+  // just go there. The lid animation is for the tins you named.
   const everything = page.getByRole("link", { name: "Open Everything" });
-  const beforeUrl = page.url();
   await everything.click();
-  check("the tap does not jump straight there", page.url() === beforeUrl);
-  await page.waitForURL(`${BASE}/box/all`, { timeout: 2000 });
-  check("but it lands inside a moment later", true);
+  await page.waitForURL(`${BASE}/box/all`, { timeout: 3000 });
+  check("Everything opens", page.url().includes("/box/all"));
   await page.goBack({ waitUntil: "networkidle" });
 
+  await page.getByRole("button", { name: "+ Name a box" }).click();
   await page.getByLabel("New box name").fill("Smoke test box");
   await page.getByRole("button", { name: "Add" }).click();
   await page.waitForFunction(
@@ -76,6 +75,52 @@ async function openApp(deviceName) {
     { timeout: 10000 },
   );
   check("a new box shows up", true);
+
+  // the tins you named still open with the lid; the standing views above do not
+  const tin = page.getByRole("link", { name: "Open Smoke test box" });
+  const beforeLid = page.url();
+  await tin.click();
+  check("a tin does not jump straight there", page.url() === beforeLid);
+  await page.waitForURL(/\/box\/[^/]+/, { timeout: 3000 });
+  check("but the lid opens into it", true);
+  await page.goBack({ waitUntil: "networkidle" });
+
+  const star = page.getByRole("button", { name: "Favorite Smoke test box", exact: true });
+  check("a new box can be starred", await star.isVisible());
+  const urlBeforeStar = page.url();
+  await star.click();
+  // The star is optimistic; Favorites only appears once the server has
+  // actually pinned the box and the shelf has re-rendered around it.
+  await page.getByText("Favorites", { exact: true }).waitFor({ timeout: 10000 });
+  check("starring does not open the box", page.url() === urlBeforeStar);
+  check(
+    "a starred box sits under Favorites",
+    (await page
+      .locator("section", { has: page.getByText("Favorites", { exact: true }) })
+      .locator("h3")
+      .allInnerTexts()).includes("Smoke test box"),
+  );
+  await page.reload({ waitUntil: "networkidle" });
+  check(
+    "the star survives a reload",
+    (await page.getByRole("button", { name: "Unfavorite Smoke test box", exact: true }).count()) === 1,
+  );
+  await page.getByRole("button", { name: "Unfavorite Smoke test box", exact: true }).click();
+  await page.waitForFunction(
+    () => {
+      const fav = [...document.querySelectorAll("section")].find((s) =>
+        [...s.querySelectorAll("span")].some((el) => el.textContent === "Favorites"),
+      );
+      if (!fav) return true;
+      return ![...fav.querySelectorAll("h3")].some((h) => h.textContent === "Smoke test box");
+    },
+    null,
+    { timeout: 10000 },
+  );
+  check(
+    "taking the star off puts it back with the others",
+    (await page.getByRole("button", { name: "Favorite Smoke test box", exact: true }).count()) === 1,
+  );
 
   // file a recipe into it
   await page.goto(`${BASE}/recipes`, { waitUntil: "networkidle" });
@@ -87,9 +132,7 @@ async function openApp(deviceName) {
     await page.waitForURL(/\/r\//);
     const title = await page.locator("h1").innerText();
 
-    // The recipe page shows the picker twice now — once up top, once at
-    // the bottom — so most of this scopes to just the first, and one check
-    // confirms the second is not its own, drifting copy.
+    // One picker on the card, after you've read it.
     const pickers = page.locator("section", {
       has: page.locator("h2", { hasText: "In these boxes" }),
     });
@@ -110,9 +153,6 @@ async function openApp(deviceName) {
       { timeout: 10000 },
     );
     check("ticking it files the recipe", true);
-    // The top one updates the instant it is clicked; the bottom is a
-    // separate copy of the same component and only catches up once the
-    // server action's revalidation reaches the page.
     await page.waitForFunction(
       () => {
         const all = [...document.querySelectorAll("button")].filter(
@@ -123,7 +163,7 @@ async function openApp(deviceName) {
       null,
       { timeout: 10000 },
     );
-    check("the picker at the bottom agrees", true);
+    check("the chip stays filed", true);
 
     // Making a box from the recipe page: the box is only real once the
     // server has made it, so the picker has to take the server's word for
@@ -294,6 +334,7 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
 
   // a box of its own, so the test never depends on what is already there
   await page.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "+ Name a box" }).click();
   await page.getByLabel("New box name").fill("Smoke share box");
   await page.getByRole("button", { name: "Add" }).click();
   await page.waitForFunction(
@@ -334,7 +375,8 @@ for (const deviceName of ["iPhone SE", "iPhone 13", "Pixel 7"]) {
   await page.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
   const bookId = page.url().match(/\/box\/([0-9a-f-]{36})/)[1];
 
-  await page.getByRole("link", { name: "Share" }).click();
+  await page.getByRole("button", { name: "Edit" }).click();
+  await page.getByRole("link", { name: "Share this box" }).click();
   await page.waitForURL(/\/share$/);
   await page.getByLabel("Who is it for").fill("Smoke guest");
   await page.getByRole("button", { name: "Share" }).click();
@@ -580,6 +622,7 @@ if (process.env.DATABASE_URL) {
       sql`DELETE FROM pinkbox.meal_plan_items`,
       sql`DELETE FROM pinkbox.grocery_extras`,
       sql`DELETE FROM pinkbox.grocery_checked`,
+      sql`UPDATE pinkbox.households SET meal_plan_enabled = true`,
     ]);
   await forget();
 
@@ -662,6 +705,20 @@ if (process.env.DATABASE_URL) {
       "each meal's own ingredient still made the list",
       /black beans/i.test(await planBody()) && /corn tortillas/i.test(await planBody()),
     );
+    {
+      const listed = await planBody();
+      const order = ["Produce", "Bread", "Cans & jars", "Baking", "Spices"]
+        .map((aisle) => listed.indexOf(aisle))
+        .filter((at) => at >= 0);
+      check(
+        "the grocery list is grouped by store section",
+        /Produce/.test(listed) && /Baking/.test(listed) && /Spices/.test(listed),
+      );
+      check(
+        "those sections are in walking order",
+        order.length >= 3 && order.every((at, i) => i === 0 || at > order[i - 1]),
+      );
+    }
 
     // crossing an item off, and having it stick — matched on the merged
     // line's exact text, not just "garlic," so a line from some unrelated
@@ -813,7 +870,7 @@ if (process.env.DATABASE_URL && INVITE) {
     await page.getByLabel("Password").fill("apasswordthatislong");
     await page.getByLabel("Invite code").fill(INVITE);
     await page.getByRole("button", { name: /Create my box/ }).click();
-    await page.waitForURL(`${BASE}/recipes`, { timeout: 20000 });
+    await page.waitForURL(`${BASE}/box`, { timeout: 20000 });
     return { ctx, page, errors };
   }
 
@@ -835,6 +892,7 @@ if (process.env.DATABASE_URL && INVITE) {
   );
 
   await op.goto(`${BASE}/box`, { waitUntil: "networkidle" });
+  await op.getByRole("button", { name: "+ Name a box" }).click();
   await op.getByLabel("New box name").fill(BOX);
   await op.getByRole("button", { name: "Add" }).click();
   await op.waitForFunction(
@@ -846,7 +904,8 @@ if (process.env.DATABASE_URL && INVITE) {
   await op.waitForURL(/\/box\/[0-9a-f-]{36}/, { timeout: 2000 });
   const bookId = op.url().match(/\/box\/([0-9a-f-]{36})/)[1];
 
-  await op.getByRole("link", { name: "Share" }).click();
+  await op.getByRole("button", { name: "Edit" }).click();
+  await op.getByRole("link", { name: "Share this box" }).click();
   await op.waitForURL(/\/share$/);
   await op.getByLabel("Who is it for").fill("Smokeguest");
   await op.getByLabel(/Let them add their own/).check();

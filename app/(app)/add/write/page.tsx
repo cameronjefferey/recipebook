@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { listDividers } from "@/lib/books";
 import { WriteForm } from "@/components/write-form";
-import { BackLink, Card } from "@/components/ui";
+import { BackLink } from "@/components/ui";
 
 export default async function WritePage() {
   const user = await requireUser();
@@ -14,9 +14,9 @@ export default async function WritePage() {
         <h1 className="font-display text-2xl">Type it in</h1>
       </div>
 
-      <Card className="p-4">
+      <div className="index-sheet p-4">
         <WriteForm names={dividers.names} books={dividers.books} />
-      </Card>
+      </div>
     </div>
   );
 }

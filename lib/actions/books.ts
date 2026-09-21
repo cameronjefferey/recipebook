@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { books, bookRecipes, recipes } from "@/lib/db/schema";
+import { books, bookRecipes, bookFavorites, recipes } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
 import { bookAccess } from "@/lib/access";
+import { isSmartBook } from "@/lib/books";
 
 export type BookState = { error?: string };
 
@@ -68,6 +69,14 @@ export async function deleteBook(bookId: string) {
   await db
     .delete(books)
     .where(and(eq(books.id, bookId), eq(books.householdId, user.householdId)));
+  await db
+    .delete(bookFavorites)
+    .where(
+      and(
+        eq(bookFavorites.householdId, user.householdId),
+        eq(bookFavorites.bookId, bookId),
+      ),
+    );
 
   revalidatePath("/box");
   redirect("/box");
@@ -141,4 +150,37 @@ export async function createBookWithRecipe(recipeId: string, name: string) {
 
   revalidatePath("/box");
   revalidatePath(`/r/${recipeId}`);
+}
+
+/**
+ * Pin a box to the top of the shelf, or take the star off. The box has to
+ * already be on this household's shelf — a standing one, one of ours, or
+ * one shared with us. Starring is a household note, the same way the meal
+ * plan is: whoever's cooking next week sees the same stars.
+ */
+export async function setBookFavorite(bookId: string, favorite: boolean) {
+  const user = await requireUser();
+  if (!isSmartBook(bookId)) {
+    const access = await bookAccess(user, bookId);
+    if (!access) return;
+  }
+
+  if (favorite) {
+    await db
+      .insert(bookFavorites)
+      .values({ householdId: user.householdId, bookId })
+      .onConflictDoNothing();
+  } else {
+    await db
+      .delete(bookFavorites)
+      .where(
+        and(
+          eq(bookFavorites.householdId, user.householdId),
+          eq(bookFavorites.bookId, bookId),
+        ),
+      );
+  }
+
+  revalidatePath("/box");
+  revalidatePath(`/box/${bookId}`);
 }

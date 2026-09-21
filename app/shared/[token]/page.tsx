@@ -40,7 +40,7 @@ export default async function SharedBookPage({
 
   return (
     <div className="flex h-dvh flex-col">
-      <header className="pt-safe shrink-0 bg-pink px-5 py-3 text-page">
+      <header className="pt-safe shrink-0 bg-pink px-4 py-2.5 text-page">
         <p className="font-display truncate text-xl leading-none">
           {share.bookName}
         </p>

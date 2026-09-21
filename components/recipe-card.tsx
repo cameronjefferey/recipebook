@@ -1,25 +1,42 @@
 import Link from "next/link";
 import type { RecipeCard as Card } from "@/lib/recipes";
-import { CategoryIcon } from "@/lib/category-icon";
 
 /** Wear builds with use, then levels off so a favourite never looks ruined. */
 function splatterOpacity(timesCooked: number) {
   return Math.min(timesCooked / 10, 1) * 0.5;
 }
 
+/** A little lean, stable per card, the way a real stack never sits square. */
+function cardTilt(id: string) {
+  let n = 0;
+  for (let i = 0; i < id.length; i++) n = (n + id.charCodeAt(i) * (i + 3)) % 9;
+  return (n - 4) * 0.45;
+}
+
 export function RecipeCard({ recipe }: { recipe: Card }) {
   const cooked = recipe.timesCooked > 0;
+  const note = [
+    recipe.category,
+    cooked
+      ? `cooked ${recipe.timesCooked}×`
+      : recipe.status === "want_to_try"
+        ? "want to try"
+        : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <Link
       href={`/r/${recipe.id}`}
-      className="dog-ear group relative block overflow-hidden rounded-card border border-line bg-card shadow-[0_1px_3px_#382a2214] active:brightness-[0.98]"
+      className="dog-ear index-card group relative block min-h-[9.25rem] overflow-hidden border border-line px-3 pt-3.5 pb-3 active:brightness-[0.98]"
+      style={{ rotate: `${cardTilt(recipe.id)}deg` }}
     >
       {recipe.status === "keeper" ? <span className="ribbon" /> : null}
 
-      <div className="relative aspect-4/3 bg-sink">
-        {recipe.imageId ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
+      {recipe.imageId ? (
+        <span className="absolute top-2.5 right-2.5 h-12 w-12 overflow-hidden rounded-[2px] border border-line bg-sink shadow-sm">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`/api/images/${recipe.imageId}`}
             alt=""
@@ -27,31 +44,19 @@ export function RecipeCard({ recipe }: { recipe: Card }) {
             className="h-full w-full object-cover"
             style={{ rotate: `${recipe.rotation}deg` }}
           />
-        ) : (
-          <span className="flex h-full items-center justify-center">
-            <CategoryIcon category={recipe.category} className="h-10 w-10 text-pink-mid" />
-          </span>
-        )}
-      </div>
+        </span>
+      ) : null}
 
-      <div className="relative p-3">
-        <h3 className="font-display line-clamp-2 text-[1.05rem] leading-snug">
-          {recipe.title}
-        </h3>
-        <p className="mt-1 text-[0.8rem] text-muted">
-          {[
-            recipe.category,
-            recipe.servings ? `serves ${recipe.servings}` : null,
-            cooked
-              ? `cooked ${recipe.timesCooked}×`
-              : recipe.status === "want_to_try"
-                ? "want to try"
-                : null,
-          ]
-            .filter(Boolean)
-            .join(" · ")}
-        </p>
-      </div>
+      <h3
+        className={`font-display relative text-[1.15rem] leading-snug ${
+          recipe.imageId ? "pr-14" : recipe.status === "keeper" ? "pr-9" : "pr-6"
+        }`}
+      >
+        {recipe.title}
+      </h3>
+      {note ? (
+        <p className="relative mt-2 text-[0.8rem] text-muted">{note}</p>
+      ) : null}
 
       <span
         className="splatter"

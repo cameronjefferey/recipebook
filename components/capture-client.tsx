@@ -116,7 +116,7 @@ export function CaptureClient() {
 
       <button
         onClick={() => cameraRef.current?.click()}
-        className="tap flex w-full flex-col items-center gap-2 rounded-card bg-pink px-6 py-8 text-page shadow-sm active:brightness-95"
+        className="tap flex w-full flex-col items-center gap-1.5 rounded-[3px] bg-pink px-6 py-7 text-page shadow-sm active:brightness-95"
       >
         <CameraIcon className="h-10 w-10" />
         <span className="font-display text-2xl">Take a photo</span>
@@ -128,7 +128,7 @@ export function CaptureClient() {
       <div className="grid grid-cols-1 gap-3">
         <button
           onClick={() => libraryRef.current?.click()}
-          className="tap flex items-center gap-3 rounded-card border border-line bg-card px-5 py-4 text-left active:brightness-95"
+          className="tap flex items-center gap-3 rounded-[3px] border border-line bg-card px-5 py-4 text-left active:brightness-95"
         >
           <PhotoIcon className="h-6 w-6 shrink-0 text-pink" />
           <span>
@@ -141,7 +141,7 @@ export function CaptureClient() {
 
         <Link
           href="/add/link"
-          className="tap flex items-center gap-3 rounded-card border border-line bg-card px-5 py-4 text-left active:brightness-95"
+          className="tap flex items-center gap-3 rounded-[3px] border border-line bg-card px-5 py-4 text-left active:brightness-95"
         >
           <LinkIcon className="h-6 w-6 shrink-0 text-pink" />
           <span>
@@ -154,7 +154,7 @@ export function CaptureClient() {
 
         <Link
           href="/add/write"
-          className="tap flex items-center gap-3 rounded-card border border-line bg-card px-5 py-4 text-left active:brightness-95"
+          className="tap flex items-center gap-3 rounded-[3px] border border-line bg-card px-5 py-4 text-left active:brightness-95"
         >
           <PencilIcon className="h-6 w-6 shrink-0 text-pink" />
           <span>

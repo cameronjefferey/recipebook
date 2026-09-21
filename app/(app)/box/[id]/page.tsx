@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import {
@@ -10,6 +9,7 @@ import {
 import { BookClient } from "@/components/book-client";
 import { BookMenu } from "@/components/book-menu";
 import { BoxSearch } from "@/components/box-search";
+import { FavoriteStar } from "@/components/favorite-star";
 import { BackLink, ButtonLink } from "@/components/ui";
 import { plannedRecipeIds } from "@/lib/grocery";
 
@@ -58,16 +58,19 @@ export default async function OpenBoxPage({
             </p>
           ) : null}
         </div>
+        {book.smart ? null : (
+          <FavoriteStar
+            bookId={book.id}
+            name={book.name}
+            favorite={book.favorite}
+          />
+        )}
         {book.smart || theirs ? null : (
-          <>
-            <Link
-              href={`/box/${book.id}/share`}
-              className="tap flex items-center justify-center px-2 text-[0.85rem] font-bold text-browned"
-            >
-              Share
-            </Link>
-            <BookMenu bookId={book.id} name={book.name} />
-          </>
+          <BookMenu
+            bookId={book.id}
+            name={book.name}
+            shareHref={`/box/${book.id}/share`}
+          />
         )}
       </div>
 
@@ -76,7 +79,9 @@ export default async function OpenBoxPage({
       {q && pages.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <p className="font-display text-2xl text-pink">Nothing matched</p>
-          <p className="hand mt-2 text-browned">“{q}” is not in {book.name}</p>
+          <p className="hand mt-2 text-browned">
+            “{q}” is not in {book.name}
+          </p>
           <ButtonLink
             href={by ? `/box/${book.id}?by=${by}` : `/box/${book.id}`}
             variant="secondary"
@@ -101,10 +106,10 @@ export default async function OpenBoxPage({
             <>
               <p className="font-display text-2xl text-pink">This box is empty</p>
               <p className="hand mt-2 text-browned">
-                open a recipe and file it in here
+                file a card into this one from the recipe
               </p>
-              <ButtonLink href="/recipes" variant="secondary" className="mt-6">
-                Go to your recipes
+              <ButtonLink href="/box/all" variant="secondary" className="mt-6">
+                Flip through Everything
               </ButtonLink>
             </>
           )}

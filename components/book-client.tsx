@@ -134,18 +134,26 @@ export function BookClient({
     return null;
   }, [index, pages]);
 
+  const currentOrder = orders.find((o) => o.active) ?? orders[0];
+  const nextOrder =
+    orders[
+      (orders.findIndex((o) => o.key === currentOrder.key) + 1) % orders.length
+    ];
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div className="flex items-center gap-2">
-        <div className="no-scrollbar -mx-4 min-w-0 flex-1 overflow-x-auto px-4">
+        <div className="no-scrollbar min-w-0 flex-1">
           <ul className="flex gap-2">
-            {orders.map(({ key, label, active }) => (
-              <li key={key}>
-                <Link href={orderHref(basePath, key, query)} className={pill(active)}>
-                  {label}
-                </Link>
-              </li>
-            ))}
+            <li>
+              <Link
+                href={orderHref(basePath, nextOrder.key, query)}
+                className={pill(true)}
+                aria-label={`Sorted by ${currentOrder.label}. Change to ${nextOrder.label}.`}
+              >
+                {currentOrder.label}
+              </Link>
+            </li>
           </ul>
         </div>
         {/* Bordered rather than filled, so it does not read as a fourth pill.

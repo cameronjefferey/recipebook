@@ -84,7 +84,9 @@ export function BookPicker({
 
   return (
     <section className="no-print">
-      <h2 className="font-display mb-2 text-xl">In these boxes</h2>
+      <h2 className="mb-2 text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
+        In these boxes
+      </h2>
 
       <ul className="flex flex-wrap gap-2">
         {choices.map((choice) => (

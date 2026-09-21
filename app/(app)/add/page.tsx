@@ -28,7 +28,7 @@ export default async function AddPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl">Add a recipe</h1>
+      <p className="hand">a photo, a link, or write it down</p>
 
       <CaptureClient />
 
@@ -44,7 +44,7 @@ export default async function AddPage() {
               <img
                 src={`/api/captures/${capture.id}/image`}
                 alt=""
-                className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                className="h-14 w-14 shrink-0 rounded-[3px] object-cover"
               />
               <div className="min-w-0 flex-1">
                 <p className="text-[0.95rem] font-bold">

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import type { RecipeCard as Card } from "@/lib/recipes";
 import { RecipeCard } from "@/components/recipe-card";
 import { addManyToPlan } from "@/lib/actions/plan";
@@ -17,9 +17,13 @@ import { Button } from "@/components/ui";
 export function BoxGrid({
   recipes,
   planEnabled = true,
+  lead,
+  children,
 }: {
   recipes: Card[];
   planEnabled?: boolean;
+  lead?: ReactNode;
+  children?: ReactNode;
 }) {
   const [selecting, setSelecting] = useState(false);
   const [picked, setPicked] = useState<Set<string>>(new Set());
@@ -54,30 +58,42 @@ export function BoxGrid({
   };
 
   return (
-    <div className="space-y-3">
-      {planEnabled ? (
-        <div className="flex min-h-8 items-center justify-between gap-3">
-          {message ? (
-            <p className="hand text-[0.95rem] text-browned">
-              {message} <Link href="/plan" className="underline">See the list</Link>
-            </p>
+    <div className="space-y-4">
+      {lead || planEnabled ? (
+        <div className="flex items-center gap-1">
+          {lead ? (
+            <div className="flex min-w-0 flex-1 items-center gap-1">{lead}</div>
           ) : (
-            <span />
+            <span className="flex-1" />
           )}
-          <button
-            onClick={() => {
-              setMessage(null);
-              if (selecting) stopSelecting();
-              else setSelecting(true);
-            }}
-            className="tap shrink-0 px-2 text-[0.9rem] font-bold text-pink"
-          >
-            {selecting ? "Cancel" : "Select"}
-          </button>
+          {planEnabled ? (
+            <button
+              onClick={() => {
+                setMessage(null);
+                if (selecting) stopSelecting();
+                else setSelecting(true);
+              }}
+              className="tap shrink-0 px-2 text-[0.9rem] font-bold text-pink"
+            >
+              {selecting ? "Cancel" : "Select"}
+            </button>
+          ) : null}
         </div>
       ) : null}
 
-      <ul className="grid grid-cols-2 gap-3">
+      {message ? (
+        <p className="hand text-[0.95rem] text-browned">
+          {message}{" "}
+          <Link href="/plan" className="underline">
+            See the list
+          </Link>
+        </p>
+      ) : null}
+
+      {children}
+
+      {recipes.length > 0 ? (
+      <ul className="grid grid-cols-2 gap-x-3 gap-y-4 py-1">
         {recipes.map((recipe) => (
           <li key={recipe.id} className="relative">
             <div
@@ -91,7 +107,7 @@ export function BoxGrid({
                 onClick={() => toggle(recipe.id)}
                 aria-pressed={picked.has(recipe.id)}
                 aria-label={`Select ${recipe.title}`}
-                className="tap absolute inset-0 z-10 rounded-card"
+                className="tap absolute inset-0 z-10 rounded-[3px]"
               >
                 <span
                   className={`absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full border-2 shadow-sm ${
@@ -107,6 +123,7 @@ export function BoxGrid({
           </li>
         ))}
       </ul>
+      ) : null}
 
       {selecting && picked.size > 0 ? (
         <div className="fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-20 flex justify-center px-4">

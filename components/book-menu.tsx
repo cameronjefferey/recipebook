@@ -1,11 +1,20 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { deleteBook, renameBook } from "@/lib/actions/books";
 import { Button, Input } from "@/components/ui";
 
-/** Rename or remove a box. Deleting the box never deletes its recipes. */
-export function BookMenu({ bookId, name }: { bookId: string; name: string }) {
+/** Rename, share, or remove a box. Deleting the box never deletes its recipes. */
+export function BookMenu({
+  bookId,
+  name,
+  shareHref,
+}: {
+  bookId: string;
+  name: string;
+  shareHref?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(name);
   const [pending, startTransition] = useTransition();
@@ -54,6 +63,14 @@ export function BookMenu({ bookId, name }: { bookId: string; name: string }) {
             Cancel
           </Button>
         </div>
+        {shareHref ? (
+          <Link
+            href={shareHref}
+            className="tap inline-flex w-full items-center justify-center rounded-full border border-line bg-card px-6 text-[0.95rem] font-bold"
+          >
+            Share this box
+          </Link>
+        ) : null}
         <Button
           type="button"
           variant="danger"

@@ -90,7 +90,7 @@ export async function saveFromCapture(
       .update(captures)
       .set({ status: "discarded" })
       .where(eq(captures.id, captureId));
-    redirect("/box/all");
+    redirect("/box");
   }
 
   const standalone = kept.filter((r) => r.role === "main" || !r.mergeIntoMain);
@@ -193,7 +193,7 @@ export async function saveFromCapture(
 
   revalidatePath("/recipes");
   revalidatePath("/box");
-  redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/box/all");
+  redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/box");
 }
 
 export async function setStatus(
@@ -245,7 +245,7 @@ export async function deleteRecipe(recipeId: string) {
     );
   revalidatePath("/recipes");
   revalidatePath("/box");
-  redirect("/box/all");
+  redirect("/box");
 }
 
 export async function updateRecipe(recipeId: string, formData: FormData) {
