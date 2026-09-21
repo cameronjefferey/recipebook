@@ -16,6 +16,8 @@ import { isUuid } from "@/lib/ids";
 function touchPlan(recipeId?: string) {
   revalidatePath("/plan");
   revalidatePath("/box");
+  // The open box is where "Cook this week" sits on the card itself.
+  revalidatePath("/box/[id]", "page");
   if (recipeId) revalidatePath(`/r/${recipeId}`);
 }
 

@@ -53,6 +53,15 @@ export async function planCount(householdId: string) {
   return rows.length;
 }
 
+/** Recipe ids on this household's "cooking this week" list. */
+export async function plannedRecipeIds(householdId: string) {
+  const rows = await db
+    .select({ recipeId: mealPlanItems.recipeId })
+    .from(mealPlanItems)
+    .where(eq(mealPlanItems.householdId, householdId));
+  return rows.map((row) => row.recipeId);
+}
+
 export async function isPlanned(user: CurrentUser, recipeId: string) {
   const [row] = await db
     .select({ recipeId: mealPlanItems.recipeId })

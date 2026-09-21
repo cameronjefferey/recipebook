@@ -11,6 +11,7 @@ import {
   groupInstructions,
 } from "@/lib/ingredients";
 import { ChevronLeft, ChevronRight, DieIcon } from "@/components/icons";
+import { MealPlanToggle } from "@/components/meal-plan-toggle";
 
 /**
  * The box read as a book. Pages are a horizontal scroll-snap track, so the
@@ -26,6 +27,7 @@ export function BookClient({
   query,
   imageBase = "/api/images",
   showActions = true,
+  plannedIds = null,
 }: {
   pages: BookLeaf[];
   initialIndex: number;
@@ -38,6 +40,11 @@ export function BookClient({
   imageBase?: string;
   /** off for guests, who have nowhere to open or cook a recipe */
   showActions?: boolean;
+  /**
+   * Ids on this week's list. Null when meal planning is off, so the
+   * control stays hidden. An empty list still shows "Cook this week".
+   */
+  plannedIds?: string[] | null;
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [index, setIndex] = useState(initialIndex);
@@ -175,6 +182,7 @@ export function BookClient({
                 near={Math.abs(i - index) <= 1}
                 imageBase={imageBase}
                 showActions={showActions}
+                plannedIds={plannedIds}
               />
             )}
           </div>
@@ -264,6 +272,7 @@ function RecipeLeaf({
   near,
   imageBase,
   showActions,
+  plannedIds,
 }: {
   recipe: BookRecipe;
   number: number;
@@ -271,6 +280,7 @@ function RecipeLeaf({
   near: boolean;
   imageBase: string;
   showActions: boolean;
+  plannedIds: string[] | null;
 }) {
   const ingredients = groupIngredients(recipe.ingredients);
   const steps = groupInstructions(recipe.instructions);
@@ -315,18 +325,24 @@ function RecipeLeaf({
         {/* Open or cook right away, without turning past the whole page
             first — the same pair sits at the bottom too, once you have. */}
         {showActions ? (
-          <div className="mt-3 flex gap-2">
-            <Link
-              href={`/r/${recipe.id}`}
-              className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
-            >
-              Open
-            </Link>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {plannedIds ? (
+              <MealPlanToggle
+                recipeId={recipe.id}
+                planned={plannedIds.includes(recipe.id)}
+              />
+            ) : null}
             <Link
               href={`/cook/${recipe.id}`}
-              className="tap flex flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
+              className="tap flex min-w-[9rem] flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
             >
               Start cooking
+            </Link>
+            <Link
+              href={`/r/${recipe.id}`}
+              className="tap flex min-w-[6rem] flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
+            >
+              Open
             </Link>
           </div>
         ) : null}

@@ -11,6 +11,7 @@ import { BookClient } from "@/components/book-client";
 import { BookMenu } from "@/components/book-menu";
 import { BoxSearch } from "@/components/box-search";
 import { BackLink, ButtonLink } from "@/components/ui";
+import { plannedRecipeIds } from "@/lib/grocery";
 
 export default async function OpenBoxPage({
   params,
@@ -27,7 +28,12 @@ export default async function OpenBoxPage({
   if (!book) notFound();
 
   const order = toBookOrder(by);
-  const pages = await listBookPages(user.householdId, book.id, order, q);
+  const [pages, plannedIds] = await Promise.all([
+    listBookPages(user.householdId, book.id, order, q),
+    user.mealPlanEnabled
+      ? plannedRecipeIds(user.householdId)
+      : Promise.resolve(null),
+  ]);
   const theirs = !!book.ownerName;
 
   const openAt = at
@@ -108,6 +114,7 @@ export default async function OpenBoxPage({
           basePath={`/box/${book.id}`}
           query={q}
           pages={pages}
+          plannedIds={plannedIds}
           initialIndex={openAt > 0 ? openAt : 0}
           orders={BOOK_ORDERS.map(({ key, label }) => ({
             key,

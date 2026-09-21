@@ -136,12 +136,17 @@ export function RecipeView({
             </button>
           ))}
         </div>
-        <Link
-          href={`/cook/${recipe.id}?x=${factor}`}
-          className="tap inline-flex w-full items-center justify-center rounded-full bg-pink px-6 font-bold text-page"
-        >
-          Start cooking
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          {planned !== null ? (
+            <MealPlanToggle recipeId={recipe.id} planned={planned} />
+          ) : null}
+          <Link
+            href={`/cook/${recipe.id}?x=${factor}`}
+            className="tap inline-flex min-w-[9rem] flex-1 items-center justify-center rounded-full bg-pink px-6 font-bold text-page"
+          >
+            Start cooking
+          </Link>
+        </div>
       </div>
 
       <div className="no-print flex flex-wrap gap-2">
@@ -162,9 +167,6 @@ export function RecipeView({
             {label}
           </button>
         ))}
-        {planned !== null ? (
-          <MealPlanToggle recipeId={recipe.id} planned={planned} />
-        ) : null}
       </div>
 
       {mine ? (
