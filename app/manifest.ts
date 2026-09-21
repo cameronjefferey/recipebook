@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "The Pink Recipe Box",
     short_name: "Recipe Box",
     description: "Every recipe worth keeping.",
-    start_url: "/box/all",
+    start_url: "/box",
     scope: "/",
     display: "standalone",
     orientation: "any",

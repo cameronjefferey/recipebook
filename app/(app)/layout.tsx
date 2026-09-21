@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { AppHeader } from "@/components/app-header";
 import { TabBar } from "@/components/tab-bar";
 
 export default async function AppLayout({
@@ -11,16 +11,12 @@ export default async function AppLayout({
 
   return (
     // Exactly one screen tall, with the middle doing the scrolling. That keeps
-    // the header and the tabs put, and lets a page ask for the height that is
+    // the lid and the tabs put, and lets a page ask for the height that is
     // actually left over instead of guessing at the chrome.
     <div className="flex h-dvh flex-col">
-      <header className="no-print pt-safe z-30 shrink-0 bg-pink px-5 py-3 text-page">
-        <Link href="/box/all" className="font-display block text-xl leading-none">
-          The Pink Recipe Box
-        </Link>
-      </header>
+      <AppHeader />
 
-      <main className="mx-auto w-full max-w-lg min-h-0 flex-1 overflow-y-auto px-4 py-5 md:max-w-[45rem] lg:max-w-[60rem]">
+      <main className="mx-auto w-full max-w-lg min-h-0 flex-1 overflow-y-auto px-4 py-4 md:max-w-[45rem] lg:max-w-[60rem]">
         {children}
       </main>
 

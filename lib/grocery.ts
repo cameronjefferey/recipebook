@@ -11,6 +11,7 @@ import {
 import { visibleRecipe } from "@/lib/access";
 import { loadComponents, withComponents } from "@/lib/component-recipes";
 import { formatIngredient } from "@/lib/ingredients";
+import { groceryAisle, groceryAisleFromText, type GroceryAisle } from "@/lib/grocery-aisle";
 import { firstImages } from "@/lib/recipes";
 import type { CurrentUser } from "@/lib/auth";
 
@@ -36,12 +37,14 @@ export type GroceryLine = {
   /** which planned recipes contributed to this line, when more than one did */
   from: string[];
   checked: boolean;
+  aisle: GroceryAisle;
 };
 
 export type ExtraItem = {
   id: string;
   text: string;
   checked: boolean;
+  aisle: GroceryAisle;
 };
 
 /** How many recipes are marked for this week, for a badge on the shelf. */
@@ -129,6 +132,7 @@ export function combineIngredients(
         key: `sum:${key}`,
         text: formatIngredient(merged),
         from: dedupe(group.map((e) => e.recipeTitle)),
+        aisle: groceryAisle(merged.item, merged.unit),
       });
       continue;
     }
@@ -150,6 +154,7 @@ export function combineIngredients(
         key: `line:${key}:${text}`,
         text,
         from: dedupe(dupes.map((e) => e.recipeTitle)),
+        aisle: groceryAisle(dupes[0].ingredient.item, dupes[0].ingredient.unit),
       });
     }
   }
@@ -228,6 +233,7 @@ export async function loadPlan(user: CurrentUser) {
       id: e.id,
       text: e.text,
       checked: e.checked,
+      aisle: groceryAisleFromText(e.text),
     })),
   };
 }

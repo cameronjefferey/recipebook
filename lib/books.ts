@@ -2,7 +2,7 @@ import "server-only";
 import { and, asc, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
 import { db } from "@/lib/db";
 import type { Ingredient, Instruction } from "@/lib/db/schema";
-import { books, bookRecipes, recipes, recipeTags } from "@/lib/db/schema";
+import { books, bookFavorites, bookRecipes, recipes, recipeTags } from "@/lib/db/schema";
 import { firstImages, listCategories } from "@/lib/recipes";
 import { bookAccess, sharedWithMe } from "@/lib/access";
 import type { CurrentUser } from "@/lib/auth";
@@ -83,6 +83,7 @@ export type ShelfBook = {
   name: string;
   blurb: string | null;
   smart: boolean;
+  favorite: boolean;
   count: number;
   coverId: string | null;
   rotation: number;
@@ -105,7 +106,7 @@ export async function listShelf(user: CurrentUser): Promise<{
   shared: SharedShelfBook[];
 }> {
   const householdId = user.householdId;
-  const [rows, mineRows, sharedRows] = await Promise.all([
+  const [rows, mineRows, sharedRows, favoriteRows] = await Promise.all([
     db
       .select({
         id: recipes.id,
@@ -121,7 +122,12 @@ export async function listShelf(user: CurrentUser): Promise<{
       .where(eq(books.householdId, householdId))
       .orderBy(asc(books.position), asc(books.name)),
     sharedWithMe(user),
+    db
+      .select({ bookId: bookFavorites.bookId })
+      .from(bookFavorites)
+      .where(eq(bookFavorites.householdId, householdId)),
   ]);
+  const favoriteIds = new Set(favoriteRows.map((f) => f.bookId));
 
   const ids = rows.map((r) => r.id);
   const [memberships, covers] = await Promise.all([
@@ -158,6 +164,7 @@ export async function listShelf(user: CurrentUser): Promise<{
       name,
       blurb,
       smart,
+      favorite: favoriteIds.has(id),
       count: members.length,
       coverId: cover?.id ?? null,
       rotation: cover?.rotation ?? 0,
@@ -221,6 +228,7 @@ export async function listShelf(user: CurrentUser): Promise<{
       name: b.name,
       blurb: null,
       smart: false,
+      favorite: favoriteIds.has(b.id),
       count: members.length,
       coverId: cover?.id ?? null,
       rotation: cover?.rotation ?? 0,
@@ -236,6 +244,7 @@ export type ResolvedBook = {
   id: string;
   name: string;
   smart: boolean;
+  favorite: boolean;
   /** somebody else's book, on this shelf because it was shared */
   ownerName: string | null;
   canAdd: boolean;
@@ -251,12 +260,25 @@ export async function resolveBook(
   user: CurrentUser,
   id: string,
 ): Promise<ResolvedBook | null> {
+  const [favorite] = await db
+    .select({ bookId: bookFavorites.bookId })
+    .from(bookFavorites)
+    .where(
+      and(
+        eq(bookFavorites.householdId, user.householdId),
+        eq(bookFavorites.bookId, id),
+      ),
+    )
+    .limit(1);
+  const starred = !!favorite;
+
   const smart = SMART_BOOKS.find((b) => b.id === id);
   if (smart) {
     return {
       id: smart.id,
       name: smart.name,
       smart: true,
+      favorite: starred,
       ownerName: null,
       canAdd: false,
       canManage: false,
@@ -270,6 +292,7 @@ export async function resolveBook(
     id: access.bookId,
     name: access.name,
     smart: false,
+    favorite: starred,
     ownerName: access.role === "owner" ? null : access.ownerName,
     canAdd: access.canAdd,
     canManage: access.canManage,

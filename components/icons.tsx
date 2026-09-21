@@ -168,6 +168,22 @@ export function PencilIcon({ className }: P) {
   );
 }
 
+/** A slightly wonky five-point star, for a box that's a favourite. */
+export function StarIcon({
+  className,
+  filled = false,
+}: P & { filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path
+        {...stroke}
+        fill={filled ? "currentColor" : "none"}
+        d="M12 3.6 14.4 9l6 .6-4.5 4.1 1.3 5.8L12 16.8 6.8 19.5l1.3-5.8L3.6 9.6l6-.6Z"
+      />
+    </svg>
+  );
+}
+
 /* ============================== stand-ins for a recipe with no photo yet */
 
 /** Mains: a pot, lid slightly askew from whatever's simmering under it. */

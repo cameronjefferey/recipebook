@@ -57,6 +57,13 @@
       "when": 1789500669850,
       "tag": "0007_fix_multi_value_categories",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789584249913,
+      "tag": "0008_nifty_slipstream",
+      "breakpoints": true
     }
   ]
 }

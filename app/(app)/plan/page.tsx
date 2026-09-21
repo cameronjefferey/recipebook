@@ -13,10 +13,7 @@ export default async function PlanPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-2xl">This week</h1>
-        <p className="hand mt-1">what&apos;s cooking, and what to buy for it</p>
-      </div>
+      <p className="hand">what&apos;s cooking, and what to buy for it</p>
 
       <PlanClient planned={planned} groceryLines={groceryLines} extras={extras} />
     </div>

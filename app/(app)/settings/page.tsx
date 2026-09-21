@@ -25,7 +25,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="font-display text-2xl">Settings</h1>
+      <p className="hand">you, and this box</p>
 
       <Card className="p-4">
         <p className="font-bold">{user.name}</p>

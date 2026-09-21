@@ -2,18 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BoxIcon,
-  CameraIcon,
-  CartIcon,
-  GearIcon,
-} from "@/components/icons";
+import { BoxIcon, CameraIcon, CartIcon } from "@/components/icons";
 
 const allTabs = [
-  { href: "/box/all", label: "Box", Icon: BoxIcon, home: true },
-  { href: "/plan", label: "Plan", Icon: CartIcon, plan: true },
+  { href: "/box", label: "Box", Icon: BoxIcon, home: true },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
-  { href: "/settings", label: "Settings", Icon: GearIcon },
+  { href: "/plan", label: "Plan", Icon: CartIcon, plan: true },
 ];
 
 export function TabBar({ planEnabled }: { planEnabled: boolean }) {

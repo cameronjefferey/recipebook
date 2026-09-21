@@ -267,6 +267,26 @@ export const bookRecipes = pinkbox.table(
 );
 
 /**
+ * A starred box, pinned to the top of the shelf. `bookId` is text rather than
+ * a uuid-with-FK because the standing boxes ("Keepers", "Everything") have
+ * no row in `books` to point at — and a shared box belongs to somebody else's
+ * household anyway. Access is checked at write time, not by the schema.
+ */
+export const bookFavorites = pinkbox.table(
+  "book_favorites",
+  {
+    householdId: uuid("household_id")
+      .notNull()
+      .references(() => households.id, { onDelete: "cascade" }),
+    bookId: text("book_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.householdId, t.bookId] })],
+);
+
+/**
  * A book handed to one person by name, each with a link of their own, so that
  * "Aunt Carol can no longer see this" is possible without disturbing anybody
  * else. Recipients never need an account: the token in the link is the whole
