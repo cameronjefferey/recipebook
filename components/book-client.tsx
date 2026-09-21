@@ -23,6 +23,7 @@ export function BookClient({
   initialIndex,
   orders,
   basePath,
+  query,
   imageBase = "/api/images",
   showActions = true,
 }: {
@@ -31,6 +32,8 @@ export function BookClient({
   orders: { key: string; label: string; active: boolean }[];
   /** where the ordering pills point, e.g. "/book/<id>" */
   basePath: string;
+  /** kept on the order links so a search is not thrown away */
+  query?: string;
   /** photo URLs hang off this, so a guest can be served through their token */
   imageBase?: string;
   /** off for guests, who have nowhere to open or cook a recipe */
@@ -131,7 +134,7 @@ export function BookClient({
           <ul className="flex gap-2">
             {orders.map(({ key, label, active }) => (
               <li key={key}>
-                <Link href={`${basePath}?by=${key}`} className={pill(active)}>
+                <Link href={orderHref(basePath, key, query)} className={pill(active)}>
                   {label}
                 </Link>
               </li>
@@ -144,7 +147,7 @@ export function BookClient({
           <button
             onClick={surprise}
             aria-label="Turn to a recipe at random"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
+            className="tap flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
           >
             <DieIcon className="h-5 w-5" />
           </button>
@@ -203,8 +206,14 @@ export function BookClient({
   );
 }
 
+function orderHref(basePath: string, key: string, query?: string) {
+  const params = new URLSearchParams({ by: key });
+  if (query?.trim()) params.set("q", query.trim());
+  return `${basePath}?${params}`;
+}
+
 function pill(active: boolean) {
-  return `inline-flex h-9 items-center rounded-full px-3 text-[0.85rem] font-bold whitespace-nowrap ${
+  return `tap inline-flex h-12 items-center rounded-full px-4 text-[0.9rem] font-bold whitespace-nowrap ${
     active ? "bg-pink text-page" : "bg-pink-soft text-pink"
   }`;
 }

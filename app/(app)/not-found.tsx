@@ -8,8 +8,8 @@ export default function NotFound() {
       <p className="hand mt-3 text-browned">
         it may have been thrown out, or never existed
       </p>
-      <ButtonLink href="/recipes" variant="secondary" className="mt-7">
-        Back to your recipes
+      <ButtonLink href="/box/all" variant="secondary" className="mt-7">
+        Back to the box
       </ButtonLink>
     </div>
   );

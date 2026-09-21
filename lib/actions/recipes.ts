@@ -65,6 +65,8 @@ export type ReviewedRecipe = {
   instructionLines: string[];
   notes?: string | null;
   tags: string[];
+  /** true only when she asked for a new box under this category */
+  makeBox?: boolean;
 };
 
 export async function saveFromCapture(
@@ -88,7 +90,7 @@ export async function saveFromCapture(
       .update(captures)
       .set({ status: "discarded" })
       .where(eq(captures.id, captureId));
-    redirect("/recipes");
+    redirect("/box/all");
   }
 
   const standalone = kept.filter((r) => r.role === "main" || !r.mergeIntoMain);
@@ -158,7 +160,9 @@ export async function saveFromCapture(
 
     createdIds.push(row.id);
 
-    await fileUnderCategory(user.householdId, row.id, entry.category);
+    await fileUnderCategory(user.householdId, row.id, entry.category, {
+      createIfMissing: Boolean(entry.makeBox),
+    });
 
     // Each recipe keeps its own copy of the photo, so it stays self-contained
     // and deleting one recipe never orphans or strands another's original.
@@ -189,7 +193,7 @@ export async function saveFromCapture(
 
   revalidatePath("/recipes");
   revalidatePath("/box");
-  redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/recipes");
+  redirect(createdIds.length === 1 ? `/r/${createdIds[0]}` : "/box/all");
 }
 
 export async function setStatus(
@@ -228,6 +232,7 @@ export async function logCook(recipeId: string) {
     .where(eq(recipes.id, recipeId));
 
   revalidatePath("/recipes");
+  revalidatePath("/box");
   revalidatePath(`/r/${recipeId}`);
 }
 
@@ -239,7 +244,63 @@ export async function deleteRecipe(recipeId: string) {
       and(eq(recipes.id, recipeId), eq(recipes.householdId, user.householdId)),
     );
   revalidatePath("/recipes");
-  redirect("/recipes");
+  revalidatePath("/box");
+  redirect("/box/all");
+}
+
+export async function updateRecipe(recipeId: string, formData: FormData) {
+  const user = await requireUser();
+
+  const title = String(formData.get("title") ?? "").trim();
+  if (!title) throw new Error("A recipe needs a name.");
+
+  const category = String(formData.get("category") ?? "").trim() || null;
+  const makeBox = String(formData.get("makeBox") ?? "") === "yes";
+
+  const [row] = await db
+    .update(recipes)
+    .set({
+      title,
+      description: String(formData.get("description") ?? "").trim() || null,
+      category,
+      ingredients: linesToIngredients(
+        String(formData.get("ingredients") ?? "").split("\n"),
+      ),
+      instructions: linesToInstructions(
+        String(formData.get("instructions") ?? "").split("\n"),
+      ),
+      notes: String(formData.get("notes") ?? "").trim() || null,
+      sourceName: String(formData.get("sourceName") ?? "").trim() || null,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(eq(recipes.id, recipeId), eq(recipes.householdId, user.householdId)),
+    )
+    .returning({ id: recipes.id });
+
+  if (!row) throw new Error("That card is not yours to change.");
+
+  const tags = String(formData.get("tags") ?? "")
+    .split(",")
+    .map((tag) => tag.trim().toLowerCase())
+    .filter(Boolean);
+
+  await db.delete(recipeTags).where(eq(recipeTags.recipeId, recipeId));
+  if (tags.length) {
+    await db
+      .insert(recipeTags)
+      .values([...new Set(tags)].map((tag) => ({ recipeId, tag })))
+      .onConflictDoNothing();
+  }
+
+  await fileUnderCategory(user.householdId, recipeId, category, {
+    createIfMissing: makeBox,
+  });
+
+  revalidatePath("/recipes");
+  revalidatePath("/box");
+  revalidatePath(`/r/${recipeId}`);
+  redirect(`/r/${recipeId}`);
 }
 
 export async function createManualRecipe(formData: FormData) {
@@ -270,7 +331,9 @@ export async function createManualRecipe(formData: FormData) {
     })
     .returning({ id: recipes.id });
 
-  await fileUnderCategory(user.householdId, row.id, category);
+  await fileUnderCategory(user.householdId, row.id, category, {
+    createIfMissing: String(formData.get("makeBox") ?? "") === "yes",
+  });
 
   revalidatePath("/recipes");
   revalidatePath("/box");

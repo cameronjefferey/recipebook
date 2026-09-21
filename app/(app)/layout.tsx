@@ -15,12 +15,12 @@ export default async function AppLayout({
     // actually left over instead of guessing at the chrome.
     <div className="flex h-dvh flex-col">
       <header className="no-print pt-safe z-30 shrink-0 bg-pink px-5 py-3 text-page">
-        <Link href="/recipes" className="font-display block text-xl leading-none">
+        <Link href="/box/all" className="font-display block text-xl leading-none">
           The Pink Recipe Box
         </Link>
       </header>
 
-      <main className="mx-auto w-full max-w-lg min-h-0 flex-1 overflow-y-auto px-4 py-5">
+      <main className="mx-auto w-full max-w-lg min-h-0 flex-1 overflow-y-auto px-4 py-5 md:max-w-[45rem] lg:max-w-[60rem]">
         {children}
       </main>
 

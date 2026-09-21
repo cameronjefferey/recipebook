@@ -187,3 +187,22 @@ export function groupInstructions(list: Instruction[]) {
   }
   return Array.from(groups, ([name, items]) => ({ name, items }));
 }
+
+/** The text a cook edits: one line each, `#` marking a heading. */
+export function ingredientLines(list: Ingredient[]): string[] {
+  const lines: string[] = [];
+  for (const group of groupIngredients(list)) {
+    if (group.name) lines.push(`# ${group.name}`);
+    for (const ing of group.items) lines.push(formatIngredient(ing));
+  }
+  return lines;
+}
+
+export function instructionLines(list: Instruction[]): string[] {
+  const lines: string[] = [];
+  for (const group of groupInstructions(list)) {
+    if (group.name) lines.push(`# ${group.name}`);
+    for (const step of group.items) lines.push(step.text);
+  }
+  return lines;
+}

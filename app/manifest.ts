@@ -5,10 +5,10 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "The Pink Recipe Box",
     short_name: "Recipe Box",
     description: "Every recipe worth keeping.",
-    start_url: "/recipes",
+    start_url: "/box/all",
     scope: "/",
     display: "standalone",
-    orientation: "portrait",
+    orientation: "any",
     background_color: "#fdf6ea",
     theme_color: "#c2566f",
     icons: [

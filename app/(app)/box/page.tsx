@@ -3,6 +3,7 @@ import { listShelf } from "@/lib/books";
 import { shareCounts } from "@/lib/sharing";
 import { NewBookForm } from "@/components/new-book-form";
 import { BoxCard } from "@/components/box-card";
+import { BoxSearch } from "@/components/box-search";
 import { Eyebrow } from "@/components/ui";
 
 export default async function BoxPage() {
@@ -18,6 +19,8 @@ export default async function BoxPage() {
         <h1 className="font-display text-2xl">The box</h1>
         <p className="hand mt-1">tap one open and see what&apos;s inside</p>
       </div>
+
+      <BoxSearch action="/box/all" />
 
       <section className="space-y-3">
         <Eyebrow>Your boxes</Eyebrow>

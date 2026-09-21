@@ -3,6 +3,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { captures } from "@/lib/db/schema";
 import { requireUser } from "@/lib/auth";
+import { listDividers } from "@/lib/books";
 import { parsedPageSchema } from "@/lib/ai/schema";
 import { ReviewClient } from "@/components/review-client";
 import { BackLink } from "@/components/ui";
@@ -39,11 +40,14 @@ export default async function ReviewPage({
     );
   }
 
+  const dividers = await listDividers(user.householdId);
+
   return (
     <ReviewClient
       captureId={capture.id}
       page={parsed.data}
       imageUrl={`/api/captures/${capture.id}/image`}
+      dividers={dividers}
     />
   );
 }

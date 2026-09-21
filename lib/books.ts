@@ -1,9 +1,9 @@
 import "server-only";
-import { and, asc, desc, eq, inArray, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
 import { db } from "@/lib/db";
 import type { Ingredient, Instruction } from "@/lib/db/schema";
-import { books, bookRecipes, recipes } from "@/lib/db/schema";
-import { firstImages } from "@/lib/recipes";
+import { books, bookRecipes, recipes, recipeTags } from "@/lib/db/schema";
+import { firstImages, listCategories } from "@/lib/recipes";
 import { bookAccess, sharedWithMe } from "@/lib/access";
 import type { CurrentUser } from "@/lib/auth";
 
@@ -324,11 +324,27 @@ function initialOf(title: string) {
   return /[A-Z]/.test(c) ? c : "#";
 }
 
+function textSearch(q: string): SQL {
+  const needle = `%${q}%`;
+  return or(
+    ilike(recipes.title, needle),
+    ilike(recipes.description, needle),
+    ilike(recipes.notes, needle),
+    ilike(recipes.category, needle),
+    ilike(recipes.sourceName, needle),
+    sql`${recipes.ingredients}::text ILIKE ${needle}`,
+    sql`${recipes.instructions}::text ILIKE ${needle}`,
+    sql`EXISTS (SELECT 1 FROM ${recipeTags} WHERE ${recipeTags.recipeId} = ${recipes.id} AND ${recipeTags.tag} ILIKE ${needle})`,
+  )!;
+}
+
 export async function listBookPages(
   householdId: string,
   bookId: string,
   order: BookOrder,
+  q?: string,
 ): Promise<BookLeaf[]> {
+  const needle = q?.trim();
   const rows = await db
     .select({
       id: recipes.id,
@@ -347,7 +363,11 @@ export async function listBookPages(
       sourceName: recipes.sourceName,
     })
     .from(recipes)
-    .where(scopeOf(householdId, bookId))
+    .where(
+      needle
+        ? and(scopeOf(householdId, bookId), textSearch(needle))
+        : scopeOf(householdId, bookId),
+    )
     .orderBy(...orderClause(order))
     .limit(300);
 
@@ -391,15 +411,16 @@ export async function listBookPages(
 }
 
 /**
- * File a new recipe into the box named after its category, making the box if
- * there is not one yet. Without this the box would slowly go stale:
- * transcription suggests a category, and everything new would otherwise pile up
- * in "Not in a box" however carefully it had been labelled.
+ * File a recipe into the box that shares its category name.
+ *
+ * An existing box is used quietly. A new box is made only when the cook asked
+ * (`createIfMissing`), so a mistyped category cannot mint a divider on its own.
  */
 export async function fileUnderCategory(
   householdId: string,
   recipeId: string,
   category: string | null | undefined,
+  options?: { createIfMissing?: boolean },
 ) {
   const name = category?.trim().replace(/\s+/g, " ").slice(0, 60);
   if (!name) return;
@@ -415,6 +436,8 @@ export async function fileUnderCategory(
     )
     .limit(1);
 
+  if (!existing && !options?.createIfMissing) return;
+
   const bookId =
     existing?.id ??
     (
@@ -428,6 +451,41 @@ export async function fileUnderCategory(
     .insert(bookRecipes)
     .values({ bookId, recipeId })
     .onConflictDoNothing();
+}
+
+/** Category names already on cards, plus the boxes on the shelf. */
+export async function listDividers(householdId: string): Promise<{
+  names: string[];
+  books: string[];
+}> {
+  const [categories, own] = await Promise.all([
+    listCategories(householdId),
+    db
+      .select({ name: books.name })
+      .from(books)
+      .where(eq(books.householdId, householdId))
+      .orderBy(asc(books.name)),
+  ]);
+
+  const seen = new Set<string>();
+  const unique = (values: string[]) => {
+    const out: string[] = [];
+    for (const raw of values) {
+      const name = raw.trim();
+      const key = name.toLowerCase();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(name);
+    }
+    return out;
+  };
+
+  const boxNames = unique(own.map((b) => b.name));
+  seen.clear();
+  const names = unique([...categories, ...boxNames]).sort((a, b) =>
+    a.localeCompare(b),
+  );
+  return { names, books: boxNames };
 }
 
 /**

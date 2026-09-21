@@ -4,6 +4,8 @@ import { useMemo, useState, useTransition } from "react";
 import type { ParsedPage, ParsedRecipe } from "@/lib/ai/schema";
 import { formatIngredient } from "@/lib/ingredients";
 import { saveFromCapture, type ReviewedRecipe } from "@/lib/actions/recipes";
+import { CategoryField } from "@/components/category-field";
+import { LineEditor } from "@/components/line-editor";
 import { BackLink, Button, Card, ErrorNote, Field, Input, Textarea } from "@/components/ui";
 
 type Line = { text: string; uncertain: boolean };
@@ -23,6 +25,7 @@ type Draft = {
   instructions: Line[];
   complete: boolean;
   confidence: ParsedRecipe["confidence"];
+  makeBox: boolean;
 };
 
 function toDraft(r: ParsedRecipe, pageSource?: string | null): Draft {
@@ -68,6 +71,7 @@ function toDraft(r: ParsedRecipe, pageSource?: string | null): Draft {
     instructions,
     complete: r.complete,
     confidence: r.confidence,
+    makeBox: false,
   };
 }
 
@@ -75,10 +79,12 @@ export function ReviewClient({
   captureId,
   page,
   imageUrl,
+  dividers,
 }: {
   captureId: string;
   page: ParsedPage;
   imageUrl: string;
+  dividers: { names: string[]; books: string[] };
 }) {
   const [drafts, setDrafts] = useState<Draft[]>(() =>
     page.recipes.map((r) => toDraft(r, page.sourceName)),
@@ -158,7 +164,8 @@ export function ReviewClient({
       servingsText: d.servingsText || null,
       sourceName: d.sourceName || null,
       notes: d.notes || null,
-      tags: d.tags,
+      tags: d.tags.map((tag) => tag.trim()).filter(Boolean),
+      makeBox: d.makeBox,
       ingredientLines: d.ingredients.map((l) => l.text),
       instructionLines: d.instructions.map((l) => l.text),
     }));
@@ -268,7 +275,7 @@ export function ReviewClient({
               <button
                 key={option}
                 onClick={() => patch(i, { disposition: option })}
-                className={`rounded-full border px-4 py-2 text-[0.85rem] font-bold ${
+                className={`tap inline-flex h-12 items-center rounded-full border px-4 text-[0.9rem] font-bold ${
                   draft.disposition === option
                     ? "border-pink bg-pink text-page"
                     : "border-line bg-page text-muted"
@@ -286,21 +293,31 @@ export function ReviewClient({
 
           {draft.disposition === "skip" ? null : (
             <>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Serves">
-                  <Input
-                    inputMode="numeric"
-                    value={draft.servings}
-                    onChange={(e) => patch(i, { servings: e.target.value })}
-                  />
-                </Field>
-                <Field label="Category">
-                  <Input
-                    value={draft.category}
-                    onChange={(e) => patch(i, { category: e.target.value })}
-                  />
-                </Field>
-              </div>
+          <Field label="Serves">
+            <Input
+              inputMode="numeric"
+              value={draft.servings}
+              onChange={(e) => patch(i, { servings: e.target.value })}
+            />
+          </Field>
+
+          <CategoryField
+            names={dividers.names}
+            books={dividers.books}
+            value={draft.category}
+            onChange={(category) => patch(i, { category })}
+            makeBox={draft.makeBox}
+            onMakeBox={(makeBox) => patch(i, { makeBox })}
+          />
+
+          <Field label="A short note">
+            <Textarea
+              rows={2}
+              value={draft.description}
+              onChange={(e) => patch(i, { description: e.target.value })}
+              placeholder="Who it's from, or when you make it"
+            />
+          </Field>
 
               <LineEditor
                 label="Ingredients"
@@ -329,6 +346,18 @@ export function ReviewClient({
                 />
               </Field>
 
+              <Field label="Tags" hint="A comma between each one.">
+                <Input
+                  value={draft.tags.join(", ")}
+                  onChange={(e) =>
+                    patch(i, {
+                      tags: e.target.value.split(",").map((tag) => tag.trim()),
+                    })
+                  }
+                  placeholder="holiday, sunday"
+                />
+              </Field>
+
               <Field label="Where it came from">
                 <Input
                   value={draft.sourceName}
@@ -348,77 +377,3 @@ export function ReviewClient({
   );
 }
 
-function LineEditor({
-  label,
-  hint,
-  lines,
-  multiline,
-  onChange,
-  onRemove,
-  onAdd,
-}: {
-  label: string;
-  hint?: string;
-  lines: Line[];
-  multiline?: boolean;
-  onChange: (index: number, text: string) => void;
-  onRemove: (index: number) => void;
-  onAdd: () => void;
-}) {
-  return (
-    <div>
-      <span className="mb-1.5 block text-[0.8rem] font-bold tracking-wide text-browned uppercase">
-        {label}
-      </span>
-      {hint ? <p className="mb-2 text-[0.85rem] text-muted">{hint}</p> : null}
-
-      <ul className="space-y-2">
-        {lines.map((line, j) => {
-          const heading = line.text.trim().startsWith("#");
-          return (
-            <li key={j} className="flex items-start gap-2">
-              {multiline ? (
-                <textarea
-                  value={line.text}
-                  rows={2}
-                  onChange={(e) => onChange(j, e.target.value)}
-                  className={`flex-1 rounded-xl border bg-page px-3 py-2 text-[1rem] focus:outline-none ${
-                    line.uncertain
-                      ? "border-butter bg-butter/15 focus:border-pink"
-                      : "border-line focus:border-pink"
-                  }`}
-                />
-              ) : (
-                <input
-                  value={line.text}
-                  onChange={(e) => onChange(j, e.target.value)}
-                  className={`h-11 flex-1 rounded-xl border bg-page px-3 text-[1rem] focus:outline-none ${
-                    heading ? "font-bold" : ""
-                  } ${
-                    line.uncertain
-                      ? "border-butter bg-butter/15 focus:border-pink"
-                      : "border-line focus:border-pink"
-                  }`}
-                />
-              )}
-              <button
-                onClick={() => onRemove(j)}
-                aria-label={`Remove line ${j + 1}`}
-                className="tap shrink-0 text-muted"
-              >
-                ×
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-
-      <button
-        onClick={onAdd}
-        className="mt-2 text-[0.9rem] font-bold text-pink underline underline-offset-2"
-      >
-        Add a line
-      </button>
-    </div>
-  );
-}

@@ -9,6 +9,7 @@ import {
 } from "@/lib/books";
 import { BookClient } from "@/components/book-client";
 import { BookMenu } from "@/components/book-menu";
+import { BoxSearch } from "@/components/box-search";
 import { BackLink, ButtonLink } from "@/components/ui";
 
 export default async function OpenBoxPage({
@@ -16,17 +17,17 @@ export default async function OpenBoxPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ by?: string; at?: string }>;
+  searchParams: Promise<{ by?: string; at?: string; q?: string }>;
 }) {
   const user = await requireUser();
   const { id } = await params;
-  const { by, at } = await searchParams;
+  const { by, at, q } = await searchParams;
 
   const book = await resolveBook(user, id);
   if (!book) notFound();
 
   const order = toBookOrder(by);
-  const pages = await listBookPages(user.householdId, book.id, order);
+  const pages = await listBookPages(user.householdId, book.id, order, q);
   const theirs = !!book.ownerName;
 
   const openAt = at
@@ -38,7 +39,9 @@ export default async function OpenBoxPage({
     // and the pager takes what the title, pills and buttons do not want.
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="relative flex items-center gap-1">
-        <BackLink href="/box" label="Back to the box" />
+        <BackLink href="/box" label="Boxes">
+          Boxes
+        </BackLink>
         <div className="min-w-0 flex-1">
           <h1 className="font-display truncate text-xl">{book.name}</h1>
           {theirs ? (
@@ -62,19 +65,48 @@ export default async function OpenBoxPage({
         )}
       </div>
 
-      {pages.length === 0 ? (
+      <BoxSearch action={`/box/${book.id}`} query={q} preserve={{ by }} />
+
+      {q && pages.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <p className="font-display text-2xl text-pink">This box is empty</p>
-          <p className="hand mt-2 text-browned">
-            open a recipe and file it in here
-          </p>
-          <ButtonLink href="/recipes" variant="secondary" className="mt-6">
-            Go to your recipes
+          <p className="font-display text-2xl text-pink">Nothing matched</p>
+          <p className="hand mt-2 text-browned">“{q}” is not in {book.name}</p>
+          <ButtonLink
+            href={by ? `/box/${book.id}?by=${by}` : `/box/${book.id}`}
+            variant="secondary"
+            className="mt-6"
+          >
+            Show the cards
           </ButtonLink>
+        </div>
+      ) : pages.length === 0 ? (
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
+          {book.id === "all" ? (
+            <>
+              <p className="font-display text-2xl text-pink">The box is empty</p>
+              <p className="hand mt-2 text-browned">
+                start with a card from the kitchen drawer
+              </p>
+              <ButtonLink href="/add" className="mt-6">
+                Add the first recipe
+              </ButtonLink>
+            </>
+          ) : (
+            <>
+              <p className="font-display text-2xl text-pink">This box is empty</p>
+              <p className="hand mt-2 text-browned">
+                open a recipe and file it in here
+              </p>
+              <ButtonLink href="/recipes" variant="secondary" className="mt-6">
+                Go to your recipes
+              </ButtonLink>
+            </>
+          )}
         </div>
       ) : (
         <BookClient
           basePath={`/box/${book.id}`}
+          query={q}
           pages={pages}
           initialIndex={openAt > 0 ? openAt : 0}
           orders={BOOK_ORDERS.map(({ key, label }) => ({
