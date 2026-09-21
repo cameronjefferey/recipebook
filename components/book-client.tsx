@@ -11,6 +11,7 @@ import {
   groupInstructions,
 } from "@/lib/ingredients";
 import { ChevronLeft, ChevronRight, DieIcon } from "@/components/icons";
+import { MealPlanToggle } from "@/components/meal-plan-toggle";
 
 /**
  * The box read as a book. Pages are a horizontal scroll-snap track, so the
@@ -23,18 +24,27 @@ export function BookClient({
   initialIndex,
   orders,
   basePath,
+  query,
   imageBase = "/api/images",
   showActions = true,
+  plannedIds = null,
 }: {
   pages: BookLeaf[];
   initialIndex: number;
   orders: { key: string; label: string; active: boolean }[];
   /** where the ordering pills point, e.g. "/book/<id>" */
   basePath: string;
+  /** kept on the order links so a search is not thrown away */
+  query?: string;
   /** photo URLs hang off this, so a guest can be served through their token */
   imageBase?: string;
   /** off for guests, who have nowhere to open or cook a recipe */
   showActions?: boolean;
+  /**
+   * Ids on this week's list. Null when meal planning is off, so the
+   * control stays hidden. An empty list still shows "Cook this week".
+   */
+  plannedIds?: string[] | null;
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [index, setIndex] = useState(initialIndex);
@@ -131,7 +141,7 @@ export function BookClient({
           <ul className="flex gap-2">
             {orders.map(({ key, label, active }) => (
               <li key={key}>
-                <Link href={`${basePath}?by=${key}`} className={pill(active)}>
+                <Link href={orderHref(basePath, key, query)} className={pill(active)}>
                   {label}
                 </Link>
               </li>
@@ -144,7 +154,7 @@ export function BookClient({
           <button
             onClick={surprise}
             aria-label="Turn to a recipe at random"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
+            className="tap flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
           >
             <DieIcon className="h-5 w-5" />
           </button>
@@ -172,6 +182,7 @@ export function BookClient({
                 near={Math.abs(i - index) <= 1}
                 imageBase={imageBase}
                 showActions={showActions}
+                plannedIds={plannedIds}
               />
             )}
           </div>
@@ -203,8 +214,14 @@ export function BookClient({
   );
 }
 
+function orderHref(basePath: string, key: string, query?: string) {
+  const params = new URLSearchParams({ by: key });
+  if (query?.trim()) params.set("q", query.trim());
+  return `${basePath}?${params}`;
+}
+
 function pill(active: boolean) {
-  return `inline-flex h-9 items-center rounded-full px-3 text-[0.85rem] font-bold whitespace-nowrap ${
+  return `tap inline-flex h-12 items-center rounded-full px-4 text-[0.9rem] font-bold whitespace-nowrap ${
     active ? "bg-pink text-page" : "bg-pink-soft text-pink"
   }`;
 }
@@ -255,6 +272,7 @@ function RecipeLeaf({
   near,
   imageBase,
   showActions,
+  plannedIds,
 }: {
   recipe: BookRecipe;
   number: number;
@@ -262,6 +280,7 @@ function RecipeLeaf({
   near: boolean;
   imageBase: string;
   showActions: boolean;
+  plannedIds: string[] | null;
 }) {
   const ingredients = groupIngredients(recipe.ingredients);
   const steps = groupInstructions(recipe.instructions);
@@ -306,18 +325,24 @@ function RecipeLeaf({
         {/* Open or cook right away, without turning past the whole page
             first — the same pair sits at the bottom too, once you have. */}
         {showActions ? (
-          <div className="mt-3 flex gap-2">
-            <Link
-              href={`/r/${recipe.id}`}
-              className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
-            >
-              Open
-            </Link>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {plannedIds ? (
+              <MealPlanToggle
+                recipeId={recipe.id}
+                planned={plannedIds.includes(recipe.id)}
+              />
+            ) : null}
             <Link
               href={`/cook/${recipe.id}`}
-              className="tap flex flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
+              className="tap flex min-w-[9rem] flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
             >
               Start cooking
+            </Link>
+            <Link
+              href={`/r/${recipe.id}`}
+              className="tap flex min-w-[6rem] flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
+            >
+              Open
             </Link>
           </div>
         ) : null}

@@ -152,14 +152,23 @@ export function Switch({
  * place, `BackButton` (components/back-button.tsx) retraces actual history
  * instead of guessing which parent to send someone to.
  */
-export function BackLink({ href, label }: { href: string; label: string }) {
+export function BackLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children?: ReactNode;
+}) {
   return (
     <Link
       href={href}
       aria-label={label}
-      className="tap -ml-3 flex shrink-0 items-center justify-center text-pink"
+      className="tap -ml-3 flex shrink-0 items-center justify-center gap-0.5 pr-1 font-bold text-pink"
     >
       <ChevronLeft className="h-6 w-6" />
+      {children}
     </Link>
   );
 }

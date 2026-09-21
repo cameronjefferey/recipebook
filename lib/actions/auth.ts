@@ -43,7 +43,7 @@ export async function loginAction(
   }
 
   await createSession(user.id);
-  redirect("/recipes");
+  redirect("/box/all");
 }
 
 export async function joinAction(
@@ -103,7 +103,7 @@ export async function joinAction(
     .returning();
 
   await createSession(user.id);
-  redirect("/recipes");
+  redirect("/box/all");
 }
 
 export async function logoutAction() {

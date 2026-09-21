@@ -16,7 +16,7 @@ export default function NotFound() {
         If somebody shared a recipe book with you, ask them to send the link
         again.
       </p>
-      <ButtonLink href="/recipes" variant="secondary" className="mt-7">
+      <ButtonLink href="/box/all" variant="secondary" className="mt-7">
         Go to the recipe box
       </ButtonLink>
     </div>

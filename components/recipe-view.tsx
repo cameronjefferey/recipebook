@@ -13,8 +13,9 @@ import { logCook, setStatus } from "@/lib/actions/recipes";
 import { BookPicker } from "@/components/book-picker";
 import { MealPlanToggle } from "@/components/meal-plan-toggle";
 import { BackButton } from "@/components/back-button";
+import { ThrowCard } from "@/components/throw-card";
 import { ChevronRight } from "@/components/icons";
-import { Button } from "@/components/ui";
+import { Button, ButtonLink } from "@/components/ui";
 
 type Recipe = {
   id: string;
@@ -99,7 +100,7 @@ export function RecipeView({
   return (
     <article className="space-y-6 pb-8">
       <div className="no-print">
-        <BackButton fallback="/recipes" label="Back" />
+        <BackButton fallback="/box/all" label="Back" />
       </div>
 
       <header>
@@ -121,6 +122,33 @@ export function RecipeView({
         </p>
       </header>
 
+      <div className="no-print sticky top-0 z-20 -mx-4 space-y-2 bg-page px-4 py-2 md:static md:mx-0 md:bg-transparent md:px-0">
+        <div className="flex flex-wrap items-center gap-2">
+          {[0.5, 1, 2, 3].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFactor(f)}
+              className={`tap h-12 min-w-12 rounded-full px-3 text-[0.95rem] font-bold ${
+                factor === f ? "bg-pink text-page" : "bg-pink-soft text-pink"
+              }`}
+            >
+              {f === 0.5 ? "½×" : `${f}×`}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {planned !== null ? (
+            <MealPlanToggle recipeId={recipe.id} planned={planned} />
+          ) : null}
+          <Link
+            href={`/cook/${recipe.id}?x=${factor}`}
+            className="tap inline-flex min-w-[9rem] flex-1 items-center justify-center rounded-full bg-pink px-6 font-bold text-page"
+          >
+            Start cooking
+          </Link>
+        </div>
+      </div>
+
       <div className="no-print flex flex-wrap gap-2">
         {(mine ? STATUSES : []).map(({ key, label }) => (
           <button
@@ -130,7 +158,7 @@ export function RecipeView({
               setLocalStatus(next);
               startTransition(() => setStatus(recipe.id, next));
             }}
-            className={`rounded-full border px-4 py-2 text-[0.85rem] font-bold ${
+            className={`tap inline-flex h-12 items-center rounded-full border px-4 text-[0.9rem] font-bold ${
               status === key
                 ? "border-pink bg-pink text-page"
                 : "border-line bg-card text-muted"
@@ -139,13 +167,16 @@ export function RecipeView({
             {label}
           </button>
         ))}
-        {planned !== null ? (
-          <MealPlanToggle recipeId={recipe.id} planned={planned} />
-        ) : null}
       </div>
 
-      {/* Which boxes it's in, right up top too — so filing a recipe away
-          doesn't wait until you've scrolled past the whole thing. */}
+      {mine ? (
+        <div className="no-print">
+          <ButtonLink href={`/r/${recipe.id}/edit`} variant="secondary" className="w-full">
+            Correct this card
+          </ButtonLink>
+        </div>
+      ) : null}
+
       {mine ? <BookPicker recipeId={recipe.id} books={books} /> : null}
 
       {original ? (
@@ -171,22 +202,7 @@ export function RecipeView({
       ) : null}
 
       <section>
-        <div className="ruled mb-3 flex items-center justify-between">
-          <h2 className="font-display text-xl">Ingredients</h2>
-          <div className="no-print flex items-center gap-1">
-            {[0.5, 1, 2, 3].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFactor(f)}
-                className={`h-9 min-w-11 rounded-full px-2 text-[0.85rem] font-bold ${
-                  factor === f ? "bg-pink text-page" : "bg-pink-soft text-pink"
-                }`}
-              >
-                {f === 0.5 ? "½×" : `${f}×`}
-              </button>
-            ))}
-          </div>
-        </div>
+        <h2 className="font-display ruled mb-3 text-xl">Ingredients</h2>
 
         {groups.map((group, gi) => {
           // A heading that names a component recipe is a way through to it.
@@ -217,7 +233,7 @@ export function RecipeView({
                     <li key={key} className="flex items-start">
                       <button
                         onClick={() => toggle(key)}
-                        className={`no-select flex flex-1 items-start gap-3 rounded-lg px-2 py-2 text-left text-[1.05rem] ${
+                        className={`no-select flex min-h-12 flex-1 items-start gap-3 rounded-lg px-2 py-2 text-left text-[1.05rem] ${
                           done ? "text-muted line-through" : ""
                         }`}
                       >
@@ -281,15 +297,13 @@ export function RecipeView({
         </section>
       ) : null}
 
-      {mine ? <BookPicker recipeId={recipe.id} books={books} /> : null}
-
       {tags.length ? (
         <ul className="no-print flex flex-wrap gap-2">
           {tags.map((tag) => (
             <li key={tag}>
               <Link
                 href={`/recipes?tag=${encodeURIComponent(tag)}`}
-                className="inline-flex h-8 items-center rounded-full bg-pink-soft px-3 text-[0.8rem] font-bold text-pink"
+                className="tap inline-flex h-12 items-center rounded-full bg-pink-soft px-4 text-[0.9rem] font-bold text-pink"
               >
                 {tag}
               </Link>
@@ -317,12 +331,6 @@ export function RecipeView({
       ) : null}
 
       <div className="no-print flex flex-col gap-3">
-        <Link
-          href={`/cook/${recipe.id}`}
-          className="tap inline-flex items-center justify-center rounded-full bg-pink px-6 font-bold text-page"
-        >
-          Start cooking
-        </Link>
         {mine ? (
           <>
             <Button
@@ -337,6 +345,7 @@ export function RecipeView({
             >
               Flip through from here
             </Link>
+            <ThrowCard id={recipe.id} title={recipe.title} />
           </>
         ) : null}
       </div>

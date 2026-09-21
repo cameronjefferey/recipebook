@@ -93,7 +93,7 @@ export function BookPicker({
               onClick={() => toggle(choice.id)}
               aria-pressed={choice.inBook}
               disabled={choice.pending}
-              className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-4 text-[0.9rem] font-bold ${
+              className={`tap inline-flex h-12 items-center gap-1.5 rounded-full border px-4 text-[0.9rem] font-bold ${
                 choice.inBook
                   ? "border-pink bg-pink text-page"
                   : "border-line bg-card text-muted"
@@ -114,7 +114,7 @@ export function BookPicker({
           <li>
             <button
               onClick={() => setAdding(true)}
-              className="inline-flex h-10 items-center rounded-full border border-dashed border-pink-mid px-4 text-[0.9rem] font-bold text-pink"
+              className="tap inline-flex h-12 items-center rounded-full border border-dashed border-pink-mid px-4 text-[0.9rem] font-bold text-pink"
             >
               + New box
             </button>

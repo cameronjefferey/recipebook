@@ -3,20 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BookIcon,
   BoxIcon,
   CameraIcon,
   CartIcon,
   GearIcon,
-  SearchIcon,
 } from "@/components/icons";
 
 const allTabs = [
-  { href: "/recipes", label: "Recipes", Icon: BookIcon },
-  { href: "/box", label: "Box", Icon: BoxIcon },
+  { href: "/box/all", label: "Box", Icon: BoxIcon, home: true },
   { href: "/plan", label: "Plan", Icon: CartIcon, plan: true },
   { href: "/add", label: "Add", Icon: CameraIcon, primary: true },
-  { href: "/search", label: "Search", Icon: SearchIcon },
   { href: "/settings", label: "Settings", Icon: GearIcon },
 ];
 
@@ -26,9 +22,15 @@ export function TabBar({ planEnabled }: { planEnabled: boolean }) {
 
   return (
     <nav className="no-print pb-safe z-30 shrink-0 border-t border-line bg-card/95 backdrop-blur">
-      <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1">
-        {tabs.map(({ href, label, Icon, primary }) => {
-          const active = pathname === href || pathname.startsWith(href + "/");
+      <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2 pt-1 md:max-w-[45rem] lg:max-w-[60rem]">
+        {tabs.map(({ href, label, Icon, primary, home }) => {
+          const active = home
+            ? pathname === "/box" ||
+              pathname.startsWith("/box/") ||
+              pathname.startsWith("/r/") ||
+              pathname === "/recipes" ||
+              pathname.startsWith("/recipes/")
+            : pathname === href || pathname.startsWith(href + "/");
           return (
             <li key={href} className="flex-1">
               <Link

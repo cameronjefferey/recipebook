@@ -49,7 +49,7 @@ export default async function SharedBookPage({
         </p>
       </header>
 
-      <main className="mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4 py-4">
+      <main className="mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4 py-4 md:max-w-[45rem] lg:max-w-[60rem]">
         {pages.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
             <p className="font-display text-2xl text-pink">
