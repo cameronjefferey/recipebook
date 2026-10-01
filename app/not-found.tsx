@@ -8,7 +8,7 @@ import { ButtonLink } from "@/components/ui";
 export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-8 text-center">
-      <p className="font-display text-2xl text-pink">This link is not working</p>
+      <p className="font-display text-2xl text-ink">This link is not working</p>
       <p className="hand mt-3 text-browned">
         it may have been taken back, or copied down wrong
       </p>

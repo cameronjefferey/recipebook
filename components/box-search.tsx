@@ -39,7 +39,7 @@ export function BoxSearch({
       {shown ? (
         <Link
           href={clearHref}
-          className="tap inline-flex shrink-0 items-center px-2 text-[0.95rem] font-bold text-pink"
+          className="tap inline-flex shrink-0 items-center px-2 text-[0.95rem] font-bold text-ink"
         >
           Clear
         </Link>

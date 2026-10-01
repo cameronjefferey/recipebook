@@ -3,8 +3,8 @@ export function Wordmark({ size = "lg" }: { size?: "sm" | "lg" }) {
   return (
     <div className="text-center">
       <div
-        className={`font-display leading-tight text-pink ${
-          big ? "text-4xl" : "text-xl"
+        className={`font-display leading-tight text-ink ${
+          big ? "text-[2.4rem]" : "text-xl"
         }`}
       >
         The Pink Recipe Box
@@ -21,7 +21,7 @@ export function BoxRule() {
   return (
     <div className="my-6 flex items-center gap-3">
       <span className="h-px flex-1 bg-line" />
-      <span className="h-2 w-2 rotate-45 bg-pink-mid" />
+      <span className="h-1.5 w-1.5 bg-ink" />
       <span className="h-px flex-1 bg-line" />
     </div>
   );

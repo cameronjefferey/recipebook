@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChevronLeft } from "@/components/icons";
 
 /**
  * A recipe is reached from all over — the grid, a box, search, this week's
@@ -27,9 +26,9 @@ export function BackButton({
         else router.push(fallback);
       }}
       aria-label={label}
-      className="tap -ml-3 flex shrink-0 items-center justify-center text-pink"
+      className="tap margin-word -ml-2 justify-start"
     >
-      <ChevronLeft className="h-6 w-6" />
+      {label}
     </button>
   );
 }

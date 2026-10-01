@@ -97,134 +97,95 @@ export function CookMode({
     });
 
   const ingredientPane = () => (
-    <>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+    <div className="ruled-lines">
+      <div className="margin-row justify-start">
         {[0.5, 1, 2, 3].map((f) => (
           <button
             key={f}
             onClick={() => setFactor(f)}
-            className={`tap h-12 min-w-12 rounded-full px-3 font-bold ${
-              factor === f ? "bg-pink text-page" : "bg-pink-soft text-pink"
-            }`}
+            className={`tap margin-word ${factor === f ? "margin-on" : ""}`}
           >
             {f === 0.5 ? "½×" : `${f}×`}
           </button>
         ))}
         {servings ? (
-          <span className="ml-1 text-muted">
-            serves {Math.round(servings * factor)}
-          </span>
+          <span className="text-muted">serves {Math.round(servings * factor)}</span>
         ) : null}
       </div>
-
       {groups.map((group) => (
-        <div key={group.name || "all"} className="mb-4">
-          {group.name ? (
-            <h2 className="mb-1 text-[0.9rem] font-bold tracking-wide text-browned uppercase">
-              {group.name}
-            </h2>
-          ) : null}
-          <ul className="space-y-1">
-            {group.items.map(({ ing, at }) => {
-              const done = checked.has(at);
-              return (
-                <li key={at}>
-                  <button
-                    onClick={() => toggleChecked(at)}
-                    className={`flex min-h-12 w-full items-start gap-3 rounded-lg px-2 py-3 text-left text-[1.25rem] ${
-                      done ? "text-muted line-through" : ""
-                    }`}
-                  >
-                    <span
-                      className={`mt-1.5 h-6 w-6 shrink-0 rounded border-2 ${
-                        done ? "border-pink bg-pink" : "border-pink-mid"
-                      }`}
-                    />
-                    <span>{formatIngredient(ing)}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+        <div key={group.name || "all"}>
+          {group.name ? <p className="hand">{group.name}</p> : null}
+          {group.items.map(({ ing, at }) => {
+            const done = checked.has(at);
+            return (
+              <button
+                key={at}
+                onClick={() => toggleChecked(at)}
+                className={`block min-h-12 w-full text-left ${done ? "text-muted line-through" : ""}`}
+              >
+                {formatIngredient(ing)}
+              </button>
+            );
+          })}
         </div>
       ))}
-    </>
+    </div>
   );
 
   const stepPane = (
-    <>
-      <div className="flex flex-1 flex-col justify-center px-6 py-6">
-        <p className="mb-4 text-[0.9rem] font-bold tracking-wide text-browned uppercase">
-          Step {step + 1} of {steps.length}
-          {steps[step].group ? ` · ${steps[step].group}` : ""}
-        </p>
-        <p className="text-[1.6rem] leading-snug">{steps[step].text}</p>
-      </div>
-
-      <div className="pb-safe flex items-stretch gap-3 px-5 pb-4">
+    <div>
+      <p className="hand">
+        step {step + 1} of {steps.length}
+        {steps[step].group ? ` · ${steps[step].group}` : ""}
+      </p>
+      <p className="mt-2 text-[1.25rem] leading-snug">{steps[step].text}</p>
+      <div className="margin-row mt-2">
         <button
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
-          className="h-16 flex-1 rounded-full border border-line bg-card text-lg font-bold disabled:opacity-40"
+          className="tap margin-word disabled:opacity-40"
         >
-          Back
+          back
         </button>
         {last ? (
-          <button
-            onClick={finish}
-            className="h-16 flex-2 rounded-full bg-pink text-lg font-bold text-page"
-          >
+          <button onClick={finish} className="tap margin-word margin-on">
             I made this
           </button>
         ) : (
           <button
             onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
-            className="h-16 flex-2 rounded-full bg-pink text-lg font-bold text-page"
+            className="tap margin-word margin-on"
           >
-            Next
+            next
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 
   return (
-    <div className="no-select flex h-dvh flex-col bg-page">
-      <header className="pt-safe flex items-center justify-between gap-3 px-4 py-3">
-        <button
-          onClick={leave}
-          className="tap -ml-2 px-2 font-bold text-muted"
-        >
-          Done
-        </button>
-        <p className="font-display truncate text-lg">{title}</p>
-        <button
-          onClick={() => setShowIngredients((v) => !v)}
-          className="tap -mr-2 px-2 font-bold text-pink md:hidden"
-        >
-          {showIngredients ? "Steps" : "Ingredients"}
-        </button>
-        <span className="tap hidden md:block" aria-hidden />
-      </header>
-
-      {/* Phone swaps list and step, and the checks stay put either way.
-          A wide screen keeps both: the list on the left, the step on the right. */}
-      <div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 md:max-w-[60rem]">
-        <aside className="hidden min-h-0 w-[42%] overflow-y-auto border-r border-line px-5 py-4 md:block">
-          {ingredientPane()}
-        </aside>
-
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {showIngredients ? (
-            <div className="flex-1 overflow-y-auto px-5 pb-8 md:hidden">{ingredientPane()}</div>
-          ) : null}
-          <div
-            className={`${showIngredients ? "hidden md:flex" : "flex"} min-h-0 flex-1 flex-col`}
+    <div className="no-select flex min-h-dvh items-start justify-center bg-page px-4 py-6">
+      <article className="reading-card wide">
+        <div className="mb-2 flex items-start justify-between gap-3">
+          <button onClick={leave} className="tap margin-word shrink-0">
+            done
+          </button>
+          <h1 className="font-display min-w-0 flex-1 truncate text-center text-[1.45rem]">{title}</h1>
+          <button
+            onClick={() => setShowIngredients((v) => !v)}
+            className="tap margin-word shrink-0 md:hidden"
           >
-            {stepPane}
-          </div>
+            {showIngredients ? "the step" : "ingredients"}
+          </button>
         </div>
-      </div>
+
+        {/* Phone swaps list and step. A wide screen keeps both, side by side,
+            in the same card so neither half is an empty page. */}
+        <div className="md:grid md:grid-cols-2 md:items-start md:gap-8">
+          <div className={showIngredients ? "md:block" : "hidden md:block"}>{ingredientPane()}</div>
+          <div className={showIngredients ? "hidden md:block" : "block"}>{stepPane}</div>
+        </div>
+      </article>
     </div>
   );
 }

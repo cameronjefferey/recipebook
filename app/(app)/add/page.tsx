@@ -61,7 +61,7 @@ export default async function AddPage() {
               {capture.status === "ready" ? (
                 <Link
                   href={`/add/review/${capture.id}`}
-                  className="tap inline-flex items-center rounded-full bg-pink px-4 text-[0.9rem] font-bold text-page"
+                  className="tap margin-word"
                 >
                   Review
                 </Link>

@@ -66,7 +66,7 @@ export function BookMenu({
         {shareHref ? (
           <Link
             href={shareHref}
-            className="tap inline-flex w-full items-center justify-center rounded-full border border-line bg-card px-6 text-[0.95rem] font-bold"
+            className="tap margin-word"
           >
             Share this box
           </Link>

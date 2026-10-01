@@ -15,7 +15,7 @@ export function PlanOff() {
 
   return (
     <div className="py-16 text-center">
-      <p className="font-display text-2xl text-pink">Meal planning is off</p>
+      <p className="font-display text-2xl text-ink">Meal planning is off</p>
       <p className="hand mt-2 text-browned">
         turn it back on in Settings, or right here
       </p>

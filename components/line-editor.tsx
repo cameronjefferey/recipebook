@@ -19,7 +19,7 @@ export function LineEditor({
 }) {
   return (
     <div>
-      <span className="mb-1.5 block text-[0.8rem] font-bold tracking-wide text-browned uppercase">
+      <span className="hand mb-1 block">
         {label}
       </span>
       {hint ? <p className="mb-2 text-[0.85rem] text-muted">{hint}</p> : null}
@@ -69,7 +69,7 @@ export function LineEditor({
       <button
         type="button"
         onClick={onAdd}
-        className="tap mt-2 inline-flex items-center text-[0.95rem] font-bold text-pink"
+        className="tap mt-2 inline-flex items-center text-[0.95rem] font-bold text-ink"
       >
         Add a line
       </button>

@@ -78,7 +78,7 @@ export default async function OpenBoxPage({
 
       {q && pages.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <p className="font-display text-2xl text-pink">Nothing matched</p>
+          <p className="font-display text-2xl text-ink">Nothing matched</p>
           <p className="hand mt-2 text-browned">
             “{q}” is not in {book.name}
           </p>
@@ -94,7 +94,7 @@ export default async function OpenBoxPage({
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           {book.id === "all" ? (
             <>
-              <p className="font-display text-2xl text-pink">The box is empty</p>
+              <p className="font-display text-2xl text-ink">The box is empty</p>
               <p className="hand mt-2 text-browned">
                 start with a card from the kitchen drawer
               </p>
@@ -104,7 +104,7 @@ export default async function OpenBoxPage({
             </>
           ) : (
             <>
-              <p className="font-display text-2xl text-pink">This box is empty</p>
+              <p className="font-display text-2xl text-ink">This box is empty</p>
               <p className="hand mt-2 text-browned">
                 file a card into this one from the recipe
               </p>

@@ -85,8 +85,8 @@ function apply(state: State, action: Action): State {
 function Checkbox({ checked }: { checked: boolean }) {
   return (
     <span
-      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 ${
-        checked ? "border-pink bg-pink" : "border-pink-mid bg-card"
+      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border ${
+        checked ? "border-ink bg-ink text-card" : "border-ink bg-card"
       }`}
     >
       {checked ? <CheckIcon className="h-3.5 w-3.5 text-page" /> : null}
@@ -162,7 +162,7 @@ export function PlanClient({
         {state.planned.length === 0 ? (
           <p className="text-[0.95rem] text-muted">
             Nothing yet. Open a recipe and tap &ldquo;Cook this week,&rdquo; or{" "}
-            <Link href="/recipes" className="font-bold text-pink underline">
+            <Link href="/recipes" className="font-bold text-ink underline">
               pick a few cards
             </Link>
             .
@@ -189,7 +189,7 @@ export function PlanClient({
                         style={{ rotate: `${recipe.rotation}deg` }}
                       />
                     ) : (
-                      <CategoryIcon category={recipe.category} className="h-6 w-6 text-pink-mid" />
+                      <CategoryIcon category={recipe.category} className="h-6 w-6 text-muted" />
                     )}
                   </span>
                   <span className="min-w-0">

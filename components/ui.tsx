@@ -1,20 +1,18 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
-import { ChevronLeft } from "@/components/icons";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const base =
-  "tap inline-flex items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-bold " +
-  "transition-[filter,background-color] active:brightness-95 disabled:opacity-50 " +
-  "disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 " +
-  "focus-visible:outline-pink";
+  "tap margin-word inline-flex items-center justify-center gap-2 px-2 " +
+  "disabled:opacity-50 disabled:pointer-events-none " +
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-pink text-page shadow-sm",
-  secondary: "bg-card text-ink border border-line",
+  primary: "text-ink",
+  secondary: "text-browned",
   ghost: "text-browned",
-  danger: "bg-jam text-page",
+  danger: "text-jam",
 };
 
 export function Button({
@@ -46,7 +44,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-card border border-line bg-card shadow-[0_1px_3px_#382a2214] ${className}`}
+      className={`rounded-[2px] border border-line bg-card ${className}`}
     >
       {children}
     </div>
@@ -64,9 +62,7 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[0.8rem] font-bold tracking-wide text-browned uppercase">
-        {label}
-      </span>
+      <span className="hand mb-1 block">{label}</span>
       {children}
       {hint ? <span className="mt-1 block text-sm text-muted">{hint}</span> : null}
     </label>
@@ -78,8 +74,8 @@ export function Input({ className = "", ...props }: ComponentProps<"input">) {
     <input
       {...props}
       className={
-        "tap w-full rounded-xl border border-line bg-page px-4 text-[1.05rem] text-ink " +
-        "placeholder:text-muted/60 focus:border-pink focus:outline-none " +
+        "tap w-full rounded-none border-0 border-b border-rule bg-transparent px-1 text-[1.05rem] text-ink " +
+        "placeholder:text-muted/60 focus:border-ink focus:outline-none " +
         className
       }
     />
@@ -94,8 +90,8 @@ export function Textarea({
     <textarea
       {...props}
       className={
-        "w-full rounded-xl border border-line bg-page px-4 py-3 text-[1.05rem] text-ink " +
-        "placeholder:text-muted/60 focus:border-pink focus:outline-none " +
+        "w-full rounded-none border-0 border-b border-rule bg-transparent px-1 py-3 text-[1.05rem] text-ink " +
+        "placeholder:text-muted/60 focus:border-ink focus:outline-none " +
         className
       }
     />
@@ -134,7 +130,7 @@ export function Switch({
       onClick={onChange}
       disabled={disabled}
       className={`tap relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
-        checked ? "bg-pink" : "bg-line"
+        checked ? "bg-ink" : "bg-line"
       }`}
     >
       <span
@@ -165,19 +161,14 @@ export function BackLink({
     <Link
       href={href}
       aria-label={label}
-      className="tap -ml-3 flex shrink-0 items-center justify-center gap-0.5 pr-1 font-bold text-pink"
+      className="tap margin-word -ml-2 justify-start"
     >
-      <ChevronLeft className="h-6 w-6" />
-      {children}
+      {children ?? label}
     </Link>
   );
 }
 
-/** Small uppercase label used above groups of things. */
+/** A handwritten label above a group. Not small capitals. */
 export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <span className="text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
-      {children}
-    </span>
-  );
+  return <span className="hand">{children}</span>;
 }

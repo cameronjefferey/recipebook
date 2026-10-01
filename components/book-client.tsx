@@ -2,15 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
 import type { BookLeaf, BookRecipe } from "@/lib/books";
-import { CategoryIcon } from "@/lib/category-icon";
 import {
   formatIngredient,
   groupIngredients,
   groupInstructions,
 } from "@/lib/ingredients";
-import { ChevronLeft, ChevronRight, DieIcon } from "@/components/icons";
 import { MealPlanToggle } from "@/components/meal-plan-toggle";
 
 /**
@@ -141,14 +138,14 @@ export function BookClient({
     ];
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-[34rem] flex-col gap-2">
       <div className="flex items-center gap-2">
         <div className="no-scrollbar min-w-0 flex-1">
           <ul className="flex gap-2">
             <li>
               <Link
                 href={orderHref(basePath, nextOrder.key, query)}
-                className={pill(true)}
+                className="tap margin-word margin-on"
                 aria-label={`Sorted by ${currentOrder.label}. Change to ${nextOrder.label}.`}
               >
                 {currentOrder.label}
@@ -156,15 +153,9 @@ export function BookClient({
             </li>
           </ul>
         </div>
-        {/* Bordered rather than filled, so it does not read as a fourth pill.
-            Hidden in a one-recipe book, where there is nowhere to turn to. */}
         {total > 1 ? (
-          <button
-            onClick={surprise}
-            aria-label="Turn to a recipe at random"
-            className="tap flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink active:brightness-95"
-          >
-            <DieIcon className="h-5 w-5" />
+          <button onClick={surprise} className="tap margin-word shrink-0">
+            surprise
           </button>
         ) : null}
       </div>
@@ -198,25 +189,23 @@ export function BookClient({
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <PageButton
+        <button
           onClick={() => goTo(index - 1)}
           disabled={index === 0}
-          label="Previous page"
+          className="tap margin-word disabled:opacity-35"
         >
-          <ChevronLeft className="h-6 w-6" />
-        </PageButton>
+          back
+        </button>
 
-        <p className="min-w-0 truncate text-center text-[0.8rem] font-bold tracking-wide text-browned uppercase">
-          {section ?? "\u00a0"}
-        </p>
+        <p className="hand min-w-0 truncate text-center">{section ?? "\u00a0"}</p>
 
-        <PageButton
+        <button
           onClick={() => goTo(index + 1)}
           disabled={index === pages.length - 1}
-          label="Next page"
+          className="tap margin-word disabled:opacity-35"
         >
-          <ChevronRight className="h-6 w-6" />
-        </PageButton>
+          next card
+        </button>
       </div>
     </div>
   );
@@ -228,41 +217,12 @@ function orderHref(basePath: string, key: string, query?: string) {
   return `${basePath}?${params}`;
 }
 
-function pill(active: boolean) {
-  return `tap inline-flex h-12 items-center rounded-full px-4 text-[0.9rem] font-bold whitespace-nowrap ${
-    active ? "bg-pink text-page" : "bg-pink-soft text-pink"
-  }`;
-}
-
-function PageButton({
-  onClick,
-  disabled,
-  label,
-  children,
-}: {
-  onClick: () => void;
-  disabled: boolean;
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      className="tap flex shrink-0 items-center justify-center rounded-full border border-line bg-card text-pink disabled:opacity-35"
-    >
-      {children}
-    </button>
-  );
-}
-
 function DividerLeaf({ name, count }: { name: string; count: number }) {
   return (
-    <div className="book-page flex h-full flex-col items-center justify-center rounded-card border border-line px-8 text-center">
-      <h2 className="font-display text-6xl leading-none text-pink">{name}</h2>
-      <span className="mt-5 h-px w-14 bg-pink-mid" />
-      <p className="hand mt-4">
+    <div className="reading-card flex h-full min-h-[24rem] flex-col items-center justify-center text-center">
+      <span className="divider-tab">{name}</span>
+      <h2 className="font-display mt-6 text-5xl leading-none text-ink">{name}</h2>
+      <p className="mt-4">
         {count} {count === 1 ? "recipe" : "recipes"}
       </p>
     </div>
@@ -304,52 +264,35 @@ function RecipeLeaf({
     .join(" · ");
 
   return (
-    <article className="book-page no-scrollbar relative flex h-full flex-col overflow-y-auto rounded-card border border-line">
-      {recipe.status === "keeper" ? <span className="ribbon" /> : null}
-
-      {/* Capped, not a fixed ratio: a page is short, and the recipe has to be
-          readable without scrolling past a full-bleed photograph first. */}
+    <article className="reading-card no-scrollbar flex h-full min-h-[28rem] flex-col overflow-y-auto">
+      {recipe.status === "keeper" ? <span className="keeper-mark">keeper</span> : null}
       {recipe.imageId ? (
-        <div className="h-40 max-h-[38%] shrink-0 overflow-hidden bg-sink">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`${imageBase}/${recipe.imageId}`}
-            alt=""
-            loading="lazy"
-            className="h-full w-full object-cover"
-            style={{ rotate: `${recipe.rotation}deg` }}
-          />
-        </div>
-      ) : (
-        <div className="flex h-20 shrink-0 items-center justify-center bg-sink">
-          <CategoryIcon category={recipe.category} className="h-9 w-9 text-pink-mid" />
-        </div>
-      )}
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`${imageBase}/${recipe.imageId}`}
+          alt=""
+          loading="lazy"
+          className="float-right ml-3 h-16 w-16 object-cover"
+          style={{ rotate: `${recipe.rotation}deg` }}
+        />
+      ) : null}
 
-      <div className="flex flex-1 flex-col px-5 pt-4 pb-5">
-        <h2 className="font-display text-2xl leading-tight">{recipe.title}</h2>
-        {meta ? <p className="mt-1 text-[0.82rem] text-muted">{meta}</p> : null}
+      <div className="flex flex-1 flex-col">
+        <h2 className="font-display text-[1.7rem] leading-tight">{recipe.title}</h2>
+        {meta ? <p className="mt-1 text-muted">{meta}</p> : null}
 
-        {/* Open or cook right away, without turning past the whole page
-            first — the same pair sits at the bottom too, once you have. */}
         {showActions ? (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="margin-row justify-start">
             {plannedIds ? (
               <MealPlanToggle
                 recipeId={recipe.id}
                 planned={plannedIds.includes(recipe.id)}
               />
             ) : null}
-            <Link
-              href={`/cook/${recipe.id}`}
-              className="tap flex min-w-[9rem] flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
-            >
+            <Link href={`/cook/${recipe.id}`} className="tap margin-word">
               Start cooking
             </Link>
-            <Link
-              href={`/r/${recipe.id}`}
-              className="tap flex min-w-[6rem] flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
-            >
+            <Link href={`/r/${recipe.id}`} className="tap margin-word">
               Open
             </Link>
           </div>
@@ -365,18 +308,18 @@ function RecipeLeaf({
 
             {recipe.ingredients.length ? (
               <section className="mt-5">
-                <h3 className="font-display mb-2 text-lg">Ingredients</h3>
+                <h3 className="hand mb-1">Ingredients</h3>
                 {ingredients.map((group, gi) => (
                   <div key={gi} className="mb-3">
                     {group.name ? (
-                      <h4 className="mb-1 text-[0.75rem] font-bold tracking-wide text-browned uppercase">
+                      <h4 className="hand">
                         {group.name}
                       </h4>
                     ) : null}
                     <ul className="space-y-1">
                       {group.items.map((ing, i) => (
                         <li key={i} className="flex gap-2 text-[0.98rem]">
-                          <span className="text-pink-mid">·</span>
+                          <span className="text-muted">·</span>
                           <span>{formatIngredient(ing)}</span>
                         </li>
                       ))}
@@ -388,18 +331,18 @@ function RecipeLeaf({
 
             {recipe.instructions.length ? (
               <section className="mt-3">
-                <h3 className="font-display mb-2 text-lg">Steps</h3>
+                <h3 className="hand mb-1">Steps</h3>
                 {steps.map((group, gi) => (
                   <div key={gi} className="mb-3">
                     {group.name ? (
-                      <h4 className="mb-1 text-[0.75rem] font-bold tracking-wide text-browned uppercase">
+                      <h4 className="hand">
                         {group.name}
                       </h4>
                     ) : null}
                     <ol className="space-y-2">
                       {group.items.map((step, i) => (
                         <li key={i} className="flex gap-2.5">
-                          <span className="font-display shrink-0 text-pink">
+                          <span className="shrink-0">
                             {i + 1}
                           </span>
                           <p className="text-[0.98rem] leading-relaxed">
@@ -414,23 +357,17 @@ function RecipeLeaf({
             ) : null}
 
             {recipe.notes ? (
-              <section className="mt-3 rounded-card bg-sink p-3">
+              <section className="mt-3">
                 <p className="hand whitespace-pre-wrap">{recipe.notes}</p>
               </section>
             ) : null}
 
             {showActions ? (
-              <div className="mt-5 flex gap-2">
-                <Link
-                  href={`/r/${recipe.id}`}
-                  className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
-                >
+              <div className="margin-row">
+                <Link href={`/r/${recipe.id}`} className="tap margin-word">
                   Open
                 </Link>
-                <Link
-                  href={`/cook/${recipe.id}`}
-                  className="tap flex flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
-                >
+                <Link href={`/cook/${recipe.id}`} className="tap margin-word">
                   Start cooking
                 </Link>
               </div>
@@ -438,7 +375,7 @@ function RecipeLeaf({
           </>
         ) : null}
 
-        <p className="font-display mt-auto pt-5 text-center text-[0.82rem] text-muted">
+        <p className="mt-auto pt-4 text-center text-muted">
           {number} of {total}
         </p>
       </div>

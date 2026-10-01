@@ -2,7 +2,6 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 import { createBookWithRecipe, setRecipeInBook } from "@/lib/actions/books";
-import { CheckIcon } from "@/components/icons";
 import { Button, Input } from "@/components/ui";
 
 type Choice = {
@@ -84,9 +83,7 @@ export function BookPicker({
 
   return (
     <section className="no-print">
-      <h2 className="mb-2 text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
-        In these boxes
-      </h2>
+      <h2 className="hand mb-1">In these boxes</h2>
 
       <ul className="flex flex-wrap gap-2">
         {choices.map((choice) => (
@@ -95,13 +92,10 @@ export function BookPicker({
               onClick={() => toggle(choice.id)}
               aria-pressed={choice.inBook}
               disabled={choice.pending}
-              className={`tap inline-flex h-12 items-center gap-1.5 rounded-full border px-4 text-[0.9rem] font-bold ${
-                choice.inBook
-                  ? "border-pink bg-pink text-page"
-                  : "border-line bg-card text-muted"
-              } ${choice.pending ? "opacity-60" : ""}`}
+              className={`tap margin-word ${choice.inBook ? "margin-on" : ""} ${
+                choice.pending ? "opacity-60" : ""
+              }`}
             >
-              {choice.inBook ? <CheckIcon className="h-4 w-4" /> : null}
               {choice.name}
               {choice.ownerName ? (
                 <span className="font-normal opacity-70">
@@ -116,7 +110,7 @@ export function BookPicker({
           <li>
             <button
               onClick={() => setAdding(true)}
-              className="tap inline-flex h-12 items-center rounded-full border border-dashed border-pink-mid px-4 text-[0.9rem] font-bold text-pink"
+              className="tap margin-word"
             >
               + New box
             </button>

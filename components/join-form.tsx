@@ -72,7 +72,7 @@ export function JoinForm({
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-bold text-pink underline underline-offset-2"
+          className="font-bold text-ink underline underline-offset-2"
         >
           Sign in
         </Link>

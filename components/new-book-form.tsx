@@ -28,7 +28,7 @@ export function NewBookForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="tap text-[0.95rem] font-bold text-pink"
+        className="tap text-[0.95rem] font-bold text-ink"
       >
         + Name a box
       </button>
