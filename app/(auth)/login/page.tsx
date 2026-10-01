@@ -46,7 +46,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-[0.95rem] text-muted">
         First time here?{" "}
-        <Link href="/join" className="font-bold text-pink underline underline-offset-2">
+        <Link href="/join" className="font-bold text-ink underline underline-offset-2">
           Set up your box
         </Link>
       </p>

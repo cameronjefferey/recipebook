@@ -2,7 +2,6 @@
 
 import { useOptimistic, useTransition } from "react";
 import { setBookFavorite } from "@/lib/actions/books";
-import { StarIcon } from "@/components/icons";
 
 function apply(_state: boolean, next: boolean) {
   return next;
@@ -37,15 +36,9 @@ export function FavoriteStar({
       }}
       aria-pressed={starred}
       aria-label={starred ? `Unfavorite ${name}` : `Favorite ${name}`}
-      className="tap flex items-center justify-center"
+      className={`tap margin-word text-[1.4rem] leading-none ${starred ? "margin-on" : ""}`}
     >
-      <span
-        className={`flex h-8 w-8 items-center justify-center rounded-full bg-card/90 shadow-sm ${
-          starred ? "text-butter" : "text-browned"
-        }`}
-      >
-        <StarIcon className="h-5 w-5" filled={starred} />
-      </span>
+      *
     </button>
   );
 }

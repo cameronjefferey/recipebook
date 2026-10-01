@@ -1,22 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat, Source_Serif_4 } from "next/font/google";
+import { Homemade_Apple, Special_Elite } from "next/font/google";
 import { ServiceWorker } from "@/components/service-worker";
 import "./globals.css";
 
-// One hand for every title and margin note — Mom's, consistently, rather
-// than a font sampler of "handwriting" faces. See BRAND.md §5.
-const caveat = Caveat({
+// One person's hand for titles and margin notes. Rough on purpose.
+// See BRAND.md §5.
+const hand = Homemade_Apple({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-caveat",
+  variable: "--font-hand-face",
   display: "swap",
 });
 
-// Body copy: plain and readable, closer to a typed card than a website's
-// default geometric sans.
-const sourceSerif = Source_Serif_4({
+// Body copy set like a card that was typed, not a website's default sans.
+const typed = Special_Elite({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-source-serif",
-  axes: ["opsz"],
+  variable: "--font-typed",
   display: "swap",
 });
 
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#c2566f",
+  themeColor: "#f3e4cf",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${caveat.variable} ${sourceSerif.variable}`}
+      className={`${hand.variable} ${typed.variable}`}
     >
       <body className="min-h-dvh">
         {children}

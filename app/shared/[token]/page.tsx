@@ -40,19 +40,19 @@ export default async function SharedBookPage({
 
   return (
     <div className="flex h-dvh flex-col">
-      <header className="pt-safe shrink-0 bg-pink px-4 py-2.5 text-page">
-        <p className="font-display truncate text-xl leading-none">
+      <header className="pt-safe shrink-0 px-4 pt-4 pb-1">
+        <p className="font-display truncate text-[1.65rem] leading-none text-ink">
           {share.bookName}
         </p>
-        <p className="mt-1 truncate text-[0.8rem] opacity-90">
+        <p className="hand truncate">
           shared with {share.recipientName} from {share.householdName}
         </p>
       </header>
 
-      <main className="mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4 py-4 md:max-w-[45rem] lg:max-w-[60rem]">
+      <main className="mx-auto flex w-full min-h-0 flex-1 flex-col bg-page px-4 py-4">
         {pages.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <p className="font-display text-2xl text-pink">
+            <p className="font-display text-2xl text-ink">
               Nothing in here yet
             </p>
             <p className="hand mt-2 text-browned">
@@ -99,7 +99,7 @@ function KeepInMyBox({ token }: { token: string }) {
     <form action={acceptShare.bind(null, token)}>
       <button
         type="submit"
-        className="tap inline-flex items-center justify-center rounded-full bg-pink px-6 text-[0.9rem] font-bold text-page"
+        className="tap margin-word"
       >
         Keep this in my box
       </button>

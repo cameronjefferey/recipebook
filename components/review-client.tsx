@@ -255,7 +255,7 @@ export function ReviewClient({
               className="font-display min-w-0 flex-1 border-b border-line bg-transparent pb-1 text-xl focus:border-pink focus:outline-none"
             />
             {draft.role !== "main" ? (
-              <span className="mt-1 shrink-0 rounded-full bg-pink-soft px-3 py-1 text-[0.72rem] font-bold tracking-wide text-pink uppercase">
+              <span className="hand mt-1 shrink-0">
                 {draft.role}
               </span>
             ) : null}
@@ -275,9 +275,9 @@ export function ReviewClient({
               <button
                 key={option}
                 onClick={() => patch(i, { disposition: option })}
-                className={`tap inline-flex h-12 items-center rounded-full border px-4 text-[0.9rem] font-bold ${
+                className={`tap margin-word ${
                   draft.disposition === option
-                    ? "border-pink bg-pink text-page"
+                    ? "margin-on"
                     : "border-line bg-page text-muted"
                 }`}
               >

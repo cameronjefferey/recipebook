@@ -4,9 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui";
 
 function chip(on: boolean) {
-  return `tap inline-flex h-12 items-center rounded-full border px-4 text-[0.9rem] font-bold ${
-    on ? "border-pink bg-pink text-page" : "border-line bg-card text-ink"
-  }`;
+  return `tap margin-word ${on ? "margin-on" : ""}`;
 }
 
 /**
@@ -41,7 +39,7 @@ export function CategoryField({
 
   return (
     <fieldset>
-      <legend className="mb-1.5 block text-[0.8rem] font-bold tracking-wide text-browned uppercase">
+      <legend className="hand mb-1 block">
         Category
       </legend>
       <div className="flex flex-wrap gap-2">

@@ -8,7 +8,8 @@
 
 @theme {
   /* surfaces */
-  --color-page: #fdf6ea;
+  /* The table the card sits on. The card itself stays --color-card. */
+  --color-page: #f3e4cf;
   --color-card: #fffcf6;
   --color-sink: #f6ead8;
 
@@ -31,9 +32,9 @@
   --color-rule: #5c6b7a3d;
 
   /* Titles and margin notes share one hand — see BRAND.md §5. */
-  --font-display: var(--font-caveat), cursive;
-  --font-sans: var(--font-source-serif), Georgia, serif;
-  --font-hand: var(--font-caveat), cursive;
+  --font-display: var(--font-hand-face), cursive;
+  --font-sans: var(--font-typed), "American Typewriter", monospace;
+  --font-hand: var(--font-hand-face), cursive;
 
   --radius-card: 12px;
 }
@@ -52,10 +53,9 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Caveat reads thin next to Fraunces' old weight — every title needs the
-   boost to still look confidently written rather than jotted. */
+/* Homemade Apple has one weight. Faux bold makes the hand look stamped. */
 .font-display {
-  font-weight: 700;
+  font-weight: 400;
 }
 
 /* Respect the notch and the home indicator when installed. */
@@ -388,6 +388,85 @@ body {
     0 1px 3px #382a2214,
     3px 3px 0 0 var(--color-sink);
   padding: 0.85rem 1.05rem 1.5rem;
+}
+
+/* The card you actually read. Card proportion, sharp corners, table around it.
+   A slight lean on a wide screen; a phone keeps it straight. */
+.reading-card {
+  width: min(100%, 32rem);
+  margin-inline: auto;
+  background: var(--color-card);
+  border-radius: 2px;
+  padding: 1.15rem 1.25rem 0.75rem;
+  position: relative;
+}
+.reading-card.wide {
+  width: min(100%, 40rem);
+}
+@media (min-width: 768px) {
+  .reading-card {
+    transform: rotate(-0.4deg);
+  }
+}
+.ruled-lines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 1.65rem,
+    var(--color-rule) 1.65rem calc(1.65rem + 1px)
+  );
+  line-height: 1.65rem;
+}
+.keeper-mark {
+  position: absolute;
+  top: 0.7rem;
+  right: 1rem;
+  font-family: var(--font-hand);
+  color: var(--color-pink);
+  font-size: 1.15rem;
+  line-height: 1;
+  transform: rotate(6deg);
+}
+.margin-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0 0.85rem;
+}
+
+@utility margin-word {
+  font-family: var(--font-hand);
+  color: var(--color-browned);
+  font-size: 1.15rem;
+  line-height: 1.15;
+  background: transparent;
+  border: 0;
+  padding: 0 0.15rem;
+  text-align: center;
+}
+@utility margin-on {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.28rem;
+}
+
+/* Pink lives on the divider tabs, and almost nowhere else. */
+@utility divider-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  background: var(--color-pink);
+  color: #fff8f4;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 0.45rem 0.7rem 0.3rem;
+  border-radius: 1px 1px 0 0;
+  white-space: nowrap;
+}
+@utility divider-on {
+  padding-top: 0.7rem;
 }
 
 /* --- Flip view: a leaf of the book -------------------------------- *

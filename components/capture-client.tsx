@@ -116,7 +116,7 @@ export function CaptureClient() {
 
       <button
         onClick={() => cameraRef.current?.click()}
-        className="tap flex w-full flex-col items-center gap-1.5 rounded-[3px] bg-pink px-6 py-7 text-page shadow-sm active:brightness-95"
+        className="tap flex w-full flex-col items-center gap-1.5 rounded-[2px] bg-card px-6 py-7 text-ink"
       >
         <CameraIcon className="h-10 w-10" />
         <span className="font-display text-2xl">Take a photo</span>
@@ -130,7 +130,7 @@ export function CaptureClient() {
           onClick={() => libraryRef.current?.click()}
           className="tap flex items-center gap-3 rounded-[3px] border border-line bg-card px-5 py-4 text-left active:brightness-95"
         >
-          <PhotoIcon className="h-6 w-6 shrink-0 text-pink" />
+          <PhotoIcon className="h-6 w-6 shrink-0 text-ink" />
           <span>
             <span className="block font-bold">Choose photos</span>
             <span className="block text-[0.9rem] text-muted">
@@ -143,7 +143,7 @@ export function CaptureClient() {
           href="/add/link"
           className="tap flex items-center gap-3 rounded-[3px] border border-line bg-card px-5 py-4 text-left active:brightness-95"
         >
-          <LinkIcon className="h-6 w-6 shrink-0 text-pink" />
+          <LinkIcon className="h-6 w-6 shrink-0 text-ink" />
           <span>
             <span className="block font-bold">Paste a web link</span>
             <span className="block text-[0.9rem] text-muted">
@@ -156,7 +156,7 @@ export function CaptureClient() {
           href="/add/write"
           className="tap flex items-center gap-3 rounded-[3px] border border-line bg-card px-5 py-4 text-left active:brightness-95"
         >
-          <PencilIcon className="h-6 w-6 shrink-0 text-pink" />
+          <PencilIcon className="h-6 w-6 shrink-0 text-ink" />
           <span>
             <span className="block font-bold">Type it in</span>
             <span className="block text-[0.9rem] text-muted">
@@ -195,7 +195,7 @@ export function CaptureClient() {
               {job.state === "done" && (job.found ?? 0) > 0 ? (
                 <Link
                   href={`/add/review/${job.captureId}`}
-                  className="tap inline-flex items-center rounded-full bg-pink px-4 text-[0.9rem] font-bold text-page"
+                  className="tap margin-word"
                 >
                   Review
                 </Link>

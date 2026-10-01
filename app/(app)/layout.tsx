@@ -1,6 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { AppHeader } from "@/components/app-header";
-import { TabBar } from "@/components/tab-bar";
+import { PaperNav } from "@/components/paper-nav";
 
 export default async function AppLayout({
   children,
@@ -10,17 +9,14 @@ export default async function AppLayout({
   const user = await requireUser();
 
   return (
-    // Exactly one screen tall, with the middle doing the scrolling. That keeps
-    // the lid and the tabs put, and lets a page ask for the height that is
-    // actually left over instead of guessing at the chrome.
+    // The table fills the screen. A short line of words sits at the top.
+    // The middle scrolls, and a page can still ask for the height left over.
     <div className="flex h-dvh flex-col">
-      <AppHeader />
+      <PaperNav planEnabled={user.mealPlanEnabled} />
 
-      <main className="mx-auto w-full max-w-lg min-h-0 flex-1 overflow-y-auto px-4 py-4 md:max-w-[45rem] lg:max-w-[60rem]">
+      <main className="mx-auto w-full min-h-0 flex-1 overflow-y-auto px-4 py-3">
         {children}
       </main>
-
-      <TabBar planEnabled={user.mealPlanEnabled} />
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default async function RecipesPage({
             <li key={slip.key}>
               <Link
                 href={slip.href}
-                className="tap inline-flex h-12 items-center gap-2 rounded-full bg-pink-soft px-4 text-[0.95rem] font-bold text-pink"
+                className="tap margin-word"
               >
                 {slip.label}
                 <span aria-hidden>×</span>
@@ -73,7 +73,7 @@ export default async function RecipesPage({
 
       {recipes.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="font-display text-2xl text-pink">
+          <p className="font-display text-2xl text-ink">
             {narrowed ? "Nothing under that" : "The box is empty"}
           </p>
           <p className="hand mt-2 text-browned">

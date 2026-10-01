@@ -73,7 +73,7 @@ export function BoxGrid({
                 if (selecting) stopSelecting();
                 else setSelecting(true);
               }}
-              className="tap shrink-0 px-2 text-[0.9rem] font-bold text-pink"
+              className="tap shrink-0 px-2 text-[0.9rem] font-bold text-ink"
             >
               {selecting ? "Cancel" : "Select"}
             </button>
@@ -112,7 +112,7 @@ export function BoxGrid({
                 <span
                   className={`absolute top-2 left-2 flex h-7 w-7 items-center justify-center rounded-full border-2 shadow-sm ${
                     picked.has(recipe.id)
-                      ? "border-pink bg-pink text-page"
+                      ? "border-ink bg-ink text-card"
                       : "border-card bg-card/90 text-transparent"
                   }`}
                 >

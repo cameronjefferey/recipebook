@@ -76,7 +76,7 @@ export function ShareManager({
   return (
     <div className="space-y-5">
       <form ref={formRef} action={action} className="space-y-2">
-        <label className="text-[0.75rem] font-bold tracking-wide text-browned uppercase">
+        <label className="hand">
           Share with someone
         </label>
         <ErrorNote>{state.error}</ErrorNote>
@@ -145,7 +145,7 @@ function ShareRow({ share }: { share: Share }) {
           <p className="font-bold">
             {share.recipientName}
             {share.acceptedAt ? (
-              <span className="ml-2 text-[0.72rem] font-bold tracking-wide text-browned uppercase">
+              <span className="hand ml-2">
                 has an account
               </span>
             ) : null}
