@@ -32,8 +32,10 @@ export function MealPlanToggle({
         });
       }}
       aria-pressed={isPlanned}
-      className={`tap inline-flex h-12 items-center px-2 text-[0.9rem] font-bold ${
-        isPlanned ? "text-pink" : "text-browned"
+      className={`tap inline-flex h-12 shrink-0 items-center rounded-full border px-4 text-[1rem] font-bold ${
+        isPlanned
+          ? "border-pink-deep bg-pink-deep text-page"
+          : "border-line bg-card text-ink"
       }`}
     >
       {isPlanned ? "Cooking this week" : "Cook this week"}

@@ -42,3 +42,8 @@ next-env.d.ts
 
 # keep the documented template
 !.env.example
+
+# impeccable: local caches and review captures
+.impeccable/review/
+.impeccable/hook.cache.json
+.impeccable/questions/*.log

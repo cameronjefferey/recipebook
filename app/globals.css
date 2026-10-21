@@ -16,6 +16,11 @@
   --color-pink: #c2566f;
   --color-pink-mid: #e8909f;
   --color-pink-soft: #fadfe4;
+  /* the same pink as ink: deep enough to read at small sizes on the paper,
+     where the box pink itself falls just short. Fills stay --color-pink. */
+  --color-pink-deep: #a8415a;
+  /* the tin itself: the inside the cards sit in, and its rim */
+  --color-box-rim: #dba6b0;
 
   /* warmth */
   --color-butter: #f0c264;
@@ -24,7 +29,8 @@
 
   /* ink */
   --color-ink: #382a22;
-  --color-muted: #8b7565;
+  /* pencil grey, but dark enough to read without glasses: 6:1 on the paper */
+  --color-muted: #6f5a4b;
   --color-line: #382a2218;
   /* the one cool note in an otherwise warm box: the printed rule an
      index card's own lines were laid down in. */
@@ -50,6 +56,21 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   overscroll-behavior-y: none;
+  accent-color: var(--color-pink);
+  caret-color: var(--color-pink-deep);
+}
+
+/* The parts the browser draws still belong to the box. */
+::selection {
+  background: var(--color-pink-soft);
+  color: var(--color-ink);
+}
+:focus-visible {
+  outline: 2px solid var(--color-pink-deep);
+  outline-offset: 2px;
+}
+a {
+  text-underline-offset: 0.15em;
 }
 
 /* Caveat reads thin next to Fraunces' old weight — every title needs the
@@ -163,16 +184,36 @@ body {
 .box-card {
   position: relative;
   width: 100%;
+  max-width: 9rem;
+  margin-inline: auto;
   perspective: 1100px;
   perspective-origin: 50% 0%;
 }
 .box-card::before {
   content: "";
   display: block;
-  padding-top: 133.333%;
+  padding-top: 118%;
 }
-.box-card > a {
+.box-card > a,
+.box-card > button {
   transform-style: preserve-3d;
+}
+/* The smaller tin that stands in a row above the wall of cards. */
+.box-card--row {
+  max-width: none;
+  margin-inline: 0;
+}
+.box-card--row .box-label h3 {
+  font-size: 1rem;
+}
+/* With the lid up, the open tin is the one the wall is showing. */
+.box-card.is-open .box-front {
+  box-shadow:
+    inset 0 10px 8px -8px #382a2233,
+    inset 8px 0 8px -8px #382a2218,
+    0 2px 5px #382a2218,
+    0 0 0 2px var(--color-page),
+    0 0 0 4px var(--color-pink-deep);
 }
 
 .box-well {
@@ -266,13 +307,13 @@ body {
 
 .box-label {
   position: absolute;
-  inset-inline: 0.7rem;
-  bottom: 0.7rem;
+  inset-inline: 0.45rem;
+  bottom: 0.45rem;
   rotate: -1deg;
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
   border: 1px solid color-mix(in srgb, var(--color-pink-mid) 50%, transparent);
   background: color-mix(in srgb, var(--color-card) 95%, transparent);
-  padding: 0.5rem 0.65rem;
+  padding: 0.3rem 0.4rem;
   text-align: center;
   box-shadow: 0 1px 2px #382a2214;
 }
@@ -356,6 +397,85 @@ body {
   }
 }
 
+/* --- Signature: the tabbed dividers inside the box. A row of tabs sits on
+   the top edge of the wall of cards; the chosen one is cut from the same
+   paper as the wall and joins it, the rest stand behind in the sink colour. */
+.divider-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.3rem;
+  padding-inline: 0.25rem;
+}
+.divider-tab {
+  position: relative;
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.95rem 0.45rem;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  background: var(--color-sink);
+  color: var(--color-browned);
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 160ms ease-out,
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.divider-tab[aria-selected="true"],
+.divider-tab[aria-current="page"] {
+  background: var(--color-page);
+  color: var(--color-ink);
+  border-color: var(--color-box-rim);
+  transform: translateY(1px);
+  z-index: 1;
+}
+/* When the row wraps, a chosen divider in an upper row cannot reach the
+   wall's edge, so every tab closes into a chip and the wall keeps its own
+   full rim; the joined treatment is only drawn when it can be true. */
+.divider-tabs[data-wrapped="true"] .divider-tab {
+  border-bottom: 1px solid transparent;
+  border-radius: 7px;
+  transform: none;
+}
+.divider-tabs[data-wrapped="true"] .divider-tab[aria-selected="true"] {
+  border-color: var(--color-box-rim);
+}
+.divider-tabs[data-wrapped="true"] + .divider-wall {
+  border-radius: 7px;
+}
+/* the tab that unfolds every other box */
+.divider-tab--more {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--color-pink-deep);
+}
+/* a box found by name through the search line */
+.divider-tab[data-hit="true"]:not([aria-selected="true"]) {
+  background: var(--color-pink-soft);
+  color: var(--color-pink-deep);
+}
+.divider-tab .count {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+/* The wall the cards sit on: the same paper as the page, held by the box's
+   rim, the divider in use joined to it. */
+.divider-wall {
+  border: 1px solid var(--color-box-rim);
+  border-radius: 0 7px 7px 7px;
+  background: var(--color-page);
+  padding: 0.9rem 0.6rem 0.75rem;
+}
+
 /* --- Signature: an index card on the table. Slightly sharp corners,
    the printed rules, a paper shadow — not a rounded SaaS tile. ----- */
 .index-card {
@@ -388,6 +508,23 @@ body {
     0 1px 3px #382a2214,
     3px 3px 0 0 var(--color-sink);
   padding: 0.85rem 1.05rem 1.5rem;
+}
+
+/* The recipe read as one card. On a phone the page is the card and needs no
+   frame; from a tablet up it sits as a sheet on the counter. */
+.card-sheet {
+  position: relative;
+}
+@media (min-width: 768px) {
+  .card-sheet {
+    background-color: var(--color-card);
+    border: 1px solid var(--color-line);
+    border-radius: 3px;
+    box-shadow:
+      0 1px 3px #382a2214,
+      0 10px 24px -18px #382a2240;
+    padding: 1.75rem 2.25rem 2.25rem;
+  }
 }
 
 /* --- Flip view: a leaf of the book -------------------------------- *

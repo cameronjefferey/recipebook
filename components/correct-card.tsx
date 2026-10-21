@@ -76,7 +76,7 @@ export function CorrectCard({
     <div className="space-y-5 pb-8">
       <div className="flex items-center gap-1">
         <BackLink href={`/r/${id}`} label="Back to the card" />
-        <h1 className="font-display text-2xl">Correct this card</h1>
+        <h1 className="font-display text-2xl">Edit this card</h1>
       </div>
 
       <div className={image ? "md:grid md:grid-cols-2 md:items-start md:gap-8" : ""}>

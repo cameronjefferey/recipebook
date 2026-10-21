@@ -1,0 +1,565 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T21:51:00-07:00",
+  "title": "Design System: The Pink Recipe Box",
+  "source": {
+    "surfaceBrief": ".impeccable/surfaces/app-app-box-page-tsx.md",
+    "seed": "seed:0f39acc7ce729bab",
+    "structure": "card-wall",
+    "tokenFile": "app/globals.css",
+    "tokenCount": 46
+  },
+  "extensions": {
+    "colorMeta": {
+      "page": {
+        "role": "neutral",
+        "displayName": "Counter Cream",
+        "canonical": "#fdf6ea",
+        "tonalRamp": [
+          "oklch(15% 0.01 85)",
+          "oklch(27% 0.015 85)",
+          "oklch(39% 0.02 85)",
+          "oklch(51% 0.025 85)",
+          "oklch(63% 0.025 85)",
+          "oklch(75% 0.025 85)",
+          "oklch(87% 0.02 85)",
+          "oklch(97% 0.02 85)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card Paper",
+        "canonical": "#fffcf6",
+        "tonalRamp": [
+          "oklch(15% 0.005 85)",
+          "oklch(27% 0.008 85)",
+          "oklch(39% 0.01 85)",
+          "oklch(51% 0.012 85)",
+          "oklch(63% 0.012 85)",
+          "oklch(75% 0.012 85)",
+          "oklch(87% 0.01 85)",
+          "oklch(99% 0.01 85)"
+        ]
+      },
+      "sink": {
+        "role": "neutral",
+        "displayName": "Sink",
+        "canonical": "#f6ead8",
+        "tonalRamp": [
+          "oklch(15% 0.015 80)",
+          "oklch(27% 0.02 80)",
+          "oklch(39% 0.03 80)",
+          "oklch(51% 0.035 80)",
+          "oklch(63% 0.035 80)",
+          "oklch(75% 0.035 80)",
+          "oklch(87% 0.03 80)",
+          "oklch(94% 0.03 80)"
+        ]
+      },
+      "pink": {
+        "role": "primary",
+        "displayName": "Box Pink",
+        "canonical": "#c2566f",
+        "tonalRamp": [
+          "oklch(15% 0.06 5)",
+          "oklch(27% 0.1 5)",
+          "oklch(39% 0.13 5)",
+          "oklch(50% 0.15 5)",
+          "oklch(58% 0.15 5)",
+          "oklch(70% 0.12 5)",
+          "oklch(84% 0.07 5)",
+          "oklch(95% 0.025 5)"
+        ]
+      },
+      "pink-mid": {
+        "role": "primary",
+        "displayName": "Faded Pink",
+        "canonical": "#e8909f",
+        "tonalRamp": [
+          "oklch(15% 0.04 10)",
+          "oklch(27% 0.07 10)",
+          "oklch(39% 0.09 10)",
+          "oklch(51% 0.11 10)",
+          "oklch(63% 0.11 10)",
+          "oklch(73% 0.11 10)",
+          "oklch(85% 0.07 10)",
+          "oklch(95% 0.025 10)"
+        ]
+      },
+      "pink-soft": {
+        "role": "primary",
+        "displayName": "Pink Wash",
+        "canonical": "#fadfe4",
+        "tonalRamp": [
+          "oklch(15% 0.02 10)",
+          "oklch(27% 0.03 10)",
+          "oklch(39% 0.03 10)",
+          "oklch(51% 0.035 10)",
+          "oklch(63% 0.035 10)",
+          "oklch(75% 0.035 10)",
+          "oklch(87% 0.03 10)",
+          "oklch(92% 0.03 10)"
+        ]
+      },
+      "pink-deep": {
+        "role": "primary",
+        "displayName": "Pink Ink",
+        "canonical": "#a8415a",
+        "tonalRamp": [
+          "oklch(15% 0.06 5)",
+          "oklch(27% 0.1 5)",
+          "oklch(39% 0.13 5)",
+          "oklch(50% 0.15 5)",
+          "oklch(60% 0.14 5)",
+          "oklch(72% 0.11 5)",
+          "oklch(85% 0.06 5)",
+          "oklch(95% 0.025 5)"
+        ]
+      },
+      "box-rim": {
+        "role": "primary",
+        "displayName": "Tin Rim",
+        "canonical": "#dba6b0",
+        "tonalRamp": [
+          "oklch(15% 0.02 10)",
+          "oklch(27% 0.04 10)",
+          "oklch(39% 0.05 10)",
+          "oklch(51% 0.06 10)",
+          "oklch(63% 0.06 10)",
+          "oklch(77% 0.06 10)",
+          "oklch(87% 0.04 10)",
+          "oklch(95% 0.02 10)"
+        ]
+      },
+      "butter": {
+        "role": "secondary",
+        "displayName": "Butter",
+        "canonical": "#f0c264",
+        "tonalRamp": [
+          "oklch(15% 0.03 85)",
+          "oklch(27% 0.06 85)",
+          "oklch(39% 0.08 85)",
+          "oklch(51% 0.1 85)",
+          "oklch(63% 0.12 85)",
+          "oklch(75% 0.12 85)",
+          "oklch(83% 0.12 85)",
+          "oklch(95% 0.04 85)"
+        ]
+      },
+      "browned": {
+        "role": "secondary",
+        "displayName": "Browned Butter",
+        "canonical": "#8a6242",
+        "tonalRamp": [
+          "oklch(15% 0.03 55)",
+          "oklch(27% 0.05 55)",
+          "oklch(39% 0.065 55)",
+          "oklch(50% 0.07 55)",
+          "oklch(63% 0.07 55)",
+          "oklch(75% 0.06 55)",
+          "oklch(87% 0.04 55)",
+          "oklch(95% 0.02 55)"
+        ]
+      },
+      "jam": {
+        "role": "secondary",
+        "displayName": "Jam",
+        "canonical": "#a8322f",
+        "tonalRamp": [
+          "oklch(15% 0.06 28)",
+          "oklch(27% 0.11 28)",
+          "oklch(39% 0.15 28)",
+          "oklch(48% 0.17 28)",
+          "oklch(60% 0.16 28)",
+          "oklch(72% 0.12 28)",
+          "oklch(85% 0.07 28)",
+          "oklch(95% 0.025 28)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Cocoa Ink",
+        "canonical": "#382a22",
+        "tonalRamp": [
+          "oklch(15% 0.02 55)",
+          "oklch(26% 0.025 55)",
+          "oklch(39% 0.03 55)",
+          "oklch(51% 0.03 55)",
+          "oklch(63% 0.03 55)",
+          "oklch(75% 0.025 55)",
+          "oklch(87% 0.02 55)",
+          "oklch(95% 0.01 55)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Pencil",
+        "canonical": "#6f5a4b",
+        "tonalRamp": [
+          "oklch(15% 0.02 55)",
+          "oklch(27% 0.03 55)",
+          "oklch(39% 0.035 55)",
+          "oklch(46% 0.035 55)",
+          "oklch(63% 0.035 55)",
+          "oklch(75% 0.03 55)",
+          "oklch(87% 0.02 55)",
+          "oklch(95% 0.01 55)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Pencil Line",
+        "canonical": "#382a2218",
+        "alpha": 0.094,
+        "tonalRamp": [
+          "oklch(26% 0.025 55 / 0.9)",
+          "oklch(26% 0.025 55 / 0.7)",
+          "oklch(26% 0.025 55 / 0.5)",
+          "oklch(26% 0.025 55 / 0.35)",
+          "oklch(26% 0.025 55 / 0.24)",
+          "oklch(26% 0.025 55 / 0.16)",
+          "oklch(26% 0.025 55 / 0.094)",
+          "oklch(26% 0.025 55 / 0.04)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Printed Rule",
+        "canonical": "#5c6b7a3d",
+        "alpha": 0.24,
+        "tonalRamp": [
+          "oklch(50% 0.025 240 / 0.9)",
+          "oklch(50% 0.025 240 / 0.7)",
+          "oklch(50% 0.025 240 / 0.5)",
+          "oklch(50% 0.025 240 / 0.35)",
+          "oklch(50% 0.025 240 / 0.24)",
+          "oklch(50% 0.025 240 / 0.16)",
+          "oklch(50% 0.025 240 / 0.1)",
+          "oklch(50% 0.025 240 / 0.04)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "\"The Pink Recipe Box\" top-left on the pink lid (header bar), in page cream."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "The recipe title on its card, with the .ruled underline. 2.1rem on a phone, 2.6rem from 768px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section names on and behind a card, and the divider tabs (1.2rem)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "A recipe's name on its card on the wall; 1.3rem on a 1.65rem rule when written on the lines."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Ingredients, steps, descriptions; max 62ch. Cook mode steps rise to 1.6rem."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Button and chip text, tab-bar labels (0.9rem), Start cooking (1.15rem). Bold Source Serif; there is no sans."
+      },
+      "hand": {
+        "displayName": "Hand",
+        "purpose": "Margin notes, card counts, aisle names, captions. Regular weight on purpose: an aside, not a heading."
+      },
+      "note": {
+        "displayName": "Note",
+        "purpose": "The single muted line under a card (\"Mains · cooked 12×\"); facts under a title at 0.95rem."
+      }
+    },
+    "fonts": [
+      {
+        "name": "Caveat",
+        "cssVar": "--font-caveat",
+        "loader": "next/font/google",
+        "weightsUsed": [
+          400,
+          700
+        ],
+        "role": "hand / display"
+      },
+      {
+        "name": "Source Serif 4",
+        "cssVar": "--font-source-serif",
+        "loader": "next/font/google",
+        "axes": [
+          "opsz"
+        ],
+        "weightsUsed": [
+          400,
+          700
+        ],
+        "role": "body / label"
+      }
+    ],
+    "rootFontSize": "17px",
+    "tapFloor": "48px",
+    "shadows": [
+      {
+        "name": "paper",
+        "value": "0 1px 2px #382a2214, 1px 2px 0 0 color-mix(in srgb, var(--color-sink) 80%, var(--color-browned))",
+        "purpose": "An index card on the wall; the offset is the card beneath."
+      },
+      {
+        "name": "sheet",
+        "value": "0 1px 3px #382a2214, 3px 3px 0 0 var(--color-sink)",
+        "purpose": "A form sheet on top of a small stack."
+      },
+      {
+        "name": "card-sheet",
+        "value": "0 1px 3px #382a2214, 0 10px 24px -18px #382a2240",
+        "purpose": "The recipe read as one card on the counter; from 768px only."
+      },
+      {
+        "name": "flat",
+        "value": "0 1px 3px #382a2214",
+        "purpose": "The generic Card container (settings, login, capture rows)."
+      },
+      {
+        "name": "lift",
+        "value": "0 2px 6px #382a2233",
+        "purpose": "Pink fills that float: Start cooking (#382a2226) and the camera tab."
+      },
+      {
+        "name": "ribbon",
+        "value": "0 1px 2px #382a2233",
+        "purpose": "The Keeper bookmark."
+      },
+      {
+        "name": "leaf",
+        "value": "0 1px 3px #382a2214, 4px 0 0 -1px var(--color-sink), 7px 0 0 -2px color-mix(in srgb, var(--color-sink) 65%, var(--color-browned))",
+        "purpose": "A page in the flip-through view; pages still to come underneath."
+      }
+    ],
+    "motion": [
+      {
+        "name": "lid",
+        "value": "560ms cubic-bezier(0.18, 0.7, 0.2, 1)",
+        "purpose": "The tin's lid hinging open and the cards fanning inside it."
+      },
+      {
+        "name": "tab-fill",
+        "value": "160ms ease-out",
+        "purpose": "Divider tab background on select."
+      },
+      {
+        "name": "tab-settle",
+        "value": "220ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Divider tab dropping 1px to join the wall."
+      },
+      {
+        "name": "press",
+        "value": "200ms ease-out",
+        "purpose": "Index card active:scale(0.985); buttons use filter brightness(0.95) with no duration."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition: none on .box-lid and .box-index",
+        "purpose": "prefers-reduced-motion disables the tin."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px",
+        "effect": "wall goes to 3 columns; Settings label appears"
+      },
+      {
+        "name": "md",
+        "value": "768px",
+        "effect": "column 45rem; recipe becomes a card sheet with two-column ingredients/steps; display 2.6rem"
+      },
+      {
+        "name": "lg",
+        "value": "1024px",
+        "effect": "column 60rem; wall goes to 4 columns"
+      }
+    ],
+    "signatures": [
+      {
+        "name": "ribbon",
+        "css": "position:absolute; top:-2px; right:14px; width:20px; height:34px; background:var(--color-pink); clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%); box-shadow:0 1px 2px #382a2233",
+        "when": "status === keeper"
+      },
+      {
+        "name": "dog-ear-fold",
+        "css": "position:absolute; right:0; bottom:0; width:26px; height:26px; background:linear-gradient(135deg, transparent 0 50%, color-mix(in srgb, var(--color-sink) 88%, var(--color-browned)) 50% 100%); border-bottom-right-radius:3px",
+        "when": "timesCooked > 0"
+      },
+      {
+        "name": "splatter",
+        "css": "five radial-gradient marks in browned, jam and butter; opacity: var(--splat)",
+        "when": "--splat = min(timesCooked / 10, 1) * 0.5"
+      },
+      {
+        "name": "tilt",
+        "css": "rotate: ±0.6deg | ±1.2deg, hashed from the card id",
+        "when": "every card on the wall"
+      },
+      {
+        "name": "ruled",
+        "css": "border-bottom:1px solid var(--color-rule); padding-bottom:0.5rem",
+        "when": "a title or section heading on a card"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one action that matters on a screen: Start cooking, Add, Put a card in. Box pink pill, cream text.",
+      "html": "<button class=\"ds-btn-primary\">Start cooking</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; min-height:48px; min-width:48px; padding:0 1.5rem; border:0; border-radius:9999px; background:var(--color-pink, #c2566f); color:var(--color-page, #fdf6ea); font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:1.1rem; font-weight:700; box-shadow:0 2px 6px #382a2226; cursor:pointer; transition:filter 120ms, background-color 120ms; } .ds-btn-primary:active { filter:brightness(0.95); } .ds-btn-primary:focus-visible { outline:2px solid var(--color-pink, #c2566f); outline-offset:2px; } .ds-btn-primary:disabled { opacity:0.5; pointer-events:none; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Everything else you can press on the back of a card: I made this, Correct this card, Cancel. Card paper with a pencil-line border.",
+      "html": "<button class=\"ds-btn-secondary\">I made this</button>",
+      "css": ".ds-btn-secondary { display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; min-height:48px; min-width:48px; padding:0 1.5rem; border:1px solid var(--color-line, #382a2218); border-radius:9999px; background:var(--color-card, #fffcf6); color:var(--color-ink, #382a22); font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:1.1rem; font-weight:700; cursor:pointer; transition:filter 120ms; } .ds-btn-secondary:active { filter:brightness(0.95); } .ds-btn-secondary:focus-visible { outline:2px solid var(--color-pink, #c2566f); outline-offset:2px; } .ds-btn-secondary:disabled { opacity:0.5; pointer-events:none; }"
+    },
+    {
+      "name": "Search Line",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "One search line on the box page, filtering the wall in place. Card paper on the page (cream on a sheet), pink border on focus.",
+      "html": "<label class=\"ds-search\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"m16 16 4.5 4.5\"/></svg><input type=\"search\" placeholder=\"Chicken, or a name you remember\" aria-label=\"Search your recipes\"></label>",
+      "css": ".ds-search { position:relative; display:block; width:100%; max-width:32rem; color:var(--color-muted, #6f5a4b); } .ds-search svg { position:absolute; top:50%; left:1rem; transform:translateY(-50%); pointer-events:none; } .ds-search input { width:100%; min-height:48px; padding:0.625rem 1rem 0.625rem 3rem; border:1px solid var(--color-line, #382a2218); border-radius:0.75rem; background:var(--color-card, #fffcf6); color:var(--color-ink, #382a22); font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:1.05rem; caret-color:var(--color-pink-deep, #a8415a); } .ds-search input::placeholder { color:color-mix(in srgb, var(--color-muted, #6f5a4b) 80%, transparent); } .ds-search input:focus { border-color:var(--color-pink, #c2566f); outline:none; }"
+    },
+    {
+      "name": "Divider Tabs",
+      "kind": "nav",
+      "refersTo": "divider-tab",
+      "description": "The tabbed dividers inside the box. The chosen one is cut from the wall's paper and joins it; the rest stand behind in sink. Wrapped rows fall back to chips.",
+      "html": "<div class=\"ds-dividers\"><div class=\"ds-divider-tabs\" role=\"tablist\"><button class=\"ds-divider-tab\" role=\"tab\" aria-selected=\"true\">Everything</button><button class=\"ds-divider-tab\" role=\"tab\">Mains</button><button class=\"ds-divider-tab\" role=\"tab\">Desserts <span class=\"ds-count\">from Sam</span></button><button class=\"ds-divider-tab\" role=\"tab\">Keepers</button></div><div class=\"ds-divider-wall\"><p class=\"ds-hand\">4 cards in the box</p></div></div>",
+      "css": ".ds-dividers { max-width:36rem; } .ds-divider-tabs { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0.3rem; padding-inline:0.25rem; } .ds-divider-tab { position:relative; display:inline-flex; min-height:48px; align-items:center; gap:0.4rem; padding:0.35rem 0.95rem 0.45rem; border:1px solid transparent; border-bottom:0; border-radius:7px 7px 0 0; background:var(--color-sink, #f6ead8); color:var(--color-browned, #8a6242); font-family:var(--font-caveat, Caveat), cursive; font-weight:700; font-size:1.2rem; line-height:1; white-space:nowrap; cursor:pointer; transition:background-color 160ms ease-out, transform 220ms cubic-bezier(0.2,0.8,0.2,1); } .ds-divider-tab[aria-selected=\"true\"] { background:var(--color-page, #fdf6ea); color:var(--color-ink, #382a22); border-color:var(--color-box-rim, #dba6b0); transform:translateY(1px); z-index:1; } .ds-divider-tab:focus-visible { outline:2px solid var(--color-pink-deep, #a8415a); outline-offset:2px; } .ds-count { font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-weight:400; font-size:0.8rem; color:var(--color-muted, #6f5a4b); } .ds-divider-wall { min-height:6rem; border:1px solid var(--color-box-rim, #dba6b0); border-radius:0 7px 7px 7px; background:var(--color-page, #fdf6ea); padding:0.9rem 0.6rem 0.75rem; } .ds-hand { margin:0; padding-inline:0.25rem; font-family:var(--font-caveat, Caveat), cursive; font-size:1rem; line-height:1.3; color:var(--color-browned, #8a6242); }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Keeper / Want to try / Nope, Filed under, Cook this week. Unselected is card paper with a pencil line; selected fills pink ink. The dashed one names a new divider.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12.5 4.5 4.5L19 7\"/></svg>Keeper</button><button class=\"ds-chip\" aria-pressed=\"false\">Want to try</button><button class=\"ds-chip\" aria-pressed=\"false\">Nope</button><button class=\"ds-chip ds-chip-new\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>New divider</button></div>",
+      "css": ".ds-chips { display:flex; flex-wrap:wrap; gap:0.5rem; } .ds-chip { display:inline-flex; height:48px; align-items:center; gap:0.375rem; padding:0 1rem; border:1px solid var(--color-line, #382a2218); border-radius:9999px; background:var(--color-card, #fffcf6); color:var(--color-ink, #382a22); font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:1rem; font-weight:700; cursor:pointer; transition:background-color 120ms, color 120ms, border-color 120ms; } .ds-chip[aria-pressed=\"true\"] { border-color:var(--color-pink-deep, #a8415a); background:var(--color-pink-deep, #a8415a); color:var(--color-page, #fdf6ea); } .ds-chip-new { border:1px dashed var(--color-pink-mid, #e8909f); background:transparent; color:var(--color-pink-deep, #a8415a); } .ds-chip:focus-visible { outline:2px solid var(--color-pink-deep, #a8415a); outline-offset:2px; }"
+    },
+    {
+      "name": "Index Card",
+      "kind": "card",
+      "refersTo": "index-card",
+      "description": "One card on the wall: 3px corners, printed rules, a paper-edge shadow, a slight lean. Title in the hand on the lines when there is no photo; Keeper ribbon top-right, dog-ear and splatter once cooked.",
+      "html": "<a href=\"#\" class=\"ds-index-card\" style=\"rotate:-1.2deg; --splat:0.5\"><span class=\"ds-ribbon\" aria-hidden=\"true\"></span><span class=\"ds-card-face\"><span class=\"ds-card-title\">Crispy Skillet Turkey Burgers</span><svg class=\"ds-card-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 11h14v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-5Z\"/><path d=\"M3.5 11h17M2 8.5l2 1M22 8.5l-2 1\"/><path d=\"M12 5.5c.9-1 2.2-1 2.6 0\"/></svg></span><span class=\"ds-card-foot\"><span class=\"ds-card-note\">Mains · cooked 12×</span></span><span class=\"ds-splatter\" aria-hidden=\"true\"></span><span class=\"ds-dog-ear\" aria-hidden=\"true\"></span></a>",
+      "css": ".ds-index-card { position:relative; display:flex; flex-direction:column; width:11rem; overflow:hidden; text-decoration:none; color:var(--color-ink, #382a22); border:1px solid var(--color-line, #382a2218); border-radius:3px; background-color:var(--color-card, #fffcf6); background-image:repeating-linear-gradient(to bottom, transparent, transparent 1.65rem, var(--color-rule, #5c6b7a3d) 1.65rem, var(--color-rule, #5c6b7a3d) calc(1.65rem + 1px)); box-shadow:0 1px 2px #382a2214, 1px 2px 0 0 color-mix(in srgb, var(--color-sink, #f6ead8) 80%, var(--color-browned, #8a6242)); transition:transform 200ms ease-out; } .ds-index-card:active { transform:scale(0.985); } .ds-index-card:focus-visible { outline:2px solid var(--color-pink-deep, #a8415a); outline-offset:2px; } .ds-ribbon { position:absolute; top:-2px; right:14px; z-index:1; width:20px; height:34px; background:var(--color-pink, #c2566f); clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%); box-shadow:0 1px 2px #382a2233; } .ds-card-face { position:relative; display:block; aspect-ratio:4/3; padding:0.45rem 0.75rem 0; } .ds-card-title { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; overflow:hidden; padding-right:1.75rem; font-family:var(--font-caveat, Caveat), cursive; font-weight:700; font-size:1.3rem; line-height:1.65rem; } .ds-card-icon { position:absolute; right:0.625rem; bottom:0.5rem; width:28px; height:28px; color:var(--color-pink-mid, #e8909f); } .ds-card-foot { display:flex; flex:1; flex-direction:column; padding:0.625rem 0.75rem 0.75rem; } .ds-card-note { font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:0.82rem; line-height:1.375; color:var(--color-muted, #6f5a4b); } .ds-splatter { position:absolute; inset:0; pointer-events:none; border-radius:3px; opacity:var(--splat, 0); background-image:radial-gradient(ellipse 9px 7px at 18% 26%, color-mix(in srgb, var(--color-browned, #8a6242) 55%, transparent) 0 60%, transparent 62%), radial-gradient(circle 3px at 27% 33%, color-mix(in srgb, var(--color-browned, #8a6242) 45%, transparent) 0 60%, transparent 62%), radial-gradient(ellipse 7px 10px at 78% 63%, color-mix(in srgb, var(--color-jam, #a8322f) 38%, transparent) 0 60%, transparent 62%), radial-gradient(circle 2.5px at 70% 74%, color-mix(in srgb, var(--color-jam, #a8322f) 32%, transparent) 0 60%, transparent 62%), radial-gradient(ellipse 12px 6px at 47% 88%, color-mix(in srgb, var(--color-butter, #f0c264) 60%, transparent) 0 60%, transparent 62%); } .ds-dog-ear { position:absolute; right:0; bottom:0; width:26px; height:26px; background:linear-gradient(135deg, transparent 0 50%, color-mix(in srgb, var(--color-sink, #f6ead8) 88%, var(--color-browned, #8a6242)) 50% 100%); border-bottom-right-radius:3px; }"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar-primary",
+      "description": "Box, Add (the primary, a pink circle with the camera), Plan. Card paper over a blur, a pencil-line top edge; pink ink when current.",
+      "html": "<nav class=\"ds-tabbar\"><a href=\"#\" class=\"ds-tab\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" width=\"28\" height=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z\"/><path d=\"M3 8 5 4h14l2 4\"/><path d=\"M10 12h4\"/></svg><span>Box</span></a><a href=\"#\" class=\"ds-tab\"><span class=\"ds-tab-primary\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z\"/><circle cx=\"12\" cy=\"13.5\" r=\"3.5\"/></svg></span><span>Add</span></a><a href=\"#\" class=\"ds-tab\"><svg viewBox=\"0 0 24 24\" width=\"28\" height=\"28\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 8h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8L4 8Z\"/><path d=\"M8 8 9.5 4h5L16 8\"/><path d=\"M9.5 12v4M14.5 12v4\"/></svg><span>Plan</span></a></nav>",
+      "css": ".ds-tabbar { display:flex; align-items:stretch; justify-content:space-around; width:100%; max-width:32rem; padding:0.25rem 0.5rem 0.5rem; border-top:1px solid var(--color-line, #382a2218); background:color-mix(in srgb, var(--color-card, #fffcf6) 95%, transparent); backdrop-filter:blur(8px); } .ds-tab { display:flex; flex:1; flex-direction:column; align-items:center; justify-content:center; gap:0.25rem; min-height:48px; padding:0.375rem 0; border-radius:0.75rem; text-decoration:none; color:var(--color-muted, #6f5a4b); font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:0.9rem; font-weight:700; } .ds-tab[aria-current=\"page\"] { color:var(--color-pink-deep, #a8415a); } .ds-tab:focus-visible { outline:2px solid var(--color-pink-deep, #a8415a); outline-offset:2px; } .ds-tab-primary { display:flex; width:48px; height:48px; align-items:center; justify-content:center; border-radius:9999px; background:var(--color-pink, #c2566f); color:var(--color-page, #fdf6ea); box-shadow:0 2px 6px #382a2233; }"
+    },
+    {
+      "name": "Hand Heading",
+      "kind": "custom",
+      "refersTo": "hand-heading",
+      "description": "A section name written in the hand with the printed rule under it, the way a card's own headings are. The one cool line in the system.",
+      "html": "<div class=\"ds-section\"><h2 class=\"ds-hand-heading\">Ingredients</h2><p class=\"ds-body\">2 cups all-purpose flour</p><p class=\"ds-aside\">double for the holidays</p></div>",
+      "css": ".ds-section { max-width:28rem; color:var(--color-ink, #382a22); } .ds-hand-heading { margin:0 0 0.75rem; padding-bottom:0.5rem; border-bottom:1px solid var(--color-rule, #5c6b7a3d); font-family:var(--font-caveat, Caveat), cursive; font-weight:700; font-size:1.35rem; line-height:1; color:var(--color-browned, #8a6242); } .ds-body { margin:0; font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:1.05rem; line-height:1.625; } .ds-aside { margin:0.75rem 0 0; font-family:var(--font-caveat, Caveat), cursive; font-size:1.25em; line-height:1.3; color:var(--color-browned, #8a6242); }"
+    },
+    {
+      "name": "Header",
+      "kind": "nav",
+      "refersTo": "wordmark",
+      "description": "The pink lid of the box, with the name written on it in cream. Settings is the one thing up here.",
+      "html": "<header class=\"ds-header\"><a href=\"#\" class=\"ds-wordmark\">The Pink Recipe Box</a><a href=\"#\" class=\"ds-settings\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z\"/></svg><span>Settings</span></a></header>",
+      "css": ".ds-header { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; width:100%; max-width:32rem; padding:0.5rem 1rem 0.25rem; background:var(--color-pink, #c2566f); box-shadow:0 1px 3px #382a2226; } .ds-wordmark { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0.25rem 0; text-decoration:none; font-family:var(--font-caveat, Caveat), cursive; font-weight:700; font-size:1.75rem; line-height:1; color:var(--color-page, #fdf6ea); } .ds-settings { display:flex; align-items:center; gap:0.375rem; min-height:48px; padding:0 0.75rem; border-radius:9999px; text-decoration:none; color:color-mix(in srgb, var(--color-page, #fdf6ea) 85%, transparent); font-family:var(--font-source-serif, 'Source Serif 4'), Georgia, serif; font-size:0.95rem; font-weight:700; } .ds-settings[aria-current=\"page\"] { color:var(--color-page, #fdf6ea); } .ds-settings:focus-visible, .ds-wordmark:focus-visible { outline:2px solid var(--color-pink-deep, #a8415a); outline-offset:2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lid Comes Off",
+    "overview": "Open the app and the recipes are already in front of you, as cards you recognise by sight. Everything in this system is a part of one physical object, a sun-faded pink recipe tin and the handwritten index cards inside it, and nothing is allowed to be a part of a website instead. The page is the counter the tin sits on, in flour cream. The cards are a whiter paper with faint printed rules. The pink is the tin itself, and it appears only where the tin would: the lid, a fabric bookmark, the one button that matters. A warm cocoa ink does all the writing.\n\nDensity is generous because this is used one-handed on a phone or at arm's length on an iPad, often with wet fingers and without reading glasses: 17px root type, a 48px floor on everything that can be tapped, two cards across on a phone. Imperfection is a feature, not a flourish. Cards sit at a slight lean that never resolves to zero; a cooked card picks up a folded corner and faint butter and jam marks that build with use and then level off. The rules of the paper are the one cool colour in the whole palette and they are only ever one pixel thick.\n\nTwo voices do all the type. Caveat, bold, is the hand that wrote every title, every divider, every heading and margin note. Source Serif is everything that is read: ingredients, steps, labels on buttons. There is no sans, no mono, no kicker, no badge row of metadata above a title.",
+    "keyCharacteristics": [
+      "Paper, not panels: cream on cream, 3px corners, printed rules, tonal paper-edge shadows",
+      "One pink, used as the tin would show it: a lid, a bookmark, a primary action",
+      "Caveat for the hand, Source Serif for the read; no third face",
+      "Counter-scale ergonomics: 17px root, 48px tap floor, large pill buttons",
+      "Wear as a record: tilt, dog-ear, splatter, cook count, Keeper ribbon",
+      "The wall re-deals in place; narrowing never navigates away"
+    ],
+    "rules": [
+      {
+        "name": "The Tin Rule",
+        "body": "Box Pink fills only what the tin itself would be: the lid across the top of the screen (the header bar), the primary action, the camera tab, the Keeper ribbon, the tins. It is never a page background or a card border.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Rule",
+        "body": "Pink used as text or as a small selected fill is always pink-deep, never pink. The two are the same pink at two distances.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Cool Note Rule",
+        "body": "The blue-grey rule is the only cool colour in the system and it appears only as a 1px line: card rules and the .ruled underline. Never as a fill, border, or text.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Hand Rule",
+        "body": "Every title, heading, divider, and margin note is Caveat. Headings are bold; asides are regular. No second handwriting face, ever.",
+        "section": "typography"
+      },
+      {
+        "name": "The Counter Rule",
+        "body": "Root type is 17px and nothing read mid-cook drops below 1.05rem. Inputs stay above the 16px iOS zoom threshold.",
+        "section": "typography"
+      },
+      {
+        "name": "The Re-deal Rule",
+        "body": "Choosing a divider or typing in search narrows the same wall in place and updates the address; it never navigates to a new screen.",
+        "section": "layout"
+      },
+      {
+        "name": "The Card Beneath Rule",
+        "body": "Offset shadows are always paper-toned (sink, or sink mixed with browned) and never ink-toned or black. They stand for the card under this one, not for height.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Phone Is The Card Rule",
+        "body": "On a phone a recipe has no frame or shadow; the page is the card. The sheet treatment appears only from 768px.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Paper Or Pill Rule",
+        "body": "Anything that is a card is 3px; anything that is pressed is a pill. Nothing is 8px-rounded-SaaS in between except an input (0.75rem) or a container Card (12px).",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do write the wordmark on the pink lid in Caveat 700 at 1.75rem in page cream; the header bar is the one place pink spans the screen.",
+      "Do give every index card a 3px corner, the printed rule lines, the paper shadow, and a non-zero tilt from the set ±0.6° / ±1.2°.",
+      "Do set every title and heading in Caveat at weight 700, and every aside in .hand at regular weight in browned.",
+      "Do keep all tap targets at or above 48 × 48px and all read text at or above 1.05rem.",
+      "Do fill selected chips and small pink text with pink-deep, and reserve pink for the primary action, the camera tab, the ribbon and the tin.",
+      "Do make offset shadows paper-toned (sink) so they read as the card beneath.",
+      "Do narrow the wall in place when a divider or search changes, and keep the URL in step.",
+      "Do record wear with the three marks that exist (ribbon, dog-ear, splatter) and nothing else."
+    ],
+    "donts": [
+      "Don't add a sans-serif, a mono, or a second handwriting face. Two faces, total.",
+      "Don't use pink as text on the paper; it falls short of contrast at small sizes. Use pink-deep.",
+      "Don't introduce any cool colour beyond the 1px rule line. No blue, purple, teal, or sage anywhere.",
+      "Don't use pure black, grey shadows, or 8px-rounded tiles for cards; paper is 3px and tools are pills.",
+      "Don't put a kicker or eyebrow label above a title, or a row of metadata badges; facts go in one muted line below the title.",
+      "Don't distress every card uniformly: splatter opacity is driven by cook count and caps at 0.5, and the dog-ear appears only once cooked.",
+      "Don't draw the joined divider-tab treatment when the row has wrapped; close the tabs into chips instead.",
+      "Don't render the Keeper ribbon or a card frame on a phone-width recipe; there the page is the card."
+    ]
+  }
+}

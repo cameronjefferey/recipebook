@@ -1,0 +1,27 @@
+{
+  "buildPath": "comp",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/**"
+        ],
+        "createdAt": "2026-10-20T21:19:51.552Z",
+        "reason": "Decision sketches of the pinned pink-box world: card cream is the box's paper (PRODUCT.md Brand Commitments; user: 'still pink recipe box themed')"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-10-20T21:19:51.571Z",
+        "reason": "Incumbent --color-page/--color-card: the aged-paper cream of the pinned pink-box world (PRODUCT.md Brand Commitments; user: 'still pink recipe box themed')"
+      }
+    ]
+  }
+}

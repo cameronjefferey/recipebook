@@ -5,10 +5,10 @@ import { ChevronLeft } from "@/components/icons";
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const base =
-  "tap inline-flex items-center justify-center gap-2 rounded-full px-6 text-[0.95rem] font-bold " +
+  "tap inline-flex items-center justify-center gap-2 rounded-full px-6 text-[1.1rem] font-bold " +
   "transition-[filter,background-color] active:brightness-95 disabled:opacity-50 " +
   "disabled:pointer-events-none focus-visible:outline-2 focus-visible:outline-offset-2 " +
-  "focus-visible:outline-pink";
+  "focus-visible:outline-pink-deep";
 
 const variants: Record<Variant, string> = {
   primary: "bg-pink text-page shadow-sm",
@@ -173,11 +173,19 @@ export function BackLink({
   );
 }
 
-/** Small uppercase label used above groups of things. */
-export function Eyebrow({ children }: { children: ReactNode }) {
+/** A section name written in the hand, the way a card's own headings are. */
+export function HandHeading({
+  children,
+  as: Tag = "h2",
+  className = "",
+}: {
+  children: ReactNode;
+  as?: "h2" | "h3";
+  className?: string;
+}) {
   return (
-    <span className="text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
+    <Tag className={`font-display text-[1.35rem] leading-none text-browned ${className}`}>
       {children}
-    </span>
+    </Tag>
   );
 }

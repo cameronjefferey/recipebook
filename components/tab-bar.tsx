@@ -30,18 +30,18 @@ export function TabBar({ planEnabled }: { planEnabled: boolean }) {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`tap flex w-full flex-col items-center justify-center gap-0.5 rounded-xl py-1 ${
-                  active ? "text-pink" : "text-muted"
+                className={`tap flex w-full flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${
+                  active ? "text-pink-deep" : "text-muted"
                 }`}
               >
                 {primary ? (
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-pink text-page shadow-sm">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-pink text-page shadow-[0_2px_6px_#382a2233]">
                     <Icon className="h-6 w-6" />
                   </span>
                 ) : (
-                  <Icon className="h-6 w-6" />
+                  <Icon className="h-7 w-7" />
                 )}
-                <span className="text-[0.7rem] font-bold">{label}</span>
+                <span className="text-[0.9rem] font-bold">{label}</span>
               </Link>
             </li>
           );

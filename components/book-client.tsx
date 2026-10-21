@@ -333,25 +333,27 @@ function RecipeLeaf({
         {/* Open or cook right away, without turning past the whole page
             first — the same pair sits at the bottom too, once you have. */}
         {showActions ? (
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 space-y-2">
+            <div className="flex gap-2">
+              <Link
+                href={`/cook/${recipe.id}`}
+                className="tap flex flex-1 items-center justify-center rounded-full bg-pink px-4 text-[0.9rem] font-bold whitespace-nowrap text-page"
+              >
+                Start cooking
+              </Link>
+              <Link
+                href={`/r/${recipe.id}`}
+                className="tap flex flex-1 items-center justify-center rounded-full border border-line bg-card px-4 text-[0.9rem] font-bold whitespace-nowrap text-ink"
+              >
+                Open
+              </Link>
+            </div>
             {plannedIds ? (
               <MealPlanToggle
                 recipeId={recipe.id}
                 planned={plannedIds.includes(recipe.id)}
               />
             ) : null}
-            <Link
-              href={`/cook/${recipe.id}`}
-              className="tap flex min-w-[9rem] flex-1 items-center justify-center rounded-full bg-pink text-[0.9rem] font-bold text-page"
-            >
-              Start cooking
-            </Link>
-            <Link
-              href={`/r/${recipe.id}`}
-              className="tap flex min-w-[6rem] flex-1 items-center justify-center rounded-full border border-line bg-card text-[0.9rem] font-bold text-ink"
-            >
-              Open
-            </Link>
           </div>
         ) : null}
 

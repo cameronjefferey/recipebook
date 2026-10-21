@@ -1,7 +1,104 @@
 import "server-only";
 import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { recipes, recipeImages, recipeTags } from "@/lib/db/schema";
+import { bookRecipes, recipes, recipeImages, recipeTags } from "@/lib/db/schema";
+import { visibleRecipe } from "@/lib/access";
+import type { CurrentUser } from "@/lib/auth";
+
+/**
+ * One card on the wall of the open box. Carries enough to draw it, file it
+ * under a divider, and find it by typing, so the whole box can be narrowed on
+ * the device without going back to the server for every keystroke.
+ */
+export type WallCard = {
+  id: string;
+  title: string;
+  category: string | null;
+  status: "none" | "keeper" | "want_to_try" | "nope";
+  timesCooked: number;
+  createdAt: string;
+  imageId: string | null;
+  rotation: number;
+  /** whose it is: false for a recipe met through a shared box */
+  mine: boolean;
+  /** boxes (books) this card is filed in */
+  bookIds: string[];
+  /** lower-cased words worth matching: title, category, ingredients, source, tags */
+  haystack: string;
+};
+
+/**
+ * Every recipe this person may read, with its box memberships. A household
+ * has a few hundred recipes at most, so sending them all once and narrowing on
+ * the device is cheaper, and feels faster, than a round trip per tap.
+ */
+export async function listWall(user: CurrentUser): Promise<WallCard[]> {
+  const rows = await db
+    .select({
+      id: recipes.id,
+      title: recipes.title,
+      category: recipes.category,
+      status: recipes.status,
+      timesCooked: recipes.timesCooked,
+      createdAt: recipes.createdAt,
+      householdId: recipes.householdId,
+      ingredients: recipes.ingredients,
+      sourceName: recipes.sourceName,
+    })
+    .from(recipes)
+    .where(visibleRecipe(user))
+    .orderBy(sql`lower(${recipes.title})`)
+    .limit(600);
+
+  if (rows.length === 0) return [];
+  const ids = rows.map((r) => r.id);
+
+  const [covers, memberships, tags] = await Promise.all([
+    firstImages(ids),
+    db
+      .select({ bookId: bookRecipes.bookId, recipeId: bookRecipes.recipeId })
+      .from(bookRecipes)
+      .where(inArray(bookRecipes.recipeId, ids)),
+    db
+      .select({ recipeId: recipeTags.recipeId, tag: recipeTags.tag })
+      .from(recipeTags)
+      .where(inArray(recipeTags.recipeId, ids)),
+  ]);
+
+  const booksOf = new Map<string, string[]>();
+  for (const m of memberships) {
+    if (!booksOf.has(m.recipeId)) booksOf.set(m.recipeId, []);
+    booksOf.get(m.recipeId)!.push(m.bookId);
+  }
+  const tagsOf = new Map<string, string[]>();
+  for (const t of tags) {
+    if (!tagsOf.has(t.recipeId)) tagsOf.set(t.recipeId, []);
+    tagsOf.get(t.recipeId)!.push(t.tag);
+  }
+
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    category: r.category,
+    status: r.status,
+    timesCooked: r.timesCooked,
+    createdAt: r.createdAt.toISOString(),
+    imageId: covers.get(r.id)?.id ?? null,
+    rotation: covers.get(r.id)?.rotation ?? 0,
+    mine: r.householdId === user.householdId,
+    bookIds: booksOf.get(r.id) ?? [],
+    haystack: [
+      r.title,
+      r.category,
+      r.sourceName,
+      ...(tagsOf.get(r.id) ?? []),
+      ...r.ingredients.map((i) => i.item),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase(),
+  }));
+}
 
 export type RecipeCard = {
   id: string;

@@ -208,6 +208,7 @@ export async function setStatus(
       and(eq(recipes.id, recipeId), eq(recipes.householdId, user.householdId)),
     );
   revalidatePath("/recipes");
+  revalidatePath("/box");
   revalidatePath(`/r/${recipeId}`);
 }
 

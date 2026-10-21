@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Source+Serif+4:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:1180px;height:820px;overflow:hidden;background:#fdf6ea;color:#382a22;font:17px/1.45 "Source Serif 4",Georgia,serif}
+  .hand{font-family:Caveat,cursive;font-weight:700}
+  .shell{display:grid;grid-template-columns:340px 1fr;height:820px}
+  aside{padding:28px 24px 24px;display:flex;flex-direction:column}
+  aside h1{font-size:34px;line-height:1.1;color:#c2566f}
+  .search{margin:18px 0 0;height:50px;border:1px solid #382a2218;border-radius:12px;background:#fffcf6;display:flex;align-items:center;padding:0 16px;color:#5f4d41}
+  .divs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .div{height:44px;padding:0 16px;display:flex;align-items:center;border-radius:6px 6px 0 0;background:#f6ead8;color:#5e3f28;font-size:18px}
+  .div.on{background:#fffcf6;color:#382a22;border:1px solid #382a2218;border-bottom:0}
+  .list{flex:1;overflow:hidden;padding-top:12px}
+  .row{display:flex;align-items:center;gap:12px;height:66px;padding:0 16px;border-radius:6px}
+  .row.on{background:#fadfe4}
+  .thumb{width:44px;height:44px;border-radius:3px;background:linear-gradient(135deg,#e8d4b8,#cfa77f);flex:none}
+  .thumb.r{background:#fffcf6;border:1px solid #382a2218}
+  .row h2{font-size:21px;line-height:1.1}
+  .row p{font-size:13px;color:#5f4d41;margin-top:2px}
+  .dot{margin-left:auto;width:10px;height:16px;background:#c2566f;clip-path:polygon(0 0,100% 0,100% 100%,50% 70%,0 100%)}
+  .cam{margin-top:14px;height:56px;border-radius:999px;background:#c2566f;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:19px;padding:0 24px}
+  main{padding:34px 48px 24px 44px;position:relative}
+  .card{background:#fffcf6;border-radius:3px;box-shadow:0 1px 3px #382a2214;padding:36px 44px 40px;height:760px;position:relative;overflow:hidden}
+  .ribbon{position:absolute;top:-2px;right:40px;width:24px;height:44px;background:#c2566f;clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
+  .card h2{font-size:52px;line-height:1.1}
+  .rule{height:1px;background:#5c6b7a3d;margin-top:18px}
+  .meta{display:flex;align-items:center;gap:14px;margin-top:20px;font-size:16px;color:#5f4d41}
+  .cook{margin-left:auto;height:56px;padding:0 30px;border-radius:999px;background:#c2566f;color:#fff;font-weight:700;display:flex;align-items:center;font-size:19px}
+  .cols{display:grid;grid-template-columns:300px 1fr;gap:40px;margin-top:28px}
+  h3{font-size:26px;line-height:1.1;margin-bottom:12px;color:#5e3f28}
+  ul,ol{padding-left:0;list-style:none}li{font-size:17px;line-height:32px}
+  ol li{display:flex;gap:14px}ol li b{color:#c2566f;font-family:Caveat;font-size:24px;line-height:32px;min-width:18px}
+  .note{margin-top:28px;font-size:24px;color:#5e3f28}
+  .more{position:absolute;top:34px;right:48px;font-size:15px;font-weight:700;color:#5e3f28}
+</style></head><body>
+<div class="shell">
+<aside>
+  <h1 class="hand">The Pink Recipe Box</h1>
+  <div class="search">Chicken, or a name you remember</div>
+  <div class="divs"><div class="div hand on">Everything</div><div class="div hand">Mains</div><div class="div hand">Sides</div><div class="div hand">Desserts</div><div class="div hand">Keepers</div></div>
+  <div class="list">
+    <div class="row on"><div class="thumb"></div><div><h2 class="hand">Crispy Skillet Turkey Burgers</h2><p>Mains · cooked 12×</p></div><div class="dot"></div></div>
+    <div class="row"><div class="thumb r"></div><div><h2 class="hand">Easy Peach and Blackberry Tart</h2><p>Desserts · want to try</p></div></div>
+    <div class="row"><div class="thumb"></div><div><h2 class="hand">Glazed Carrots with Lemon</h2><p>Sides · cooked 3×</p></div></div>
+    <div class="row"><div class="thumb r"></div><div><h2 class="hand">Teriyaki Salmon Bowl</h2><p>serves 4</p></div></div>
+    <div class="row"><div class="thumb"></div><div><h2 class="hand">Sunday Pancakes</h2><p>Breakfast · cooked 20×</p></div><div class="dot"></div></div>
+    <div class="row"><div class="thumb r"></div><div><h2 class="hand">Banana Bread</h2><p>Baking</p></div></div>
+  </div>
+  <div class="cam">Add a card</div>
+</aside>
+<main>
+  <div class="card">
+    <div class="ribbon"></div>
+    <h2 class="hand">Crispy Skillet Turkey Burgers</h2>
+    <div class="rule"></div>
+    <div class="meta">Serves 4 · cooked 12× · 1× <div class="cook">Start cooking</div></div>
+    <div class="cols">
+      <div><h3 class="hand">Ingredients</h3><ul><li>1 pound ground turkey</li><li>⅓ cup panko</li><li>2 tablespoons mayonnaise</li><li>1 teaspoon Worcestershire</li><li>½ teaspoon salt</li><li>4 buns, toasted</li><li>Butter lettuce, tomato</li></ul></div>
+      <div><h3 class="hand">Steps</h3><ol><li><b>1</b>Stir panko and mayonnaise into a paste; let sit two minutes.</li><li><b>2</b>Fold in turkey, Worcestershire and salt with a fork. Do not overwork.</li><li><b>3</b>Shape four patties a little wider than the buns.</li><li><b>4</b>Heat a skillet over medium-high until a drop of water skips.</li><li><b>5</b>Cook 5 minutes a side without pressing. Rest on the buns.</li></ol></div>
+    </div>
+    <p class="note hand">double the Worcestershire — Dad</p>
+  </div>
+  <div class="more">Keeper · In Mains · Correct · More</div>
+</main>
+</div>
+</body></html>

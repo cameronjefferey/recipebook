@@ -2,45 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GearIcon, SearchIcon } from "@/components/icons";
+import { GearIcon } from "@/components/icons";
 
 /**
- * The pink lid of the box. Search and settings live here so the tab bar can
- * stay the three things you actually do: open the box, put a card in, plan.
+ * The pink lid of the box, with the name written on it. Search lives on the
+ * box page where the cards are; Settings is the one thing up here, because it
+ * is used once and then left alone.
  */
 export function AppHeader() {
   const pathname = usePathname();
-  const searching = pathname.startsWith("/search");
   const settling = pathname.startsWith("/settings");
 
   return (
-    <header className="no-print pt-safe z-30 shrink-0 bg-pink px-4 py-2.5 text-page">
-      <div className="mx-auto flex max-w-lg items-center gap-1 md:max-w-[45rem] lg:max-w-[60rem]">
+    <header className="no-print pt-safe z-30 shrink-0 bg-pink px-4 py-2 text-page shadow-[0_1px_3px_#382a2226]">
+      <div className="mx-auto flex max-w-lg items-center justify-between gap-2 md:max-w-[45rem] lg:max-w-[60rem]">
         <Link
           href="/box"
-          className="font-display min-w-0 flex-1 truncate text-xl leading-none"
+          className="font-display min-w-0 truncate py-1 text-[1.75rem] leading-none"
         >
           The Pink Recipe Box
         </Link>
         <Link
-          href="/box/all"
-          aria-label="Search"
-          aria-current={searching ? "page" : undefined}
-          className={`tap flex items-center justify-center ${
-            searching ? "text-page" : "text-page/75"
-          }`}
-        >
-          <SearchIcon className="h-6 w-6" />
-        </Link>
-        <Link
           href="/settings"
-          aria-label="Settings"
           aria-current={settling ? "page" : undefined}
-          className={`tap flex items-center justify-center ${
-            settling ? "text-page" : "text-page/75"
+          className={`tap -mr-2 flex items-center gap-1.5 rounded-full px-3 text-[1rem] font-bold ${
+            settling ? "text-page" : "text-page/85"
           }`}
         >
           <GearIcon className="h-6 w-6" />
+          <span className="hidden sm:inline">Settings</span>
+          <span className="sr-only sm:hidden">Settings</span>
         </Link>
       </div>
     </header>
