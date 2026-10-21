@@ -3,8 +3,13 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { createBook, type BookState } from "@/lib/actions/books";
 import { Button, ErrorNote, Input } from "@/components/ui";
+import { PlusIcon } from "@/components/icons";
 
-export function NewBookForm() {
+/**
+ * Names a new box. Under the wall it is a dashed pill, the outline of a
+ * divider not yet written on; the form opens in place when tapped.
+ */
+export function NewBookForm({ asPill = false }: { asPill?: boolean }) {
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState<BookState, FormData>(
     createBook,
@@ -28,20 +33,29 @@ export function NewBookForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="tap text-[0.95rem] font-bold text-pink"
+        className={
+          asPill
+            ? "tap inline-flex items-center gap-1.5 rounded-full border border-dashed border-pink-mid px-4 text-[1rem] font-bold text-pink-deep"
+            : "tap text-[0.95rem] font-bold text-pink-deep"
+        }
       >
-        + Name a box
+        {asPill ? <PlusIcon className="h-5 w-5" /> : "+ "}
+        Name a box
       </button>
     );
   }
 
   return (
-    <form ref={formRef} action={action} className="space-y-2">
+    <form
+      ref={formRef}
+      action={action}
+      className="space-y-2"
+    >
       <ErrorNote>{state.error}</ErrorNote>
       <div className="flex gap-2">
         <Input
           name="name"
-          placeholder="Breakfast, Sides, What the kids eat…"
+          placeholder="Breakfast, Holidays, What the kids eat…"
           aria-label="New box name"
           maxLength={60}
           required
@@ -49,6 +63,14 @@ export function NewBookForm() {
         />
         <Button type="submit" disabled={pending} className="shrink-0 px-5">
           {pending ? "…" : "Add"}
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          className="shrink-0 px-4"
+          onClick={() => setOpen(false)}
+        >
+          Cancel
         </Button>
       </div>
     </form>

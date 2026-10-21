@@ -59,6 +59,14 @@ export function PlusIcon({ className }: P) {
   );
 }
 
+export function ChevronDown({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+      <path {...stroke} d="m5 9.5 7 7 7-7" />
+    </svg>
+  );
+}
+
 export function ChevronLeft({ className }: P) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>

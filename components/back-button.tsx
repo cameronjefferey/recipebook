@@ -13,9 +13,12 @@ import { ChevronLeft } from "@/components/icons";
 export function BackButton({
   fallback,
   label = "Back",
+  showLabel = false,
 }: {
   fallback: string;
   label?: string;
+  /** Print the word beside the arrow. The arrow alone is for tight rows. */
+  showLabel?: boolean;
 }) {
   const router = useRouter();
 
@@ -26,10 +29,13 @@ export function BackButton({
         if (window.history.length > 1) router.back();
         else router.push(fallback);
       }}
-      aria-label={label}
-      className="tap -ml-3 flex shrink-0 items-center justify-center text-pink"
+      aria-label={showLabel ? undefined : label}
+      className={`tap flex shrink-0 items-center justify-center gap-0.5 text-pink-deep ${
+        showLabel ? "-ml-2 pr-3 text-[1rem] font-bold" : "-ml-3"
+      }`}
     >
       <ChevronLeft className="h-6 w-6" />
+      {showLabel ? <span>{label}</span> : null}
     </button>
   );
 }

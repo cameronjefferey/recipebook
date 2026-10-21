@@ -84,8 +84,8 @@ export function BookPicker({
 
   return (
     <section className="no-print">
-      <h2 className="mb-2 text-[0.72rem] font-bold tracking-[0.14em] text-browned uppercase">
-        In these boxes
+      <h2 className="font-display mb-2 text-[1.35rem] leading-none text-browned">
+        Filed under
       </h2>
 
       <ul className="flex flex-wrap gap-2">
@@ -95,10 +95,10 @@ export function BookPicker({
               onClick={() => toggle(choice.id)}
               aria-pressed={choice.inBook}
               disabled={choice.pending}
-              className={`tap inline-flex h-12 items-center gap-1.5 rounded-full border px-4 text-[0.9rem] font-bold ${
+              className={`tap inline-flex h-12 items-center gap-1.5 rounded-full border px-4 text-[1rem] font-bold ${
                 choice.inBook
-                  ? "border-pink bg-pink text-page"
-                  : "border-line bg-card text-muted"
+                  ? "border-pink-deep bg-pink-deep text-page"
+                  : "border-line bg-card text-ink"
               } ${choice.pending ? "opacity-60" : ""}`}
             >
               {choice.inBook ? <CheckIcon className="h-4 w-4" /> : null}
@@ -116,9 +116,9 @@ export function BookPicker({
           <li>
             <button
               onClick={() => setAdding(true)}
-              className="tap inline-flex h-12 items-center rounded-full border border-dashed border-pink-mid px-4 text-[0.9rem] font-bold text-pink"
+              className="tap inline-flex h-12 items-center rounded-full border border-dashed border-pink-mid px-4 text-[1rem] font-bold text-pink-deep"
             >
-              + New box
+              + New divider
             </button>
           </li>
         )}
@@ -135,8 +135,8 @@ export function BookPicker({
                 addBook();
               }
             }}
-            placeholder="Name the box"
-            aria-label="New box name"
+            placeholder="Name the divider"
+            aria-label="New divider name"
             maxLength={60}
             autoFocus
           />

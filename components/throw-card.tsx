@@ -13,7 +13,7 @@ export function ThrowCard({ id, title }: { id: string; title: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="tap inline-flex items-center justify-center text-[0.95rem] font-bold text-jam"
+        className="tap inline-flex items-center justify-center rounded-full px-2 text-[1rem] font-bold text-jam"
       >
         Throw this card out
       </button>

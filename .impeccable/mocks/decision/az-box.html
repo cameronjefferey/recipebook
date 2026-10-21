@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Source+Serif+4:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:390px;height:844px;overflow:hidden;background:#fdf6ea;color:#382a22;font:17px/1.4 "Source Serif 4",Georgia,serif}
+  .hand{font-family:Caveat,cursive;font-weight:700}
+  header{display:flex;align-items:baseline;justify-content:space-between;padding:54px 20px 6px}
+  header h1{font-size:34px;line-height:1;color:#c2566f}
+  header a{font-size:15px;font-weight:700;color:#5e3f28}
+  .search{margin:8px 16px 0;height:52px;border:1px solid #382a2218;border-radius:14px;background:#fffcf6;display:flex;align-items:center;padding:0 16px;color:#5f4d41}
+  .tabs{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap}
+  .tab{height:44px;padding:0 16px;display:flex;align-items:center;border-radius:6px 6px 0 0;background:#f6ead8;color:#5e3f28;font-size:19px}
+  .tab.on{background:#fffcf6;color:#382a22;border:1px solid #382a2218;border-bottom:0;position:relative;top:1px}
+  .box{margin:0 16px;background:#fffcf6;border:1px solid #382a2218;border-radius:0 6px 6px 6px;padding:6px 0 0 16px;position:relative;height:560px;overflow:hidden}
+  .letter{display:flex;align-items:center;gap:10px;height:42px;margin-top:6px}
+  .letter b{font-size:26px;color:#c2566f;line-height:1;min-width:22px}
+  .letter i{flex:1;height:1px;background:#5c6b7a3d}
+  .row{display:flex;align-items:center;gap:12px;height:66px;padding-right:48px}
+  .thumb{width:46px;height:46px;border-radius:3px;background:linear-gradient(135deg,#e8d4b8,#cfa77f);flex:none}
+  .thumb.r{background:#fffcf6 repeating-linear-gradient(to bottom,transparent 0 8px,#5c6b7a3d 8px 9px);border:1px solid #382a2218}
+  .row h2{font-size:22px;line-height:1}
+  .row p{font-size:13px;color:#5f4d41;margin-top:3px}
+  .dot{margin-left:auto;width:10px;height:16px;background:#c2566f;clip-path:polygon(0 0,100% 0,100% 100%,50% 70%,0 100%)}
+  .rail{position:absolute;right:0;top:0;bottom:0;width:36px;background:#f6ead8;display:flex;flex-direction:column;align-items:center;justify-content:space-around;padding:10px 0;font-size:13px;font-weight:700;color:#5e3f28}
+  .rail b{color:#a33a55}
+  nav{position:absolute;bottom:0;left:0;right:0;height:92px;border-top:1px solid #382a2218;background:#fffcf6f2;display:flex;justify-content:space-around;align-items:center;padding-bottom:18px}
+  nav span{font-size:15px;font-weight:700;color:#5f4d41}
+  nav .cam{width:60px;height:60px;border-radius:50%;background:#c2566f;box-shadow:0 2px 6px #382a2233}
+</style></head><body>
+<header><h1 class="hand">The Pink Recipe Box</h1><a>Settings</a></header>
+<div class="search">Chicken, or a name you remember</div>
+<div class="tabs"><div class="tab hand on">Everything</div><div class="tab hand">Mains</div><div class="tab hand">Sides</div><div class="tab hand">Desserts</div><div class="tab hand">Keepers</div></div>
+<div class="box">
+  <div class="letter"><b class="hand">B</b><i></i></div>
+  <div class="row"><div class="thumb r"></div><div><h2 class="hand">Banana Bread</h2><p>Baking</p></div></div>
+  <div class="letter"><b class="hand">C</b><i></i></div>
+  <div class="row"><div class="thumb"></div><div><h2 class="hand">Crispy Skillet Turkey Burgers</h2><p>Mains · cooked 12×</p></div><div class="dot"></div></div>
+  <div class="letter"><b class="hand">E</b><i></i></div>
+  <div class="row"><div class="thumb"></div><div><h2 class="hand">Easy Peach and Blackberry Tart</h2><p>Desserts · want to try</p></div></div>
+  <div class="letter"><b class="hand">G</b><i></i></div>
+  <div class="row"><div class="thumb"></div><div><h2 class="hand">Glazed Carrots with Lemon</h2><p>Sides · cooked 3×</p></div></div>
+  <div class="letter"><b class="hand">S</b><i></i></div>
+  <div class="row"><div class="thumb"></div><div><h2 class="hand">Sunday Pancakes</h2><p>Breakfast · cooked 20×</p></div><div class="dot"></div></div>
+  <div class="letter"><b class="hand">T</b><i></i></div>
+  <div class="row"><div class="thumb r"></div><div><h2 class="hand">Teriyaki Salmon Bowl</h2><p>serves 4</p></div></div>
+  <div class="rail"><span>A</span><b>B</b><b>C</b><span>D</span><b>E</b><span>F</span><b>G</b><span>H</span><span>K</span><span>L</span><span>M</span><span>P</span><b>S</b><b>T</b><span>W</span></div>
+</div>
+<nav><span>Box</span><div class="cam"></div><span>Plan</span></nav>
+</body></html>

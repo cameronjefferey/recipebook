@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Source+Serif+4:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:390px;height:844px;overflow:hidden;background:#fdf6ea;color:#382a22;font:17px/1.4 "Source Serif 4",Georgia,serif}
+  .hand{font-family:Caveat,cursive;font-weight:700}
+  header{display:flex;align-items:baseline;justify-content:space-between;padding:54px 20px 6px}
+  header h1{font-size:34px;line-height:1;color:#c2566f}
+  header a{font-size:15px;font-weight:700;color:#5e3f28}
+  .search{margin:8px 16px 0;height:52px;border:1px solid #382a2218;border-radius:14px;background:#fffcf6;display:flex;align-items:center;gap:10px;padding:0 16px;color:#5f4d41;font-size:17px}
+  .search i{width:20px;height:20px;border:2.5px solid #5f4d41;border-radius:50%;position:relative}
+  .search i::after{content:"";position:absolute;width:3px;height:9px;background:#5f4d41;right:-6px;bottom:-7px;transform:rotate(-45deg)}
+  .tabs{display:flex;gap:6px;padding:14px 16px 0;flex-wrap:wrap}
+  .tab{height:44px;padding:0 16px;display:flex;align-items:center;border-radius:6px 6px 0 0;background:#f6ead8;color:#5e3f28;font-size:19px}
+  .tab.on{background:#fffcf6;color:#382a22;border:1px solid #382a2218;border-bottom:0;position:relative;top:1px}
+  .wall{margin:0 16px;border-top:1px solid #382a2218;padding:14px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+  .card{background:#fffcf6;border-radius:3px;box-shadow:0 1px 2px #382a2214,1px 2px 0 0 #e9d9c4;position:relative;overflow:hidden}
+  .card.tilt{transform:rotate(-1.2deg)}
+  .card.tilt2{transform:rotate(.8deg)}
+  .photo{height:118px;background:linear-gradient(135deg,#e8d4b8,#cfa77f)}
+  .photo.b{background:linear-gradient(135deg,#d9c1a5,#a66e4e)}
+  .photo.c{background:linear-gradient(135deg,#f1d9a1,#d6912f)}
+  .photo.d{background:linear-gradient(135deg,#e9b7a0,#b85a44)}
+  .ruled{height:118px;background:#fffcf6 repeating-linear-gradient(to bottom,transparent 0 23px,#5c6b7a3d 23px 24px);padding:18px 12px 0;font-size:24px;line-height:24px;color:#382a22}
+  .cap{padding:8px 10px 10px}
+  .cap h2{font-size:21px;line-height:1.05}
+  .cap p{font-size:13px;color:#5f4d41;margin-top:3px}
+  .ribbon{position:absolute;top:-2px;right:12px;width:18px;height:32px;background:#c2566f;clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
+  nav{position:absolute;bottom:0;left:0;right:0;height:92px;border-top:1px solid #382a2218;background:#fffcf6f2;display:flex;justify-content:space-around;align-items:center;padding-bottom:18px}
+  nav span{font-size:15px;font-weight:700;color:#5f4d41}
+  nav .cam{width:60px;height:60px;border-radius:50%;background:#c2566f;box-shadow:0 2px 6px #382a2233}
+</style></head><body>
+<header><h1 class="hand">The Pink Recipe Box</h1><a>Settings</a></header>
+<div class="search"><i></i>Chicken, or a name you remember</div>
+<div class="tabs">
+  <div class="tab hand on">Everything</div><div class="tab hand">Mains</div><div class="tab hand">Sides</div><div class="tab hand">Desserts</div><div class="tab hand">Keepers</div>
+</div>
+<div class="wall">
+  <div class="card tilt"><div class="ribbon"></div><div class="photo"></div><div class="cap"><h2 class="hand">Crispy Skillet Turkey Burgers</h2><p>Mains · cooked 12×</p></div></div>
+  <div class="card"><div class="ruled hand">Teriyaki Salmon Bowl</div><div class="cap"><h2 class="hand">Teriyaki Salmon Bowl</h2><p>serves 4</p></div></div>
+  <div class="card tilt2"><div class="photo c"></div><div class="cap"><h2 class="hand">Easy Peach and Blackberry Tart</h2><p>Desserts · want to try</p></div></div>
+  <div class="card"><div class="photo b"></div><div class="cap"><h2 class="hand">Glazed Carrots with Lemon</h2><p>Sides · cooked 3×</p></div></div>
+  <div class="card tilt"><div class="photo d"></div><div class="cap"><h2 class="hand">Sunday Pancakes</h2><p>Breakfast · cooked 20×</p></div></div>
+  <div class="card"><div class="ruled hand">Banana Bread</div><div class="cap"><h2 class="hand">Banana Bread</h2><p>Baking</p></div></div>
+</div>
+<nav><span>Box</span><div class="cam"></div><span>Plan</span></nav>
+</body></html>

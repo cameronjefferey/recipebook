@@ -10,7 +10,7 @@ import {
   setGroceryChecked,
   startNewWeek,
 } from "@/lib/actions/plan";
-import { Eyebrow, Input, Button } from "@/components/ui";
+import { HandHeading, Input, Button } from "@/components/ui";
 import { CheckIcon } from "@/components/icons";
 import { CategoryIcon } from "@/lib/category-icon";
 import {
@@ -158,11 +158,11 @@ export function PlanClient({
   return (
     <div className="space-y-8">
       <section className="space-y-3">
-        <Eyebrow>Cooking this week</Eyebrow>
+        <HandHeading>Cooking this week</HandHeading>
         {state.planned.length === 0 ? (
           <p className="text-[0.95rem] text-muted">
             Nothing yet. Open a recipe and tap &ldquo;Cook this week,&rdquo; or{" "}
-            <Link href="/recipes" className="font-bold text-pink underline">
+            <Link href="/box" className="font-bold text-pink-deep underline">
               pick a few cards
             </Link>
             .
@@ -193,7 +193,7 @@ export function PlanClient({
                     )}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate font-bold">{recipe.title}</span>
+                    <span className="block font-bold leading-snug">{recipe.title}</span>
                     {recipe.servings ? (
                       <span className="block text-[0.8rem] text-muted">
                         serves {recipe.servings}
@@ -204,7 +204,7 @@ export function PlanClient({
                 <button
                   onClick={() => unplan(recipe.id)}
                   aria-label={`Take ${recipe.title} off this week`}
-                  className="tap shrink-0 px-2 text-[0.85rem] font-bold text-jam"
+                  className="tap shrink-0 px-2 text-[0.95rem] font-bold text-jam"
                 >
                   Remove
                 </button>
@@ -215,7 +215,7 @@ export function PlanClient({
       </section>
 
       <section className="space-y-3">
-        <Eyebrow>Grocery list</Eyebrow>
+        <HandHeading>Grocery list</HandHeading>
 
         {grocery.length === 0 ? (
           <p className="text-[0.95rem] text-muted">
@@ -225,7 +225,7 @@ export function PlanClient({
           <div className="space-y-5">
             {grocery.map(({ aisle, items }) => (
               <div key={aisle} className="space-y-1">
-                <h2 className="hand px-2 text-[1.15rem] text-browned">{aisle}</h2>
+                <h3 className="hand px-2 text-[1.15rem] text-browned">{aisle}</h3>
                 <ul>
                   {items.map((item) =>
                     item.kind === "line" ? (
