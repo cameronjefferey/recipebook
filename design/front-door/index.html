@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Five ways to open the box</title>
+<link rel="stylesheet" href="fonts.css" />
+<script>
+  const shot = new URLSearchParams(location.search).get("shot");
+  if (shot) document.documentElement.dataset.shot = shot;
+</script>
+<style>
+  :root {
+    --page: #fdf6ea;
+    --card: #fffcf6;
+    --sink: #f6ead8;
+    --pink: #c2566f;
+    --pink-mid: #e8909f;
+    --pink-deep: #a8415a;
+    --rim: #dba6b0;
+    --butter: #f0c264;
+    --browned: #8a6242;
+    --jam: #a8322f;
+    --ink: #382a22;
+    --muted: #6f5a4b;
+    --line: rgba(56, 42, 34, 0.1);
+    --rule: rgba(92, 107, 122, 0.3);
+    --hand: "Caveat", cursive;
+    --serif: "Source Serif 4", Georgia, serif;
+    --shadow: 0 1px 2px #382a2214, 1px 2px 0 #e7d4be;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: #f3eadc;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .intro {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 48px 28px 12px;
+  }
+  .intro h1 {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 0.95;
+    color: var(--pink-deep);
+  }
+  .intro p {
+    margin: 14px 0 0;
+    max-width: 38rem;
+    color: var(--ink);
+  }
+  .intro p.quiet {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 56px 36px;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+  .stage { width: 312px; }
+  .kicker {
+    margin: 0 0 2px;
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--browned);
+  }
+  .kicker.wild { color: var(--pink-deep); }
+  .stage h2 {
+    margin: 0 0 12px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 0.95;
+  }
+  .blurb {
+    margin: 14px 2px 0;
+    font-size: 15.5px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .scaler {
+    width: 312px;
+    height: 675px;
+    position: relative;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    transform: scale(0.8);
+    transform-origin: top left;
+    background: var(--page);
+    overflow: hidden;
+    position: relative;
+    border-radius: 28px;
+    border: 1px solid rgba(56, 42, 34, 0.14);
+    box-shadow: 0 1px 2px #382a2214, 0 18px 30px -20px #382a2255;
+    display: flex;
+    flex-direction: column;
+  }
+
+  html[data-shot] body { background: var(--page); }
+  html[data-shot] .intro,
+  html[data-shot] .stage { display: none; }
+  html[data-shot="1"] #m1,
+  html[data-shot="2"] #m2,
+  html[data-shot="3"] #m3,
+  html[data-shot="4"] #m4,
+  html[data-shot="5"] #m5 { display: block; }
+  html[data-shot] .kicker,
+  html[data-shot] .stage > h2,
+  html[data-shot] .blurb { display: none; }
+  html[data-shot] .grid { display: block; padding: 0; margin: 0; max-width: none; }
+  html[data-shot] .stage { width: 390px; }
+  html[data-shot] .scaler { width: 390px; height: 844px; }
+  html[data-shot] .phone {
+    transform: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .status {
+    flex: none;
+    height: 36px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 18px 6px;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+  }
+  .status span.right { display: flex; align-items: center; gap: 6px; font-weight: 650; }
+  .status .batt {
+    border: 1.5px solid currentColor;
+    border-radius: 3px;
+    padding: 0 3px;
+    font-size: 11px;
+    line-height: 14px;
+    position: relative;
+  }
+  .status .batt::after {
+    content: "";
+    position: absolute;
+    right: -3px;
+    top: 4px;
+    width: 2px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 0 1px 1px 0;
+  }
+  .on-pink { color: var(--page); }
+
+  .ico { width: 22px; height: 22px; display: block; }
+  .ico.sm { width: 16px; height: 16px; }
+  .ico.lg { width: 26px; height: 26px; }
+
+  /* ----- shared bits ----- */
+  .wordmark {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--pink-deep);
+  }
+  .top {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 16px 8px;
+    color: var(--browned);
+  }
+  .search {
+    flex: none;
+    margin: 2px 16px 0;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: 16.5px;
+  }
+  .search .ico { color: var(--muted); flex: none; }
+
+  .tin-row {
+    flex: none;
+    display: flex;
+    gap: 14px;
+    padding: 16px 16px 4px;
+  }
+  .mini {
+    width: 124px;
+  }
+  .mini-lid {
+    height: 26px;
+    background: var(--pink);
+    border-radius: 5px 5px 2px 2px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--butter);
+    box-shadow: inset 0 -1px 0 rgba(56, 42, 34, 0.12);
+  }
+  .mini-body {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 0 0 3px 3px;
+    padding: 6px 10px 8px;
+    box-shadow: var(--shadow);
+  }
+  .mini-body strong {
+    display: block;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .mini-body em {
+    font-style: normal;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .tabs {
+    flex: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    padding: 12px 12px 0;
+  }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 42px;
+    padding: 6px 10px 8px;
+    background: var(--sink);
+    color: var(--browned);
+    border-radius: 7px 7px 0 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .tab.on {
+    background: var(--page);
+    color: var(--ink);
+    border: 1px solid var(--rim);
+    border-bottom: 0;
+    position: relative;
+    top: 1px;
+    z-index: 1;
+  }
+  .tab.more {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--pink-deep);
+    background: transparent;
+  }
+  .tab .star { color: var(--butter); }
+
+  .wall {
+    flex: 1;
+    min-height: 0;
+    margin: 0 10px;
+    border: 1px solid var(--rim);
+    border-radius: 0 7px 7px 7px;
+    background: var(--page);
+    padding: 12px 10px 12px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+  }
+  .wall-note {
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 4px 8px;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--browned);
+    line-height: 1;
+  }
+  .cards {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
+    gap: 12px 10px;
+  }
+
+  .ix {
+    position: relative;
+    background-color: var(--card);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 27px,
+      var(--rule) 27px 28px
+    );
+    background-position: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+    padding: 8px 10px 26px;
+    overflow: hidden;
+  }
+  .ix h3 {
+    position: relative;
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 27px;
+    color: var(--ink);
+  }
+  .ix .cat {
+    position: absolute;
+    left: 10px;
+    bottom: 7px;
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+    background: transparent;
+  }
+  .ix .mark {
+    position: absolute;
+    right: 8px;
+    bottom: 26px;
+    width: 26px;
+    height: 26px;
+    color: var(--pink-mid);
+  }
+  .ribbon {
+    position: absolute;
+    top: -1px;
+    right: 12px;
+    width: 16px;
+    height: 30px;
+    background: var(--pink);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+    z-index: 2;
+  }
+  .dog {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, transparent 50%, #e4d0b4 50.5% 58%, var(--sink) 58%);
+    border-bottom-right-radius: 3px;
+  }
+  .splat {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 78% 42%, rgba(168, 50, 47, 0.16) 0 6px, transparent 7px),
+      radial-gradient(circle at 70% 54%, rgba(138, 98, 66, 0.14) 0 3px, transparent 4px),
+      radial-gradient(circle at 84% 58%, rgba(240, 194, 100, 0.45) 0 4px, transparent 5px);
+  }
+
+  .tabbar {
+    flex: none;
+    height: 78px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 0 18px 12px;
+    background: rgba(255, 252, 246, 0.96);
+    border-top: 1px solid var(--line);
+    position: relative;
+    z-index: 3;
+  }
+  .ti {
+    width: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--muted);
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .ti.on { color: var(--pink-deep); }
+  .ti.add { color: var(--ink); }
+  .cam {
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+    margin-bottom: -4px;
+    border-radius: 50%;
+    background: var(--pink);
+    color: var(--page);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 2px 6px #382a2233;
+  }
+
+  /* ----- 2. on the lid ----- */
+  .lid-block {
+    flex: none;
+    background: var(--pink);
+    color: var(--page);
+    padding-bottom: 14px;
+  }
+  .lid-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 2px;
+  }
+  .lid-row .wordmark { color: var(--page); font-size: 32px; }
+  .lid-search {
+    margin: 6px 16px 0;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(253, 246, 234, 0.88);
+    border-bottom: 1px solid rgba(253, 246, 234, 0.45);
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 24px;
+  }
+  .lid-phone .tabs { padding-top: 10px; }
+  .lid-phone .tab .star { color: var(--butter); width: 14px; height: 14px; }
+  .rows-3 { grid-template-rows: 1fr 1fr 1fr; }
+  .rows-2 { grid-template-rows: 1fr 1fr; }
+
+  /* ----- 3. set out ----- */
+  .setout {
+    flex: none;
+    margin: 0;
+    padding: 0 20px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 1;
+    color: var(--browned);
+  }
+  .setout-sub {
+    flex: none;
+    margin: 4px 20px 0;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .hero {
+    flex: none;
+    margin: 16px 22px 0;
+    min-height: 292px;
+    padding: 22px 20px 34px;
+    transform: rotate(-0.7deg);
+    background-position: 0 168px;
+  }
+  .hero h3 { font-size: 50px; line-height: 46px; }
+  .hero .aside {
+    margin: 16px 0 0;
+    max-width: 14em;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.05;
+    color: var(--browned);
+  }
+  .words {
+    flex: none;
+    display: flex;
+    gap: 16px;
+    padding: 18px 22px 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--browned);
+  }
+  .words .on {
+    color: var(--ink);
+    box-shadow: inset 0 -1px 0 var(--rule);
+  }
+  .rest-label {
+    flex: none;
+    margin: 16px 22px 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--browned);
+  }
+  .spread {
+    flex: none;
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 18px 0 22px;
+    height: 132px;
+  }
+  .spread .ix {
+    width: 118px;
+    height: 118px;
+    flex: none;
+    margin-right: -34px;
+    padding-top: 10px;
+  }
+  .spread .ix h3 { font-size: 22px; line-height: 22px; }
+  .spread .ix:last-child { margin-right: 0; }
+  .find {
+    flex: none;
+    margin: auto 16px 10px;
+  }
+
+  /* ----- 4. hold the stack ----- */
+  .stack-phone { display: block; background: var(--sink); }
+  .backcard, .held {
+    position: absolute;
+    width: 308px;
+    border-radius: 3px;
+    background-color: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .backcard {
+    height: 640px;
+    padding: 8px 16px 0;
+    overflow: hidden;
+  }
+  .backcard h3 {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .held {
+    height: 600px;
+    padding: 22px 22px 20px;
+    z-index: 5;
+  }
+  .held .eyebrow {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--browned);
+  }
+  .held h3 {
+    margin: 6px 0 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 54px;
+    line-height: 0.9;
+    color: var(--ink);
+  }
+  .held .aside {
+    margin: 18px 0 0;
+    max-width: 16em;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 1.05;
+    color: var(--browned);
+  }
+  .held .lines {
+    margin-top: 26px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 29px,
+      var(--rule) 29px 30px
+    );
+  }
+  .held .lines p {
+    margin: 0;
+    height: 30px;
+    line-height: 26px;
+    font-size: 17px;
+  }
+  .held .foot {
+    position: absolute;
+    left: 22px;
+    bottom: 18px;
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--browned);
+  }
+  .held .ribbon { height: 42px; width: 18px; right: 22px; }
+  .cam-side {
+    position: absolute;
+    right: 16px;
+    bottom: 36px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .cam-side .cam { margin: 0; }
+  .stack-gear {
+    position: absolute;
+    top: 40px;
+    right: 16px;
+    z-index: 6;
+    color: var(--browned);
+  }
+
+  /* ----- 5. the tin ----- */
+  .tin-phone { display: block; background: var(--page); }
+  .open-lid {
+    position: absolute;
+    top: 46px;
+    left: 22px;
+    right: 22px;
+    height: 118px;
+    background: var(--pink);
+    border-radius: 12px 12px 3px 3px;
+    border: 1px solid #a84a60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: inset 0 1px 0 rgba(253, 246, 234, 0.35);
+  }
+  .open-lid h1 {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 0.9;
+    color: var(--page);
+  }
+  .open-lid p {
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 20px;
+    color: rgba(253, 246, 234, 0.82);
+  }
+  .hinge {
+    position: absolute;
+    top: 160px;
+    left: 86px;
+    right: 86px;
+    height: 10px;
+    background: #9a3c52;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .tin {
+    position: absolute;
+    top: 168px;
+    left: 14px;
+    right: 14px;
+    height: 508px;
+    background: var(--pink);
+    border-radius: 5px 5px 16px 16px;
+    border: 1px solid #a84a60;
+    box-shadow: 0 10px 18px -12px #382a2266, 0 1px 0 #9a3c52;
+    padding: 12px 12px 30px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .tin-tabs {
+    flex: none;
+    height: 38px;
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    padding: 0 6px;
+  }
+  .tin-tabs span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 30px;
+    padding: 0 9px 2px;
+    background: var(--sink);
+    color: var(--browned);
+    border-radius: 6px 6px 0 0;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .tin-tabs .on {
+    height: 36px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .floor {
+    flex: 1;
+    position: relative;
+    background: #f3e4d0;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: inset 0 10px 18px rgba(168, 65, 90, 0.1);
+  }
+  .fan {
+    position: absolute;
+    width: 156px;
+    height: 196px;
+    padding: 10px 10px 8px;
+  }
+  .fan h3 { font-size: 26px; line-height: 26px; }
+  .f1 { left: 18px; top: 22px; transform: rotate(-7deg); }
+  .f2 { left: 30px; top: 96px; transform: rotate(-3deg); z-index: 1; }
+  .f3 { right: 6px; top: 28px; transform: rotate(8deg); }
+  .f4 { right: -6px; top: 92px; transform: rotate(13deg); z-index: 1; }
+  .pulled {
+    position: absolute;
+    top: 458px;
+    left: 72px;
+    width: 210px;
+    height: 276px;
+    z-index: 4;
+    transform: rotate(-3.5deg);
+    padding: 16px 14px 16px;
+    background-position: 0 118px;
+    box-shadow:
+      0 1px 2px #382a2218,
+      2px 3px 0 #e7d4be,
+      0 16px 18px -14px #382a2288;
+  }
+  .pulled h3 { font-size: 40px; line-height: 38px; margin-top: 38px; }
+  .slip {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    z-index: 5;
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 14px 9px 1px;
+    transform: rotate(7deg);
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--pink-deep);
+    line-height: 1;
+    box-shadow: 1px 1px 0 #e7d4be;
+  }
+  .clip {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    margin-left: -8px;
+    width: 14px;
+    height: 28px;
+    z-index: 4;
+    border: 2px solid var(--browned);
+    border-bottom: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  .clip::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 10px;
+    width: 6px;
+    height: 18px;
+    border: 2px solid var(--browned);
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+  }
+  .counter-note {
+    position: absolute;
+    left: 22px;
+    bottom: 28px;
+    margin: 0;
+    font-family: var(--hand);
+    font-weight: 400;
+    font-size: 22px;
+    color: var(--browned);
+    transform: rotate(-1deg);
+  }
+  .tin-cam {
+    position: absolute;
+    right: 26px;
+    bottom: 24px;
+    z-index: 5;
+  }
+  .tin-cam .cam { margin: 0; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24">
+    <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="m16 16 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1Z"/>
+  </symbol>
+  <symbol id="i-bars" viewBox="0 0 18 12">
+    <path fill="currentColor" d="M1 8h2.2v3.2H1zM5.2 5.2h2.2V11.2H5.2zM9.4 2.8H11.6V11.2H9.4zM13.6.6H15.8V11.2H13.6z"/>
+  </symbol>
+  <symbol id="i-box" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M3 8 5 4h14l2 4"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M10 12h4"/>
+  </symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/>
+    <circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+  </symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 8h16l-1.6 9.2a2 2 0 0 1-2 1.8H7.6a2 2 0 0 1-2-1.8L4 8Z"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M8 8 9.5 4h5L16 8"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M9.5 12v4M14.5 12v4"/>
+  </symbol>
+  <symbol id="i-pot" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 11h14v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4v-5Z"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3.5 11h17M2 8.5l2 1M22 8.5l-2 1"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 5.5c.9-1 2.2-1 2.6 0"/>
+  </symbol>
+  <symbol id="i-cake" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6.5 12h11l-1.3 7.2a2 2 0 0 1-2 1.8h-4.4a2 2 0 0 1-2-1.8L6.5 12Z"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.8" d="M7 12a5 5 0 0 1 10 0"/>
+    <circle cx="12" cy="4.5" r="1.1" fill="currentColor"/>
+  </symbol>
+  <symbol id="i-plate" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+  </symbol>
+  <symbol id="i-star" viewBox="0 0 24 24">
+    <path fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="M12 3.6 14.4 9l6 .6-4.5 4.1 1.3 5.8L12 16.8 6.8 19.5l1.3-5.8L3.6 9.6l6-.6Z"/>
+  </symbol>
+  <symbol id="i-sig" viewBox="0 0 24 24">
+    <path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M4 16c2.5-1 3.2-4.5 1.2-4.5S3.5 15 6 15.2c2.2.2 2.4-3.2 4.6-3.2 1.6 0 2 2 3.2 2 1.8 0 2-3 4.2-2.6"/>
+  </symbol>
+</svg>
+
+<header class="intro">
+  <h1>Five ways to open the box</h1>
+  <p>The first screen currently asks for a search, two tins, six dividers, a count, and a sort before a recipe. These five keep the same cards. The first three stay inside the tin. The last two throw the frame out.</p>
+  <p class="quiet">Static mockups, for looking. Nothing here is wired into the app.</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1. Quiet counter -->
+  <section class="stage" id="m1">
+    <p class="kicker">Fits the tin</p>
+    <h2>Quiet counter</h2>
+    <div class="scaler">
+      <div class="phone">
+        <div class="status"><span>13:59</span><span class="right"><svg class="ico sm" style="width:18px;height:12px"><use href="#i-bars"/></svg><span class="batt">73</span></span></div>
+        <div class="top">
+          <h1 class="wordmark">The Pink Recipe Box</h1>
+          <svg class="ico"><use href="#i-gear"/></svg>
+        </div>
+        <div class="search">
+          <svg class="ico"><use href="#i-search"/></svg>
+          <span>Chicken, carrots, or a name</span>
+        </div>
+        <div class="tin-row">
+          <div class="mini">
+            <div class="mini-lid"><svg class="ico sm"><use href="#i-star"/></svg></div>
+            <div class="mini-body"><strong>Dinner</strong><em>3 cards</em></div>
+          </div>
+          <div class="mini">
+            <div class="mini-lid"><svg class="ico sm"><use href="#i-star"/></svg></div>
+            <div class="mini-body"><strong>Kids</strong><em>1 card</em></div>
+          </div>
+        </div>
+        <div class="tabs">
+          <span class="tab on">Everything</span>
+          <span class="tab">Keepers</span>
+          <span class="tab">Want to try</span>
+          <span class="tab more">More</span>
+        </div>
+        <div class="wall">
+          <div class="wall-note"><span>Eighteen cards.</span><span>A to Z</span></div>
+          <div class="cards rows-2">
+            <article class="ix" style="transform:rotate(-0.6deg)">
+              <span class="ribbon"></span>
+              <span class="splat"></span>
+              <h3>Arroz con<br>Pollo</h3>
+              <svg class="mark"><use href="#i-pot"/></svg>
+              <p class="cat">Main Course</p>
+              <span class="dog"></span>
+            </article>
+            <article class="ix" style="transform:rotate(0.8deg)">
+              <h3>Burst Cherry<br>Tomato<br>Orzotto</h3>
+              <svg class="mark"><use href="#i-pot"/></svg>
+              <p class="cat">Dinner</p>
+            </article>
+            <article class="ix" style="transform:rotate(0.5deg)">
+              <h3>Butter<br>Paneer</h3>
+              <svg class="mark"><use href="#i-pot"/></svg>
+              <p class="cat">Main Course</p>
+            </article>
+            <article class="ix" style="transform:rotate(-1deg)">
+              <h3>Cauliflower</h3>
+              <svg class="mark"><use href="#i-plate"/></svg>
+              <p class="cat">Sides</p>
+            </article>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="ti on"><svg class="ico lg"><use href="#i-box"/></svg><span>Box</span></div>
+          <div class="ti add"><span class="cam"><svg class="ico lg"><use href="#i-cam"/></svg></span><span>Add</span></div>
+          <div class="ti"><svg class="ico lg"><use href="#i-cart"/></svg><span>Plan</span></div>
+        </nav>
+      </div>
+    </div>
+    <p class="blurb">Same objects, fewer of them shouting. The wordmark sits on the paper, Dinner and Kids shrink back into tins, and Low Carb, NSNG, and NY Times fold into “3 more” so the tabs stay one line. The sort is a handwritten note, not a second control.</p>
+  </section>
+
+  <!-- 2. On the lid -->
+  <section class="stage" id="m2">
+    <p class="kicker">Fits the tin</p>
+    <h2>On the lid</h2>
+    <div class="scaler">
+      <div class="phone lid-phone">
+        <div class="lid-block">
+          <div class="status on-pink"><span>13:59</span><span class="right"><svg class="ico sm" style="width:18px;height:12px"><use href="#i-bars"/></svg><span class="batt">73</span></span></div>
+          <div class="lid-row">
+            <h1 class="wordmark">The Pink Recipe Box</h1>
+            <svg class="ico"><use href="#i-gear"/></svg>
+          </div>
+          <div class="lid-search">
+            <svg class="ico"><use href="#i-search"/></svg>
+            <span>Chicken, carrots, or a box</span>
+          </div>
+        </div>
+        <div class="tabs">
+          <span class="tab on">Everything</span>
+          <span class="tab">Keepers</span>
+          <span class="tab">Dinner <svg class="ico sm star"><use href="#i-star"/></svg></span>
+          <span class="tab">Kids <svg class="ico sm star"><use href="#i-star"/></svg></span>
+        </div>
+        <div class="wall">
+          <div class="wall-note"><span>Eighteen cards.</span><span>A to Z</span></div>
+          <div class="cards rows-3">
+            <article class="ix" style="transform:rotate(-0.5deg)">
+              <span class="ribbon"></span>
+              <h3>Arroz con<br>Pollo</h3>
+              <svg class="mark"><use href="#i-pot"/></svg>
+              <p class="cat">Main Course</p>
+              <span class="dog"></span>
+            </article>
+            <article class="ix" style="transform:rotate(0.7deg)">
+              <h3>Burst Cherry<br>Tomato<br>Orzotto</h3>
+              <svg class="mark"><use href="#i-pot"/></svg>
+              <p class="cat">Dinner</p>
+            </article>
+            <article class="ix" style="transform:rotate(0.4deg)">
+              <h3>Butter Paneer</h3>
+              <svg class="mark"><use href="#i-pot"/></svg>
+              <p class="cat">Main Course</p>
+            </article>
+            <article class="ix" style="transform:rotate(-0.8deg)">
+              <h3>Cauliflower</h3>
+              <svg class="mark"><use href="#i-plate"/></svg>
+              <p class="cat">Sides</p>
+            </article>
+            <article class="ix" style="transform:rotate(-0.4deg)">
+              <h3>Peach Tart</h3>
+              <svg class="mark"><use href="#i-cake"/></svg>
+              <p class="cat">Sweets</p>
+            </article>
+            <article class="ix" style="transform:rotate(0.9deg)">
+              <h3>Glazed<br>Carrots</h3>
+              <svg class="mark"><use href="#i-plate"/></svg>
+              <p class="cat">Sides</p>
+            </article>
+          </div>
+        </div>
+        <nav class="tabbar">
+          <div class="ti on"><svg class="ico lg"><use href="#i-box"/></svg><span>Box</span></div>
+          <div class="ti add"><span class="cam"><svg class="ico lg"><use href="#i-cam"/></svg></span><span>Add</span></div>
+          <div class="ti"><svg class="ico lg"><use href="#i-cart"/></svg><span>Plan</span></div>
+        </nav>
+      </div>
+    </div>
+    <p class="blurb">The search moves onto the lid, where the name already lives, so it stops being a second white bar. Dinner and Kids become tabs with a star. Want to try goes back to being a ribbon on a card, and under the row there is only the wall.</p>
+  </section>
+
+  <!-- 3. Set out -->
+  <section class="stage" id="m3">
+    <p class="kicker">Fits the tin</p>
+    <h2>Set out tonight</h2>
+    <div class="scaler">
+      <div class="phone">
+        <div class="status"><span>13:59</span><span class="right"><svg class="ico sm" style="width:18px;height:12px"><use href="#i-bars"/></svg><span class="batt">73</span></span></div>
+        <div class="top">
+          <h1 class="wordmark">The Pink Recipe Box</h1>
+          <svg class="ico"><use href="#i-gear"/></svg>
+        </div>
+        <h2 class="setout">Set out for tonight.</h2>
+        <article class="ix hero">
+          <span class="ribbon"></span>
+          <span class="splat"></span>
+          <h3>Arroz con<br>Pollo</h3>
+          <p class="aside">Olives, if you have them.</p>
+          <svg class="mark"><use href="#i-pot"/></svg>
+          <p class="cat">Main Course</p>
+          <span class="dog"></span>
+        </article>
+        <div class="words">
+          <span class="on">Everything</span>
+          <span>Keepers</span>
+          <span>Want to try</span>
+        </div>
+        <p class="rest-label">the rest of the box</p>
+        <div class="spread">
+          <article class="ix" style="transform:rotate(-2.2deg);z-index:1">
+            <h3>Burst<br>Cherry</h3>
+          </article>
+          <article class="ix" style="transform:rotate(1.4deg);z-index:2">
+            <h3>Butter<br>Paneer</h3>
+          </article>
+          <article class="ix" style="transform:rotate(-0.8deg);z-index:3">
+            <span class="ribbon"></span>
+            <h3>Cauli<br>flower</h3>
+          </article>
+          <article class="ix" style="transform:rotate(2deg);z-index:4">
+            <h3>Peach<br>Tart</h3>
+            <svg class="mark"><use href="#i-cake"/></svg>
+          </article>
+        </div>
+        <div class="search find">
+          <svg class="ico"><use href="#i-search"/></svg>
+          <span>or look for something else</span>
+        </div>
+        <nav class="tabbar">
+          <div class="ti on"><svg class="ico lg"><use href="#i-box"/></svg><span>Box</span></div>
+          <div class="ti add"><span class="cam"><svg class="ico lg"><use href="#i-cam"/></svg></span><span>Add</span></div>
+          <div class="ti"><svg class="ico lg"><use href="#i-cart"/></svg><span>Plan</span></div>
+        </nav>
+      </div>
+    </div>
+    <p class="blurb">Someone already pulled a card. The welcome is that card and the note in the margin, not a hello banner. Dividers shrink to a line of words, and the other recipes are the stack under your hand.</p>
+  </section>
+
+  <!-- 4. Hold the stack -->
+  <section class="stage" id="m4">
+    <p class="kicker wild">Out of the box</p>
+    <h2>Hold the stack</h2>
+    <div class="scaler">
+      <div class="phone stack-phone">
+        <div class="status"><span>13:59</span><span class="right"><svg class="ico sm" style="width:18px;height:12px"><use href="#i-bars"/></svg><span class="batt">73</span></span></div>
+        <article class="backcard" style="top:34px;left:58px;transform:rotate(1.2deg);z-index:1">
+          <h3>Glazed Carrots</h3>
+        </article>
+        <article class="backcard" style="top:70px;left:48px;transform:rotate(-0.4deg);z-index:2">
+          <h3>Peach Tart</h3>
+        </article>
+        <article class="backcard" style="top:106px;left:38px;transform:rotate(0.6deg);z-index:3">
+          <h3>Butter Paneer</h3>
+        </article>
+        <article class="backcard" style="top:142px;left:28px;transform:rotate(-0.2deg);z-index:4">
+          <h3>Burst Cherry</h3>
+        </article>
+        <article class="held" style="top:186px;left:12px;transform:rotate(-1deg)">
+          <span class="ribbon"></span>
+          <span class="splat"></span>
+          <p class="eyebrow">main course</p>
+          <h3>Arroz con<br>Pollo</h3>
+          <p class="aside">Olives, if you have them. I always double the garlic.</p>
+          <div class="lines">
+            <p>one chicken, cut up</p>
+            <p>a cup of rice</p>
+            <p>the jar of olives</p>
+            <p>a pinch of saffron, or not</p>
+          </div>
+          <p class="foot">cooked twelve times</p>
+          <span class="dog"></span>
+        </article>
+        <div class="cam-side">
+          <span class="cam"><svg class="ico lg"><use href="#i-cam"/></svg></span>
+          <span>Add</span>
+        </div>
+      </div>
+    </div>
+    <p class="blurb">No wall, no chips, no tab bar. You are holding one card, and the other seventeen are the paper under your thumb. The right edge is how you riffle. Niche on purpose: a box you flip, not a box you manage.</p>
+  </section>
+
+  <!-- 5. Down into the tin -->
+  <section class="stage" id="m5">
+    <p class="kicker wild">Out of the box</p>
+    <h2>Down into the tin</h2>
+    <div class="scaler">
+      <div class="phone tin-phone">
+        <div class="status"><span>13:59</span><span class="right"><svg class="ico sm" style="width:18px;height:12px"><use href="#i-bars"/></svg><span class="batt">73</span></span></div>
+        <div class="open-lid">
+          <h1>The Pink Recipe Box</h1>
+          <p>eighteen cards inside</p>
+        </div>
+        <div class="hinge"></div>
+        <div class="tin">
+          <div class="tin-tabs">
+            <span>All</span>
+            <span class="on">Dinner <svg class="ico sm" style="color:var(--butter)"><use href="#i-star"/></svg></span>
+            <span>Kids</span>
+            <span>Sweets</span>
+          </div>
+          <div class="floor">
+            <article class="ix fan f1"><h3>Peach<br>Tart</h3><svg class="mark"><use href="#i-cake"/></svg></article>
+            <article class="ix fan f2"><h3>Glazed<br>Carrots</h3><svg class="mark"><use href="#i-plate"/></svg></article>
+            <article class="ix fan f3"><span class="ribbon"></span><h3>Butter<br>Paneer</h3><svg class="mark"><use href="#i-pot"/></svg></article>
+            <article class="ix fan f4"><h3>Burst<br>Cherry</h3><svg class="mark"><use href="#i-pot"/></svg></article>
+          </div>
+        </div>
+        <article class="ix pulled">
+          <span class="slip"><span class="clip"></span>tonight</span>
+          <span class="splat"></span>
+          <h3>Arroz con<br>Pollo</h3>
+          <p class="aside" style="margin:10px 0 0;font-family:var(--hand);font-weight:400;font-size:24px;line-height:1;color:var(--browned)">Olives, if you have them.</p>
+          <svg class="mark"><use href="#i-pot"/></svg>
+          <p class="cat">Main Course</p>
+          <span class="dog"></span>
+        </article>
+        <div class="tin-cam"><span class="cam"><svg class="ico lg"><use href="#i-cam"/></svg></span></div>
+      </div>
+    </div>
+    <p class="blurb">The phone is the tin, seen from above, lid up, tabs sticking out of the back. One card has been drawn over the front lip, with a slip clipped on that says tonight. The camera is just sitting on the counter.</p>
+  </section>
+
+</div>
+</body>
+</html>
