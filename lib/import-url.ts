@@ -26,7 +26,17 @@ export async function fetchPage(url: string) {
     // allowed to hold the whole import open.
     signal: AbortSignal.timeout(20_000),
   });
-  if (!response.ok) throw new Error("That page could not be opened.");
+  if (response.status === 403 || response.status === 401) {
+    throw new Error(
+      `${parsedUrl.hostname.replace(/^www\./, "")} blocks automated imports. ` +
+        "Take a photo of the recipe on your phone instead.",
+    );
+  }
+  if (!response.ok) {
+    throw new Error(
+      `That page could not be opened (the site returned ${response.status}).`,
+    );
+  }
 
   return {
     html: await response.text(),
