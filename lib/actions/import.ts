@@ -6,7 +6,11 @@ import { requireUser } from "@/lib/auth";
 import { importFromUrl } from "@/lib/import-url";
 import { bringInComponents, saveImported } from "@/lib/component-recipes";
 
-export type ImportState = { error?: string };
+export type ImportState = {
+  error?: string;
+  /** True when the site blocked the import — prompt the user to upload a PDF instead. */
+  suggestPdf?: boolean;
+};
 
 export async function importUrlAction(
   _prev: ImportState,
@@ -26,9 +30,11 @@ export async function importUrlAction(
 
     recipeId = await saveImported(user, url, imported, ingredients);
   } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "That link could not be read.";
     return {
-      error:
-        err instanceof Error ? err.message : "That link could not be read.",
+      error: message,
+      suggestPdf: message.includes("blocks automated imports"),
     };
   }
 
